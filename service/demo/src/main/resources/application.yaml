@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: demo
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/oAuth
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8090/realms/oAuth
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: myclient
+            client-secret: bkHQBtLeyIb4oWrHChNkUwCXmtmhGSaV
+            scope: openid
+server:
+  port: 8083
+logging:
+  level:
+    org.springframework.security: TRACE

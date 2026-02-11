@@ -1,3 +1,37 @@
 spring:
   application:
     name: bulletin
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/pozdravliator
+    username: postgres
+    password: iamdeadlytired795795
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: rmuser
+    password: rmpassword
+    virtual-host: /
+    connection-timeout: 5000
+    template:
+      retry:
+        enabled: true
+        max-attempts: 3
+        initial-interval: 2000
+        multiplier: 2.0
+        max-interval: 10000
+      default-requeue-rejected: false
+  amqp:
+    deserialization:
+      trust:
+        all: true
+server:
+  port: 8080
