@@ -1,0 +1,115 @@
+services:
+  
+  bulletin:
+    build: ./service/bulletin
+    container_name: bulletin
+    ports:
+      - 8085:8080
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bulletin_db
+      - SPRING_DATASOURCE_USERNAME=dbuser
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=rmuser
+      - SPRING_RABBITMQ_PASSWORD=rmpassword
+    networks:
+      app-net:
+    depends_on:
+      - postgres
+      - rabbitmq
+  
+  keyclock:
+    image: quay.io/keycloak/keycloak:26.5.2
+    container_name: keycloak
+    volumes:
+     - ./config/keycloak/import:/opt/keycloak/data/import:ro 
+     - ./config/keycloak/spi-providers:/opt/keycloak/providers
+    ports:
+      - 8090:8080
+    environment:
+      # БД 
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak_db
+      - KC_DB=postgres
+      - KC_DB_USERNAME=dbuser
+      - KC_DB_PASSWORD=password
+      # Базовый админ
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      # Импорт конфигурации
+      - KC_IMPORT=/opt/keycloak/data/import/realm-export.json
+      # SMTP
+      - KC_SMTP_FROM=noreply@yourdomain.com
+      - KC_SMTP_HOST=smtp.yandex.ru
+      - KC_SMTP_PORT=465
+      - KC_SMTP_USER=Pavel200-7@yandex.ru
+      - KC_SMTP_PASSWORD=prvepeophfnvnjlm
+      - KC_SMTP_STARTTLS=true
+      - KC_SMTP_AUTH=true
+      # RabbitMQ для моего кастомного event listener провайдера
+      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQHOST=rabbitmq
+      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQPORT=15672
+      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQUSERNAME=rmuser
+      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQPASSWORD=rmpassword
+      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQVIRTUALHOST=/
+      # Разное
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_PORT=8080
+      - KC_HOSTNAME_STRICT=false
+      # - KC_LOG_LEVEL=debug
+    command: 
+      - start-dev
+      - --import-realm
+      - --spi-import-provider-single-file-file=/opt/keycloak/data/import/realm-export.json
+      - --spi-import-provider-single-file-override=false
+      - --spi-events-listener-registration-event-listener-enabled=true
+      - --spi-events-listener-registration-event-listener-rabbitmqhost=rabbitmq
+      - --spi-events-listener-registration-event-listener-rabbitmqport=5672 
+      - --spi-events-listener-registration-event-listener-rabbitmqusername=rmuser
+      - --spi-events-listener-registration-event-listener-rabbitmqpassword=rmpassword
+      - --spi-events-listener-registration-event-listener-rabbitmqvirtualhost=/
+    networks:
+      - app-net
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: always
+    volumes:
+      - postgres-db-vol:/var/lib/postgresql/data
+      - ./config/postgres/init-multiple-dbs.sql:/docker-entrypoint-initdb.d/init-multiple-dbs.sql:ro
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data
+    networks:
+      app-net:
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    container_name: rabbitmq
+    volumes:
+      - rabbitmq-db-vol:/var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    networks:
+      app-net:
+
+networks:
+  app-net:
+    ipam:
+      driver: default
+
+volumes:
+  postgres-db-vol:
+  rabbitmq-db-vol:

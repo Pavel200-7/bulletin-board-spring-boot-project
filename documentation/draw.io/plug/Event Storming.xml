@@ -1,0 +1,55 @@
+<mxlibrary>[
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Event&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#FF8B00;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;font style=&amp;quot;font-size: 12px;&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Command&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#25ABFD;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Aggregate&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#FFEE88;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Read Model&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#98C12A;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;External System&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#FCD5ED;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Policy&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#DEC4F2;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Issue/Question&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#FF6666;strokeColor=#666666;fontColor=#333333;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Note&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"120\" height=\"120\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 120,
+    "h": 120,
+    "aspect": "fixed"
+  },
+  {
+    "xml": "&lt;mxGraphModel&gt;&lt;root&gt;&lt;mxCell id=\"0\"/&gt;&lt;mxCell id=\"1\" parent=\"0\"/&gt;&lt;mxCell id=\"2\" value=\"&amp;lt;span style=&amp;quot;font-style: italic;&amp;quot;&amp;gt;&amp;amp;lt;&amp;amp;lt;Actor&amp;amp;gt;&amp;amp;gt;&amp;lt;/span&amp;gt;&amp;lt;font size=&amp;quot;1&amp;quot; style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\" style=\"rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFF33;strokeColor=default;fontColor=#000000;\" vertex=\"1\" parent=\"1\"&gt;&lt;mxGeometry width=\"70\" height=\"80\" as=\"geometry\"/&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;",
+    "w": 70,
+    "h": 80
+  }
+]</mxlibrary>
