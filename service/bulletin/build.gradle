@@ -27,11 +27,13 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
 
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
-    implementation 'com.example:rabbitMQ-events-contracts:1.0.0' // Моя кастомная штука
+    implementation 'com.example:rabbitMQ-events-contracts:1.0.0'
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
 
