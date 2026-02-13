@@ -32,6 +32,7 @@ public class Characteristic {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Builder.Default
     @OneToMany(mappedBy = "characteristic", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<CharacteristicValue> possibleValues = new ArrayList<>();;
