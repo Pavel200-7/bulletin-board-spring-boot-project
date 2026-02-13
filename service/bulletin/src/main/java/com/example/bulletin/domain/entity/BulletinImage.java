@@ -27,7 +27,7 @@ public class BulletinImage {
     @Column(name = "image_id", nullable = false)
     private UUID imageId;
 
-    @Column(name = "is_title")
-    private boolean isTitle;
+    @Column(name = "title")
+    private boolean title;
 }
 

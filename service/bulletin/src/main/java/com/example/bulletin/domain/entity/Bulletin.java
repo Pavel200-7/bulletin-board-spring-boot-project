@@ -3,10 +3,7 @@ package com.example.bulletin.domain.entity;
 import com.example.bulletin.domain.entity.base.BaseEntity;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Delegate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -20,6 +17,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "bulletins")
 public class Bulletin extends BaseEntity {
 
@@ -48,10 +46,12 @@ public class Bulletin extends BaseEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Builder.Default
     @OneToMany(mappedBy = "bulletin", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BulletinCharacteristic> characteristics = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "bulletin", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BulletinImage> images = new ArrayList<>();

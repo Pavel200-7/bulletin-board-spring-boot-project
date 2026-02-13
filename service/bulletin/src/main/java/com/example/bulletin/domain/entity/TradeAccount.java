@@ -3,10 +3,7 @@ package com.example.bulletin.domain.entity;
 import com.example.bulletin.domain.entity.base.BaseEntity;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Delegate;
 
 import java.util.UUID;
@@ -16,6 +13,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "trade_accounts")
 public class TradeAccount extends BaseEntity {
 
@@ -37,17 +35,17 @@ public class TradeAccount extends BaseEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "latitude", precision = 10, scale = 8)
+    @Column(name = "latitude")
     private Double latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8)
+    @Column(name = "longitude")
     private Double longitude;
 
-    @Column(name = "is_coordinates_concrete")
-    private boolean isCoordinatesConcrete;
+    @Column(name = "coordinates_concrete")
+    private boolean coordinatesConcrete;
 
-    @Column(name = "is_approved")
-    private boolean isApproved;
+    @Column(name = "approved")
+    private boolean approved;
 
     @Column(name = "image_id", nullable = true)
     private UUID imageId;

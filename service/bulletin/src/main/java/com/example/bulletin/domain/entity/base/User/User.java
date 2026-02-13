@@ -32,12 +32,12 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "is_blocked")
-    private boolean isBlocked;
+    @Column(name = "blocked")
+    private boolean blocked;
 
     @PrePersist
     public void onInit() {
-        this.isBlocked = false;
+        this.blocked = false;
     }
 
 }
