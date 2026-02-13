@@ -32,12 +32,6 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "town_latitude", precision = 10, scale = 8)
-    private Double townLatitude;
-
-    @Column(name = "town_longitude", precision = 11, scale = 8)
-    private Double townLongitude;
-
     @Column(name = "is_blocked")
     private boolean isBlocked;
 
