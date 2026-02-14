@@ -6,20 +6,31 @@ services:
     ports:
       - 8085:8080
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bulletin_db
-      - SPRING_DATASOURCE_USERNAME=dbuser
-      - SPRING_DATASOURCE_PASSWORD=password
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=rmuser
-      - SPRING_RABBITMQ_PASSWORD=rmpassword
+      - DB_URL=jdbc:postgresql://postgres:5432/bulletin_db
+      - DB_USERNAME=dbuser
+      - DB_PASSWORD=password
+      
+      # RabbitMQ
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=rmuser
+      - RABBITMQ_PASSWORD=rmpassword
+      
+      # Keycloak
+      - KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/oAuth
+      - KEYCLOAK_CLIENT_ID=myclient
+      - KEYCLOAK_CLIENT_SECRET=jeWE38sfUCQJhplYyeJ7IwcMk8P27fVh
+      
+      # Server
+      - SERVER_PORT=8080 
     networks:
       app-net:
     depends_on:
+      - keycloak
       - postgres
       - rabbitmq
   
-  keyclock:
+  keycloak:
     image: quay.io/keycloak/keycloak:26.5.2
     container_name: keycloak
     volumes:
