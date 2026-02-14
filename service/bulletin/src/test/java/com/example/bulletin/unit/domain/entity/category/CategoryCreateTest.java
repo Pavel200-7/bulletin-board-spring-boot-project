@@ -3,7 +3,6 @@ package com.example.bulletin.unit.domain.entity.category;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.vo.CategoryData;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class CategoryCreateUnitTest {
+public class CategoryCreateTest {
 
     @Autowired
     private CategoryMapper mapper;

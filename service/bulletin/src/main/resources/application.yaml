@@ -3,9 +3,9 @@ spring:
     name: bulletin
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/pozdravliator
-    username: postgres
-    password: iamdeadlytired795795
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/pozdravliator}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:iamdeadlytired795795}
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,11 +15,11 @@ spring:
       max-file-size: 5MB
       max-request-size: 5MB
   rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: rmuser
-    password: rmpassword
-    virtual-host: /
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:rmuser}
+    password: ${RABBITMQ_PASSWORD:rmpassword}
+    virtual-host: ${RABBITMQ_VHOST:/}
     connection-timeout: 5000
     template:
       retry:
@@ -33,5 +33,21 @@ spring:
     deserialization:
       trust:
         all: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/oAuth}
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/oAuth}
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT_ID:myclient}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET:jeWE38sfUCQJhplYyeJ7IwcMk8P27fVh}
+            scope: openid
+
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
