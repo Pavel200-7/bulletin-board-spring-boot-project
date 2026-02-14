@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateRootCategoryResponse {
+public class CreateLeafyChildCategoryResponse {
     private CategoryResponse categoryResponse;
 }

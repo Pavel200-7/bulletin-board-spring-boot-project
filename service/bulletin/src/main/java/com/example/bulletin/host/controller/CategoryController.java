@@ -1,8 +1,8 @@
 package com.example.bulletin.host.controller;
 
 import com.example.bulletin.application.service.category.CategoryService;
-import com.example.bulletin.application.service.category.data.request.CreateRootCategoryRequest;
-import com.example.bulletin.application.service.category.data.response.CreateRootCategoryResponse;
+import com.example.bulletin.application.service.category.data.request.*;
+import com.example.bulletin.application.service.category.data.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,16 @@ public class CategoryController {
     @PostMapping("/root")
     public ResponseEntity<CreateRootCategoryResponse> createRoot(@Valid @RequestBody CreateRootCategoryRequest request) {
         return ResponseEntity.ok(service.createRoot(request));
+    }
+
+    @PostMapping("/child")
+    public ResponseEntity<CreateChildCategoryResponse> createChild(@Valid @RequestBody CreateChildCategoryRequest request) {
+        return ResponseEntity.ok(service.createChild(request));
+    }
+
+    @PostMapping("/leafy_child")
+    public ResponseEntity<CreateLeafyChildCategoryResponse> createLeafyChild(@Valid @RequestBody CreateLeafyChildCategoryRequest request) {
+        return ResponseEntity.ok(service.createLeafyChild(request));
     }
 
 }
