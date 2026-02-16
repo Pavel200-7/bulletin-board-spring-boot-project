@@ -1,9 +1,10 @@
 package com.example.bulletin.unit.application.service.category.service;
 
+
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
-import com.example.bulletin.application.service.category.data.request.DeleteCategoryRequest;
+import com.example.bulletin.application.service.category.data.request.DeleteLeafCategoryRequest;
 import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class DeleteCategoryTests {
+public class DeleteLeafCategoryTests {
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -56,34 +57,48 @@ public class DeleteCategoryTests {
     public void setup() {
         when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.of(category));
+
+        when(bulletinRepository.existsByCategoryId(any(UUID.class)))
+                .thenReturn(false);
     }
 
     @Test
     public void shouldThrowWhenNotFound() {
         // Arrange
-        DeleteCategoryRequest request = createRequest();
+        DeleteLeafCategoryRequest request = createRequest();
         when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {service.deleteCategory(request); } );
+        assertThrows(ResourceNotFoundException.class, () -> {service.deleteLeafCategory(request); } );
+    }
+
+    @Test
+    public void shouldThrowWhenExistConnectedBulletins() {
+        // Arrange
+        DeleteLeafCategoryRequest request = createRequest();
+        when(bulletinRepository.existsByCategoryId(any(UUID.class)))
+                .thenReturn(true);
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {service.deleteLeafCategory(request); } );
     }
 
     @Test
     public void shouldDelete() {
         // Arrange
-        DeleteCategoryRequest request = createRequest();
+        DeleteLeafCategoryRequest request = createRequest();
 
         // Act
-        service.deleteCategory(request);
+        service.deleteLeafCategory(request);
 
         // Assert
-        verify(category).delete();
+        verify(category).deleteLeaf();
         verify(categoryRepository).delete(category);
     }
 
-    public DeleteCategoryRequest createRequest() {
-        return DeleteCategoryRequest.builder()
+    public DeleteLeafCategoryRequest createRequest() {
+        return DeleteLeafCategoryRequest.builder()
                 .id(UUID.randomUUID())
                 .build();
     }

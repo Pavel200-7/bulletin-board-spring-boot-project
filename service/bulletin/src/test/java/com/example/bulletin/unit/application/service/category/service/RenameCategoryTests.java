@@ -5,7 +5,9 @@ import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
 import com.example.bulletin.application.service.category.data.request.RenameCategoryRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
+import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
+import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +41,13 @@ public class RenameCategoryTests {
     private CategoryMapper mapperHelper;
 
     @Mock
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private BulletinRepository bulletinRepository;
+
+    @Mock
+    private CategoryFamilyResponseBuilder responseBuilder;
 
     @Mock
     private CategoryMapper mapper;
@@ -55,12 +63,12 @@ public class RenameCategoryTests {
     @BeforeEach
     public void setup() {
         Optional<Category> category = Optional.of(createCategory());
-        when(repository.findById(any(UUID.class)))
+        when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(category);
 
 
         Category renamedCategory = createRenamedCategory();
-        when(repository.save(any(Category.class)))
+        when(categoryRepository.save(any(Category.class)))
                 .thenReturn(renamedCategory);
 
         when(mapper.toResponse(any(Category.class)))
@@ -71,7 +79,7 @@ public class RenameCategoryTests {
     public void shouldThrowWhenNotFound() {
         // Arrange
         RenameCategoryRequest request = createRequest();
-        when(repository.findById(any(UUID.class)))
+        when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
@@ -89,7 +97,7 @@ public class RenameCategoryTests {
         service.renameCategory(request);
 
         // Assert
-        verify(repository).save(categoryCaptor.capture());
+        verify(categoryRepository).save(categoryCaptor.capture());
         Category actual = categoryCaptor.getValue();
 
         assertThat(actual)

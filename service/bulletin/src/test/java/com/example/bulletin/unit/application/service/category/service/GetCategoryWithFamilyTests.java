@@ -3,7 +3,8 @@ package com.example.bulletin.unit.application.service.category.service;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
-import com.example.bulletin.application.service.category.data.request.DeleteCategoryRequest;
+import com.example.bulletin.application.service.category.data.request.GetCategoryWithFamilyRequest;
+import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
@@ -11,8 +12,6 @@ import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,13 +22,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class DeleteCategoryTests {
+public class GetCategoryWithFamilyTests {
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -46,45 +45,63 @@ public class DeleteCategoryTests {
     @InjectMocks
     private CategoryServiceImpl service;
 
-    @Captor
-    private ArgumentCaptor<Category> categoryCaptor;
 
-    @Mock
-    private Category category;
+    private Category category = null;
 
     @BeforeEach
     public void setup() {
+        Optional<Category> category = Optional.of(createCategory());
         when(categoryRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(category));
+                .thenReturn(category);
+
+        when(responseBuilder.buildResponse(any(Category.class)))
+                .thenReturn(createCategoryFamilyResponse());
     }
 
     @Test
     public void shouldThrowWhenNotFound() {
         // Arrange
-        DeleteCategoryRequest request = createRequest();
+        GetCategoryWithFamilyRequest request = createRequest();
         when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {service.deleteCategory(request); } );
+        assertThrows(ResourceNotFoundException.class, () -> {service.getCategoryWithFamily(request); } );
     }
+
 
     @Test
-    public void shouldDelete() {
+    public void shouldReturnCategoryWithFamilyResponse() {
         // Arrange
-        DeleteCategoryRequest request = createRequest();
+        GetCategoryWithFamilyRequest request = createRequest();
+        CategoryFamilyResponse expected = createCategoryFamilyResponse();
 
         // Act
-        service.deleteCategory(request);
+        var response = service.getCategoryWithFamily(request);
+        CategoryFamilyResponse actual = response.getCategoryFamilyResponse();
 
         // Assert
-        verify(category).delete();
-        verify(categoryRepository).delete(category);
+        assertTrue(expected.equalsData(actual));
     }
 
-    public DeleteCategoryRequest createRequest() {
-        return DeleteCategoryRequest.builder()
+    public Category createCategory() {
+        if (category == null) {
+            category = Category.createRoot("root");
+        }
+        return category;
+    }
+
+    public GetCategoryWithFamilyRequest createRequest() {
+        return GetCategoryWithFamilyRequest.builder()
                 .id(UUID.randomUUID())
+                .build();
+    }
+
+    public CategoryFamilyResponse createCategoryFamilyResponse() {
+        return CategoryFamilyResponse.builder()
+                .id(UUID.randomUUID())
+                .name("some name")
+                .leaf(false)
                 .build();
     }
 

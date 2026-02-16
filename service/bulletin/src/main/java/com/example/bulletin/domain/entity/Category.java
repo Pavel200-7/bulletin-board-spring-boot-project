@@ -78,8 +78,18 @@ public class Category {
     }
 
     public Category delete() {
+        if (this.leaf) {
+            throw new IllegalStateException("This category is leafy and can not be deleted this way.");
+        }
         if (!this.children.isEmpty()) {
             throw new IllegalStateException("This category has children and can not be deleted");
+        }
+        return this;
+    }
+
+    public Category deleteLeaf() {
+        if (!this.leaf) {
+            throw new IllegalStateException("This category is not leafy and can not be deleted this way.");
         }
         return this;
     }
