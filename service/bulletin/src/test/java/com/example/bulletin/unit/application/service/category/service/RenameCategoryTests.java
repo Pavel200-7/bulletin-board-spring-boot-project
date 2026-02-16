@@ -1,10 +1,9 @@
 package com.example.bulletin.unit.application.service.category.service;
 
-import com.example.bulletin.application.exception.DuplicateResourceException;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
-import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
+import com.example.bulletin.application.service.category.data.request.RenameCategoryRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
@@ -25,16 +24,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class CreateChildTests {
+public class RenameCategoryTests {
 
     @Autowired
     private CategoryMapper mapperHelper;
@@ -51,56 +50,43 @@ public class CreateChildTests {
     @Captor
     private ArgumentCaptor<Category> categoryCaptor;
 
-    private Category root = null;
-    private Category child = null;
+    private Category category = null;
 
     @BeforeEach
     public void setup() {
-        when(repository.existsByNameAndParentId(any(String.class), any(UUID.class)))
-                .thenReturn(false);
-
-        Optional<Category> parentCategory = Optional.of(createRootCategory());
+        Optional<Category> category = Optional.of(createCategory());
         when(repository.findById(any(UUID.class)))
-                .thenReturn(parentCategory);
+                .thenReturn(category);
 
+
+        Category renamedCategory = createRenamedCategory();
         when(repository.save(any(Category.class)))
-                .thenReturn(createChildCategory());
+                .thenReturn(renamedCategory);
 
         when(mapper.toResponse(any(Category.class)))
-                .thenReturn(mapperHelper.toResponse(createChildCategory()));
+                .thenReturn(mapperHelper.toResponse(renamedCategory));
     }
 
     @Test
-    public void shouldThrowWhenParentHasChildWithSuchName() {
+    public void shouldThrowWhenNotFound() {
         // Arrange
-        CreateChildCategoryRequest request = createRequest();
-        when(repository.existsByNameAndParentId(any(String.class), any(UUID.class)))
-                .thenReturn(true);
-
-        // Act & Assert
-        assertThrows(DuplicateResourceException.class, () -> { service.createChild(request); });
-    }
-
-    @Test
-    public void shouldThrowWhenParentDoesNotExist() {
-        // Arrange
-        CreateChildCategoryRequest request = createRequest();
-        Optional<Category> parentCategory = Optional.empty();
+        RenameCategoryRequest request = createRequest();
         when(repository.findById(any(UUID.class)))
-                .thenReturn(parentCategory);
+                .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> { service.createChild(request); });
+        assertThrows(ResourceNotFoundException.class, () -> {service.renameCategory(request); } );
     }
 
     @Test
-    public void shouldCreateChildAndSave() {
+    public void shouldRenameAndSave() {
         // Arrange
-        CreateChildCategoryRequest request = createRequest();
-        Category expected = createChildCategory();
+        RenameCategoryRequest request = createRequest();
+        Category expected = createCategory()
+                .rename(request.getName());
 
         // Act
-        service.createChild(request);
+        service.renameCategory(request);
 
         // Assert
         verify(repository).save(categoryCaptor.capture());
@@ -115,38 +101,34 @@ public class CreateChildTests {
     @Test
     public void shouldReturnMappedCategory() {
         // Arrange
-        CreateChildCategoryRequest request = createRequest();
-        CategoryResponse expected = mapperHelper.toResponse(createChildCategory());
+        RenameCategoryRequest request = createRequest();
+        CategoryResponse expected = mapperHelper.toResponse(createRenamedCategory());
 
         // Act
-        var response = service.createChild(request);
+        var response = service.renameCategory(request);
         CategoryResponse actual = response.getCategoryResponse();
 
         // Assert
         assertTrue(expected.equalsData(actual));
     }
 
-    public Category createChildCategory() {
-        if (child == null) {
-            Category root = createRootCategory();
-            CreateChildCategoryRequest request = createRequest();
-            child = root.createChild(request.getName());
+    public Category createCategory() {
+        if (category == null) {
+            category = Category.createRoot("root");
         }
-        return child;
+        return category;
     }
 
-    public Category createRootCategory() {
-        if (root == null) {
-            root = Category.createRoot("root");
-        }
-        return root;
+    public Category createRenamedCategory() {
+        RenameCategoryRequest request = createRequest();
+        Category category = createCategory();
+        return category.rename(request.getName());
     }
 
-    public CreateChildCategoryRequest createRequest() {
-        Category root = createRootCategory();
-        return CreateChildCategoryRequest.builder()
-                .parentId(root.getId())
-                .name("child")
+    public RenameCategoryRequest createRequest() {
+        return RenameCategoryRequest.builder()
+                .id(UUID.randomUUID())
+                .name("new name")
                 .build();
     }
 

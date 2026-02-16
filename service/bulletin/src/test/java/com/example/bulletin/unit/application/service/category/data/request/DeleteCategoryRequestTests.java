@@ -1,18 +1,20 @@
 package com.example.bulletin.unit.application.service.category.data.request;
 
-import com.example.bulletin.application.service.category.data.request.CreateRootCategoryRequest;
+import com.example.bulletin.application.service.category.data.request.DeleteCategoryRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.NullSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.UUID;
 
-public class CreateRootCategoryRequestTests {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class DeleteCategoryRequestTests {
 
     private static Validator validator;
 
@@ -25,7 +27,7 @@ public class CreateRootCategoryRequestTests {
     @Test
     public void shouldApproveWhenValid() {
         // Arrange
-        CreateRootCategoryRequest request = createValidRequestBuilder()
+        DeleteCategoryRequest request = createValidRequestBuilder()
                 .build();
         // Act
         var violations = validator.validate(request);
@@ -35,12 +37,11 @@ public class CreateRootCategoryRequestTests {
     }
 
     @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"  ", ""})
-    public void shouldForbidBlankName(String invalidName) {
+    @NullSource
+    public void shouldForbidBlankId(UUID id) {
         // Arrange
-        CreateRootCategoryRequest request = createValidRequestBuilder()
-                .name(invalidName)
+        DeleteCategoryRequest request = createValidRequestBuilder()
+                .id(id)
                 .build();
 
         // Act
@@ -50,9 +51,9 @@ public class CreateRootCategoryRequestTests {
         assertFalse(violations.isEmpty());
     }
 
-    public CreateRootCategoryRequest.CreateRootCategoryRequestBuilder createValidRequestBuilder() {
-        return CreateRootCategoryRequest.builder()
-                .name("valid name");
+    public DeleteCategoryRequest.DeleteCategoryRequestBuilder createValidRequestBuilder() {
+        return DeleteCategoryRequest.builder()
+                .id(UUID.randomUUID());
     }
 
 }

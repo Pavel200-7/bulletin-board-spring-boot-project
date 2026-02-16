@@ -4,7 +4,6 @@ import com.example.bulletin.application.exception.DuplicateResourceException;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
-import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
 import com.example.bulletin.application.service.category.data.request.CreateLeafyChildCategoryRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
 import com.example.bulletin.domain.entity.Category;
@@ -74,7 +73,7 @@ public class CreateLeafyChildTests {
     @Test
     public void shouldThrowWhenParentHasChildWithSuchName() {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createCreateLeafyChildRequest();
+        CreateLeafyChildCategoryRequest request = createRequest();
         when(repository.existsByNameAndParentId(any(String.class), any(UUID.class)))
                 .thenReturn(true);
 
@@ -85,7 +84,7 @@ public class CreateLeafyChildTests {
     @Test
     public void shouldThrowWhenParentDoesNotExist() {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createCreateLeafyChildRequest();
+        CreateLeafyChildCategoryRequest request = createRequest();
         Optional<Category> parentCategory = Optional.empty();
         when(repository.findById(any(UUID.class)))
                 .thenReturn(parentCategory);
@@ -97,7 +96,7 @@ public class CreateLeafyChildTests {
     @Test
     public void shouldCreateChildAndSave() {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createCreateLeafyChildRequest();
+        CreateLeafyChildCategoryRequest request = createRequest();
         Category expected = createLeafyChildCategory();
 
         // Act
@@ -116,7 +115,7 @@ public class CreateLeafyChildTests {
     @Test
     public void shouldReturnMappedCategory() {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createCreateLeafyChildRequest();
+        CreateLeafyChildCategoryRequest request = createRequest();
         CategoryResponse expected = mapperHelper.toResponse(createLeafyChildCategory());
 
         // Act
@@ -130,7 +129,7 @@ public class CreateLeafyChildTests {
     public Category createLeafyChildCategory() {
         if (child == null) {
             Category root = createRootCategory();
-            CreateLeafyChildCategoryRequest request = createCreateLeafyChildRequest();
+            CreateLeafyChildCategoryRequest request = createRequest();
             child = root.createLeafyChild(request.getName());
         }
         return child;
@@ -143,11 +142,12 @@ public class CreateLeafyChildTests {
         return root;
     }
 
-    public CreateLeafyChildCategoryRequest createCreateLeafyChildRequest() {
+    public CreateLeafyChildCategoryRequest createRequest() {
         Category root = createRootCategory();
         return CreateLeafyChildCategoryRequest.builder()
                 .parentId(root.getId())
                 .name("child")
                 .build();
     }
+
 }

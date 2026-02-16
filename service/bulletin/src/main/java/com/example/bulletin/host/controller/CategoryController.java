@@ -6,10 +6,7 @@ import com.example.bulletin.application.service.category.data.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +28,17 @@ public class CategoryController {
     @PostMapping("/leafy_child")
     public ResponseEntity<CreateLeafyChildCategoryResponse> createLeafyChild(@Valid @RequestBody CreateLeafyChildCategoryRequest request) {
         return ResponseEntity.ok(service.createLeafyChild(request));
+    }
+
+    @PutMapping("/name")
+    public ResponseEntity<RenameCategoryResponse> renameCategory(@Valid @RequestBody RenameCategoryRequest request) {
+        return ResponseEntity.ok(service.renameCategory(request));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteCategory(@Valid @RequestBody DeleteCategoryRequest request) {
+        service.deleteCategory(request);
+        return ResponseEntity.noContent().build();
     }
 
 }
