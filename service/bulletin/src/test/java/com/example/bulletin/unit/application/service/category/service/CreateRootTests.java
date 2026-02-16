@@ -3,7 +3,6 @@ package com.example.bulletin.unit.application.service.category.service;
 import com.example.bulletin.application.exception.DuplicateResourceException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
-import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
 import com.example.bulletin.application.service.category.data.request.CreateRootCategoryRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
 import com.example.bulletin.domain.entity.Category;
@@ -68,7 +67,7 @@ public class CreateRootTests {
     @Test
     public void shouldThrowWhenParentHasChildWithSuchName() {
         // Arrange
-        CreateRootCategoryRequest request = createCreateRootRequest();
+        CreateRootCategoryRequest request = createRequest();
         when(repository.existsByNameAndParentId(any(String.class), eq(null)))
                 .thenReturn(true);
 
@@ -78,7 +77,7 @@ public class CreateRootTests {
 
     @Test
     public void shouldCreateRootAndSave() {
-        CreateRootCategoryRequest request = createCreateRootRequest();
+        CreateRootCategoryRequest request = createRequest();
         Category expected = createRootCategory();
 
 
@@ -98,7 +97,7 @@ public class CreateRootTests {
     @Test
     public void shouldReturnMappedCategory() {
         // Arrange
-        CreateRootCategoryRequest request = createCreateRootRequest();
+        CreateRootCategoryRequest request = createRequest();
         CategoryResponse expected = mapperHelper.toResponse(createRootCategory());
 
         // Act
@@ -109,7 +108,7 @@ public class CreateRootTests {
         assertTrue(expected.equalsData(actual));
     }
 
-    public CreateRootCategoryRequest createCreateRootRequest() {
+    public CreateRootCategoryRequest createRequest() {
         return CreateRootCategoryRequest.builder()
                 .name("root")
                 .build();
@@ -118,9 +117,10 @@ public class CreateRootTests {
     public Category createRootCategory() {
 
         if (root == null) {
-            var request = createCreateRootRequest();
+            var request = createRequest();
             root = Category.createRoot(request.getName());
         }
         return root;
     }
+
 }

@@ -70,4 +70,18 @@ public class Category {
         return child;
     }
 
+    // UPDATE OPERATIONS
+
+    public Category rename(String newName) {
+        this.name = newName;
+        return this;
+    }
+
+    public Category delete() {
+        if (!this.children.isEmpty()) {
+            throw new IllegalStateException("This category has children and can not be deleted");
+        }
+        return this;
+    }
+
 }

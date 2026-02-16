@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.service.category.data.request;
 
-import com.example.bulletin.application.service.category.data.request.CreateLeafyChildCategoryRequest;
+import com.example.bulletin.application.service.category.data.request.RenameCategoryRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -16,7 +16,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CreateLeafyChildCategoryRequestTests {
+public class RenameCategoryRequestTests {
+
     private static Validator validator;
 
     @BeforeAll
@@ -28,7 +29,7 @@ public class CreateLeafyChildCategoryRequestTests {
     @Test
     public void shouldApproveWhenValid() {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createValidRequestBuilder()
+        RenameCategoryRequest request = createValidRequestBuilder()
                 .build();
         // Act
         var violations = validator.validate(request);
@@ -39,10 +40,10 @@ public class CreateLeafyChildCategoryRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankParentId(UUID parentId) {
+    public void shouldForbidBlankId(UUID id) {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createValidRequestBuilder()
-                .parentId(parentId)
+        RenameCategoryRequest request = createValidRequestBuilder()
+                .id(id)
                 .build();
 
         // Act
@@ -57,7 +58,7 @@ public class CreateLeafyChildCategoryRequestTests {
     @ValueSource(strings = {"  ", ""})
     public void shouldForbidBlankName(String invalidName) {
         // Arrange
-        CreateLeafyChildCategoryRequest request = createValidRequestBuilder()
+        RenameCategoryRequest request = createValidRequestBuilder()
                 .name(invalidName)
                 .build();
 
@@ -68,9 +69,24 @@ public class CreateLeafyChildCategoryRequestTests {
         assertFalse(violations.isEmpty());
     }
 
-    public CreateLeafyChildCategoryRequest.CreateLeafyChildCategoryRequestBuilder createValidRequestBuilder() {
-        return CreateLeafyChildCategoryRequest.builder()
-                .parentId(UUID.randomUUID())
+    @ParameterizedTest
+    @ValueSource(strings = {"*&&&*", "H*(&#Q#"})
+    public void shouldForbidNameWithNotLettersAndDigits(String invalidName) {
+        // Arrange
+        RenameCategoryRequest request = createValidRequestBuilder()
+                .name(invalidName)
+                .build();
+
+        // Act
+        var violations = validator.validate(request);
+
+        // Assert
+        assertFalse(violations.isEmpty());
+    }
+
+    public RenameCategoryRequest.RenameCategoryRequestBuilder createValidRequestBuilder() {
+        return RenameCategoryRequest.builder()
+                .id(UUID.randomUUID())
                 .name("valid name");
     }
 

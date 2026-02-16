@@ -3,12 +3,8 @@ package com.example.bulletin.application.service.category;
 import com.example.bulletin.application.exception.DuplicateResourceException;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
-import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
-import com.example.bulletin.application.service.category.data.request.CreateLeafyChildCategoryRequest;
-import com.example.bulletin.application.service.category.data.request.CreateRootCategoryRequest;
-import com.example.bulletin.application.service.category.data.response.CreateChildCategoryResponse;
-import com.example.bulletin.application.service.category.data.response.CreateLeafyChildCategoryResponse;
-import com.example.bulletin.application.service.category.data.response.CreateRootCategoryResponse;
+import com.example.bulletin.application.service.category.data.request.*;
+import com.example.bulletin.application.service.category.data.response.*;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
@@ -54,6 +50,28 @@ public class CategoryServiceImpl implements CategoryService {
         child = repository.save(child);
         CategoryResponse categoryResponse = mapper.toResponse(child);
         return new CreateLeafyChildCategoryResponse(categoryResponse);
+    }
+
+    @Override
+    public RenameCategoryResponse renameCategory(RenameCategoryRequest request) {
+        Category category = repository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
+
+        category.rename(request.getName());
+        category = repository.save(category);
+
+        CategoryResponse categoryResponse = mapper.toResponse(category);
+        return new RenameCategoryResponse(categoryResponse);
+    }
+
+    @Override
+    public DeleteCategoryResponse deleteCategory(DeleteCategoryRequest request) {
+        Category category = repository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
+
+        category.delete();
+        repository.delete(category);
+        return new DeleteCategoryResponse();
     }
 
     private Category checkParentCategory(String name, UUID parentId) {

@@ -7,4 +7,6 @@ public interface CategoryService {
     public CreateRootCategoryResponse createRoot(CreateRootCategoryRequest request);
     public CreateChildCategoryResponse createChild(CreateChildCategoryRequest request);
     public CreateLeafyChildCategoryResponse createLeafyChild(CreateLeafyChildCategoryRequest request);
+    public RenameCategoryResponse renameCategory(RenameCategoryRequest request);
+    public DeleteCategoryResponse deleteCategory(DeleteCategoryRequest request);
 }

@@ -1,7 +1,6 @@
 package com.example.bulletin.unit.application.service.category.data.request;
 
 import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
-import com.example.bulletin.application.service.category.data.request.CreateRootCategoryRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -11,14 +10,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 public class CreateChildCategoryRequestTests {
 
     private static Validator validator;
@@ -77,4 +74,5 @@ public class CreateChildCategoryRequestTests {
                 .parentId(UUID.randomUUID())
                 .name("valid name");
     }
+
 }
