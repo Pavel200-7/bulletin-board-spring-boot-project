@@ -6,7 +6,9 @@ import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
 import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
+import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
+import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +42,13 @@ public class CreateChildTests {
     private CategoryMapper mapperHelper;
 
     @Mock
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private BulletinRepository bulletinRepository;
+
+    @Mock
+    private CategoryFamilyResponseBuilder responseBuilder;
 
     @Mock
     private CategoryMapper mapper;
@@ -56,14 +64,14 @@ public class CreateChildTests {
 
     @BeforeEach
     public void setup() {
-        when(repository.existsByNameAndParentId(any(String.class), any(UUID.class)))
+        when(categoryRepository.existsByNameAndParentId(any(String.class), any(UUID.class)))
                 .thenReturn(false);
 
         Optional<Category> parentCategory = Optional.of(createRootCategory());
-        when(repository.findById(any(UUID.class)))
+        when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(parentCategory);
 
-        when(repository.save(any(Category.class)))
+        when(categoryRepository.save(any(Category.class)))
                 .thenReturn(createChildCategory());
 
         when(mapper.toResponse(any(Category.class)))
@@ -74,7 +82,7 @@ public class CreateChildTests {
     public void shouldThrowWhenParentHasChildWithSuchName() {
         // Arrange
         CreateChildCategoryRequest request = createRequest();
-        when(repository.existsByNameAndParentId(any(String.class), any(UUID.class)))
+        when(categoryRepository.existsByNameAndParentId(any(String.class), any(UUID.class)))
                 .thenReturn(true);
 
         // Act & Assert
@@ -86,7 +94,7 @@ public class CreateChildTests {
         // Arrange
         CreateChildCategoryRequest request = createRequest();
         Optional<Category> parentCategory = Optional.empty();
-        when(repository.findById(any(UUID.class)))
+        when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(parentCategory);
 
         // Act & Assert
@@ -103,7 +111,7 @@ public class CreateChildTests {
         service.createChild(request);
 
         // Assert
-        verify(repository).save(categoryCaptor.capture());
+        verify(categoryRepository).save(categoryCaptor.capture());
         Category actual = categoryCaptor.getValue();
 
         assertThat(actual)

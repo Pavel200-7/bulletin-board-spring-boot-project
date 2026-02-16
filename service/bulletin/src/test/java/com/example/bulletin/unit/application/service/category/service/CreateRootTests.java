@@ -5,7 +5,9 @@ import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
 import com.example.bulletin.application.service.category.data.request.CreateRootCategoryRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
+import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
+import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,13 @@ public class CreateRootTests {
     private CategoryMapper mapperHelper;
 
     @Mock
-    private CategoryRepository repository;
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private BulletinRepository bulletinRepository;
+
+    @Mock
+    private CategoryFamilyResponseBuilder responseBuilder;
 
     @Mock
     private CategoryMapper mapper;
@@ -53,11 +61,11 @@ public class CreateRootTests {
 
     @BeforeEach
     public void setup() {
-        when(repository.existsByNameAndParentId(any(String.class), any(UUID.class)))
+        when(categoryRepository.existsByNameAndParentId(any(String.class), any(UUID.class)))
                 .thenReturn(false);
 
         var rootCategory = createRootCategory();
-        when(repository.save(any(Category.class)))
+        when(categoryRepository.save(any(Category.class)))
                 .thenReturn(rootCategory);
 
         when(mapper.toResponse(any(Category.class)))
@@ -68,7 +76,7 @@ public class CreateRootTests {
     public void shouldThrowWhenParentHasChildWithSuchName() {
         // Arrange
         CreateRootCategoryRequest request = createRequest();
-        when(repository.existsByNameAndParentId(any(String.class), eq(null)))
+        when(categoryRepository.existsByNameAndParentId(any(String.class), eq(null)))
                 .thenReturn(true);
 
         // Act & Assert
@@ -85,7 +93,7 @@ public class CreateRootTests {
         service.createRoot(request);
 
         // Assert
-        verify(repository).save(categoryCaptor.capture());
+        verify(categoryRepository).save(categoryCaptor.capture());
         Category actual = categoryCaptor.getValue();
 
         assertThat(actual)

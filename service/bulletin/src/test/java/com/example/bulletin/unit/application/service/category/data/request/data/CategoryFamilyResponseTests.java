@@ -1,25 +1,25 @@
 package com.example.bulletin.unit.application.service.category.data.request.data;
 
-import com.example.bulletin.domain.vo.CategoryData;
+import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CategoryResponseTests {
+public class CategoryFamilyResponseTests {
 
     @Test
     void shouldReturnTrueWhenAllFieldsMatchExceptId() {
         // Arrange
-        CategoryData data1 = CategoryData.builder()
+        CategoryFamilyResponse data1 = CategoryFamilyResponse.builder()
                 .id(UUID.randomUUID())
                 .name("Electronics")
                 .leaf(false)
                 .parentId(null)
                 .build();
 
-        CategoryData data2 = CategoryData.builder()
+        CategoryFamilyResponse data2 = CategoryFamilyResponse.builder()
                 .id(UUID.randomUUID())
                 .name("Electronics")
                 .leaf(false)

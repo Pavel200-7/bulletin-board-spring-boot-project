@@ -98,6 +98,18 @@ services:
       PGDATA: /var/lib/postgresql/data
     networks:
       app-net:
+    
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    networks:
+      app-net:
+    depends_on:
+      - postgres
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
