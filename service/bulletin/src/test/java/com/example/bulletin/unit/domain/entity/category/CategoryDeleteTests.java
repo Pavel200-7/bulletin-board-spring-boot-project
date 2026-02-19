@@ -1,6 +1,7 @@
 package com.example.bulletin.unit.domain.entity.category;
 
 import com.example.bulletin.domain.entity.Category;
+import com.example.bulletin.domain.entity.Characteristic;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -74,7 +75,19 @@ public class CategoryDeleteTests {
         assertThrows(IllegalStateException.class, () -> { notLeafyChild.deleteLeaf(); });
     }
 
+    @Test
+    public void shouldRemoveCharacteristic() {
+        // Arrange
+        Category category = createCategoryWithChildren();
+        category.addCharacteristic("characteristic");
+        Characteristic characteristic = category.getCharacteristics().get(0);
 
+        // Act
+        category.removeCharacteristic(characteristic);
+
+        // Assert
+        assertTrue(category.getCharacteristics().isEmpty());
+    }
 
     public Category createCategoryWithChildren() {
         Category root = Category.createRoot("root");

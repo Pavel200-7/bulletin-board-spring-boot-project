@@ -26,7 +26,7 @@ public class CategoryFamilyResponseBuilderImpl implements CategoryFamilyResponse
     private CategoryFamilyResponse buildCompleteSubtree(Category category) {
         CategoryFamilyResponse response = mapToCategoryFamilyResponse(category);
         List<CategoryFamilyResponse> children = category.getChildren().stream()
-                .map(this::buildCompleteSubtree)
+                .map(this::mapToCategoryFamilyResponse)
                 .collect(Collectors.toList());
         response.getChildren().addAll(children);
         return response;

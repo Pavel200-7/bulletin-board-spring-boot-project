@@ -1,5 +1,6 @@
 package com.example.bulletin.unit.application.service.category.data.request;
 
+import com.example.bulletin.application.service.category.data.request.CreateChildCategoryRequest;
 import com.example.bulletin.application.service.category.data.request.CreateLeafyChildCategoryRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -56,6 +57,21 @@ public class CreateLeafyChildCategoryRequestTests {
     @NullAndEmptySource
     @ValueSource(strings = {"  ", ""})
     public void shouldForbidBlankName(String invalidName) {
+        // Arrange
+        CreateLeafyChildCategoryRequest request = createValidRequestBuilder()
+                .name(invalidName)
+                .build();
+
+        // Act
+        var violations = validator.validate(request);
+
+        // Assert
+        assertFalse(violations.isEmpty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"*&&&*", "H*(&#Q#"})
+    public void shouldForbidNameWithNotLettersAndDigits(String invalidName) {
         // Arrange
         CreateLeafyChildCategoryRequest request = createValidRequestBuilder()
                 .name(invalidName)

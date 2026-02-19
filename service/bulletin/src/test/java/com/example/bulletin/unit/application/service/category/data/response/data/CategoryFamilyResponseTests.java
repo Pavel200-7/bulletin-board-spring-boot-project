@@ -1,4 +1,4 @@
-package com.example.bulletin.unit.application.service.category.data.request.data;
+package com.example.bulletin.unit.application.service.category.data.response.data;
 
 import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import org.junit.jupiter.api.Test;

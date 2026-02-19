@@ -17,15 +17,21 @@ public class CategoryController {
 
     private final CategoryService service;
 
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<GetCategoryResponse> getCategory(@PathVariable UUID categoryId) {
-        GetCategoryRequest request = new GetCategoryRequest(categoryId);
+    @GetMapping("/{id}")
+    public ResponseEntity<GetCategoryResponse> getCategory(@PathVariable UUID id) {
+        GetCategoryRequest request = new GetCategoryRequest(id);
         return ResponseEntity.ok(service.getCategory(request));
     }
 
-    @GetMapping("/family/{categoryId}")
-    public ResponseEntity<GetCategoryWithFamilyResponse> getCategoryWithFamily(@PathVariable UUID categoryId) {
-        GetCategoryWithFamilyRequest request = new GetCategoryWithFamilyRequest(categoryId);
+    @GetMapping("/root")
+    public ResponseEntity<GetRootCategoriesResponse> getRootCategories() {
+        GetRootCategoriesRequest request = new GetRootCategoriesRequest();
+        return ResponseEntity.ok(service.getRootCategories(request));
+    }
+
+    @GetMapping("/family/{id}")
+    public ResponseEntity<GetCategoryWithFamilyResponse> getCategoryWithFamily(@PathVariable UUID id) {
+        GetCategoryWithFamilyRequest request = new GetCategoryWithFamilyRequest(id);
         return ResponseEntity.ok(service.getCategoryWithFamily(request));
     }
 
@@ -49,15 +55,15 @@ public class CategoryController {
         return ResponseEntity.ok(service.renameCategory(request));
     }
 
-    @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable UUID categoryId) {
-        service.deleteCategory(new DeleteCategoryRequest(categoryId));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
+        service.deleteCategory(new DeleteCategoryRequest(id));
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/leaf/{categoryId}")
-    public ResponseEntity<Void> deleteLeafCategory(@PathVariable UUID categoryId) {
-        service.deleteLeafCategory(new DeleteLeafCategoryRequest(categoryId));
+    @DeleteMapping("/leaf/{id}")
+    public ResponseEntity<Void> deleteLeafCategory(@PathVariable UUID id) {
+        service.deleteLeafCategory(new DeleteLeafCategoryRequest(id));
         return ResponseEntity.noContent().build();
     }
 

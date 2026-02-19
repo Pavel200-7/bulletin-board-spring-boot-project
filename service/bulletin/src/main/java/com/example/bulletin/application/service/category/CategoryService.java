@@ -6,6 +6,7 @@ import com.example.bulletin.application.service.category.data.response.*;
 public interface CategoryService {
     public GetCategoryResponse getCategory(GetCategoryRequest request);
     public GetCategoryWithFamilyResponse getCategoryWithFamily(GetCategoryWithFamilyRequest request);
+    public GetRootCategoriesResponse getRootCategories(GetRootCategoriesRequest request);
     public CreateRootCategoryResponse createRoot(CreateRootCategoryRequest request);
     public CreateChildCategoryResponse createChild(CreateChildCategoryRequest request);
     public CreateLeafyChildCategoryResponse createLeafyChild(CreateLeafyChildCategoryRequest request);
