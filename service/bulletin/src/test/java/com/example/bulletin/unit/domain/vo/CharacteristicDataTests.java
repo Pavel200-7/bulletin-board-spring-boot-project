@@ -1,29 +1,29 @@
-package com.example.bulletin.unit.application.service.category.data.request.data;
+package com.example.bulletin.unit.domain.vo;
 
 import com.example.bulletin.domain.vo.CategoryData;
+import com.example.bulletin.domain.vo.CharacteristicData;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CategoryResponseTests {
+public class CharacteristicDataTests {
 
     @Test
     void shouldReturnTrueWhenAllFieldsMatchExceptId() {
         // Arrange
-        CategoryData data1 = CategoryData.builder()
+        UUID categoryId = UUID.randomUUID();
+        CharacteristicData data1 = CharacteristicData.builder()
                 .id(UUID.randomUUID())
-                .name("Electronics")
-                .leaf(false)
-                .parentId(null)
+                .name("name")
+                .categoryId(categoryId)
                 .build();
 
-        CategoryData data2 = CategoryData.builder()
+        CharacteristicData data2 = CharacteristicData.builder()
                 .id(UUID.randomUUID())
-                .name("Electronics")
-                .leaf(false)
-                .parentId(null)
+                .name("name")
+                .categoryId(categoryId)
                 .build();
 
         // Act

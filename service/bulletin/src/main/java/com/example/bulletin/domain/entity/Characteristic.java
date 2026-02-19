@@ -1,10 +1,8 @@
 package com.example.bulletin.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -12,17 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Table(name = "characteristics")
 public class Characteristic {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name", nullable = false)
@@ -32,9 +26,31 @@ public class Characteristic {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @Builder.Default
     @OneToMany(mappedBy = "characteristic", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<CharacteristicValue> possibleValues = new ArrayList<>();;
+    private List<CharacteristicValue> possibleValues = new ArrayList<>();
+
+    protected Characteristic() {}
+
+    private Characteristic(String name, Category category) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.category = category;
+    }
+
+    public static Characteristic createCharacteristic(String name, Category category) {
+        return new Characteristic(name, category);
+    }
+
+    public Characteristic rename(String newName) {
+        this.name = newName;
+        return this;
+    }
+
+    public CharacteristicValue addPossibleValue(String valueName) {
+        CharacteristicValue value = CharacteristicValue.createCharacteristicValue(valueName, this);
+        this.possibleValues.add(value);
+        return value;
+    }
 
 }

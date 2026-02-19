@@ -53,7 +53,7 @@ public class CategoryMapperTests {
     }
 
     private Category createCategory() {
-        return Category.createRoot("test");
+         return Category.createRoot("test");
     }
 
 }

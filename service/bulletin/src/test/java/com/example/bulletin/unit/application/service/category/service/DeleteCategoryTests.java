@@ -46,9 +46,6 @@ public class DeleteCategoryTests {
     @InjectMocks
     private CategoryServiceImpl service;
 
-    @Captor
-    private ArgumentCaptor<Category> categoryCaptor;
-
     @Mock
     private Category category;
 

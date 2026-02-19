@@ -1,7 +1,6 @@
 package com.example.bulletin.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -33,7 +32,7 @@ public class Category {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Category> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Characteristic> characteristics = new ArrayList<>();
 
@@ -46,7 +45,7 @@ public class Category {
         this.leaf = isLeaf;
     }
 
-    // CREATE OPERATIONS
+    // CREATE
 
     public static Category createRoot(String name) {
         return new Category(name, null, false);
@@ -70,12 +69,14 @@ public class Category {
         return child;
     }
 
-    // UPDATE OPERATIONS
+    // UPDATE
 
     public Category rename(String newName) {
         this.name = newName;
         return this;
     }
+
+    // DELETE
 
     public Category delete() {
         if (this.leaf) {
@@ -94,4 +95,21 @@ public class Category {
         return this;
     }
 
+    // CHARACTERISTICS
+
+    // CREATE
+
+    public Characteristic addCharacteristic(String name) {
+        Characteristic characteristic = Characteristic.createCharacteristic(name, this);
+        this.characteristics.add(characteristic);
+        return characteristic;
+    }
+
+
+    // DELETE
+
+    public Category removeCharacteristic(Characteristic characteristic) {
+        this.characteristics.remove(characteristic);
+        return this;
+    }
 }

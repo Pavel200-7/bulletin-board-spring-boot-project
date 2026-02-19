@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,6 +43,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
         CategoryFamilyResponse familyResponse = responseBuilder.buildResponse(category);
         return new GetCategoryWithFamilyResponse(familyResponse);
+    }
+
+    @Override
+    public GetRootCategoriesResponse getRootCategories(GetRootCategoriesRequest request) {
+        List<Category> categories = categoryRepository.findByParentId(null);
+        List<CategoryResponse> categoryResponse = categories.stream()
+                .map(c -> mapper.toResponse(c))
+                .collect(Collectors.toList());
+        return new GetRootCategoriesResponse(categoryResponse);
     }
 
     @Override
@@ -71,6 +82,16 @@ public class CategoryServiceImpl implements CategoryService {
         child = categoryRepository.save(child);
         CategoryResponse categoryResponse = mapper.toResponse(child);
         return new CreateLeafyChildCategoryResponse(categoryResponse);
+    }
+
+    private Category checkParentCategory(String name, UUID parentId) {
+        if (categoryRepository.existsByNameAndParentId(name, parentId)) {
+            throw new DuplicateResourceException("There parent category has a child category with such name.");
+        }
+
+        Category parent = categoryRepository.findById(parentId)
+                .orElseThrow(() -> new ResourceNotFoundException("There is not any parent category with such id."));
+        return parent;
     }
 
     @Override
@@ -108,13 +129,6 @@ public class CategoryServiceImpl implements CategoryService {
         return new DeleteLeafCategoryResponse();
     }
 
-    private Category checkParentCategory(String name, UUID parentId) {
-        if (categoryRepository.existsByNameAndParentId(name, parentId)) {
-            throw new DuplicateResourceException("There parent category has a child category with such name.");
-        }
-        Category parent = categoryRepository.findById(parentId)
-                .orElseThrow(() -> new ResourceNotFoundException("There is not any parent category with such id."));
-        return parent;
-    }
+
 
 }

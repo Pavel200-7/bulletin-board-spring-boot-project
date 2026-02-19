@@ -81,6 +81,21 @@ public class CategoryCreateTest {
         assertThrows(IllegalStateException.class, () -> { leafCategory.createLeafyChild("child"); });
     }
 
+    @Test
+    public void shouldAddCharacteristic() {
+        // Arrange
+        Category category = createLeafyParent();
+        String characteristicName = "characteristic 1";
+
+        // Act
+        category.addCharacteristic(characteristicName);
+
+        // Assert
+        assertFalse(category.getCharacteristics().isEmpty());
+        assertEquals(characteristicName,
+                category.getCharacteristics().get(0).getName());
+    }
+
     private CategoryData expectedChildData(String name, UUID parentId, boolean isLeaf) {
         return CategoryData.builder()
                 .id(null)

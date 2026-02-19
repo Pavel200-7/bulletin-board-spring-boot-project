@@ -1,6 +1,5 @@
 package com.example.bulletin.application.mapper;
 
-import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.vo.CategoryData;

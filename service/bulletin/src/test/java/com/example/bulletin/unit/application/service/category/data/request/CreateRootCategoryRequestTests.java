@@ -50,6 +50,21 @@ public class CreateRootCategoryRequestTests {
         assertFalse(violations.isEmpty());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"*&&&*", "H*(&#Q#"})
+    public void shouldForbidNameWithNotLettersAndDigits(String invalidName) {
+        // Arrange
+        CreateRootCategoryRequest request = createValidRequestBuilder()
+                .name(invalidName)
+                .build();
+
+        // Act
+        var violations = validator.validate(request);
+
+        // Assert
+        assertFalse(violations.isEmpty());
+    }
+
     public CreateRootCategoryRequest.CreateRootCategoryRequestBuilder createValidRequestBuilder() {
         return CreateRootCategoryRequest.builder()
                 .name("valid name");
