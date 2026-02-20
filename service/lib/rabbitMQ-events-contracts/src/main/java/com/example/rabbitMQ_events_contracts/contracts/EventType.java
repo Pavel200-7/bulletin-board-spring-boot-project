@@ -4,13 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum EventType {
-    USER_REGISTERED("user.registered");
-//    USER_UPDATED("user.updated"),  // на будущее
-//    USER_DELETED("user.deleted"),
-//    LOGIN_SUCCESS("user.login.success"),
-//    LOGIN_FAILED("user.login.failed"),
-//    LOGOUT("user.logout"),
-//    PASSWORD_CHANGED("user.password.changed");
+    USER_REGISTERED("user.registered"),
+    USER_BLOCKED("user.blocked"),
+    USER_UNBLOCKED("user.unblocked");
 
     public final String routingKey;
 

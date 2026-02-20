@@ -40,10 +40,10 @@ public class RenameCharacteristicRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankCategoryId(UUID parentId) {
+    public void shouldForbidBlankId(UUID id) {
         // Arrange
         RenameCharacteristicRequest request = createValidRequestBuilder()
-                .id(parentId)
+                .id(id)
                 .build();
 
         // Act

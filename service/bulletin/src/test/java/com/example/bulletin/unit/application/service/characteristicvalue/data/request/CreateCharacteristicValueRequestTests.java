@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.service.characteristicvalue.data.request;
 
-import com.example.bulletin.application.service.characteristic_value.data.request.CreateCharacteristicValueRequest;
+import com.example.bulletin.application.service.characteristicvalue.data.request.CreateCharacteristicValueRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -40,10 +40,10 @@ public class CreateCharacteristicValueRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankCategoryId(UUID parentId) {
+    public void shouldForbidBlankCharacteristicId(UUID characteristicId) {
         // Arrange
         CreateCharacteristicValueRequest request = createValidRequestBuilder()
-                .characteristicId(parentId)
+                .characteristicId(characteristicId)
                 .build();
 
         // Act

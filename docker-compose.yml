@@ -19,7 +19,7 @@ services:
       # Keycloak
       - KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/oAuth
       - KEYCLOAK_CLIENT_ID=myclient
-      - KEYCLOAK_CLIENT_SECRET=jeWE38sfUCQJhplYyeJ7IwcMk8P27fVh
+      - KEYCLOAK_CLIENT_SECRET=pioyMQ3oVnPpiJqXzQOfA1TpoJSf4mWm
       
       # Server
       - SERVER_PORT=8080 
@@ -73,12 +73,12 @@ services:
       - --import-realm
       - --spi-import-provider-single-file-file=/opt/keycloak/data/import/realm-export.json
       - --spi-import-provider-single-file-override=false
-      - --spi-events-listener-registration-event-listener-enabled=true
-      - --spi-events-listener-registration-event-listener-rabbitmqhost=rabbitmq
-      - --spi-events-listener-registration-event-listener-rabbitmqport=5672 
-      - --spi-events-listener-registration-event-listener-rabbitmqusername=rmuser
-      - --spi-events-listener-registration-event-listener-rabbitmqpassword=rmpassword
-      - --spi-events-listener-registration-event-listener-rabbitmqvirtualhost=/
+      - --spi-events-listener-my-event-listener-enabled=true
+      - --spi-events-listener-my-event-listener-rabbitmqhost=rabbitmq
+      - --spi-events-listener-my-event-listener-rabbitmqport=5672 
+      - --spi-events-listener-my-event-listener-rabbitmqusername=rmuser
+      - --spi-events-listener-my-event-listener-rabbitmqpassword=rmpassword
+      - --spi-events-listener-my-event-listener-rabbitmqvirtualhost=/
     networks:
       - app-net
     depends_on:

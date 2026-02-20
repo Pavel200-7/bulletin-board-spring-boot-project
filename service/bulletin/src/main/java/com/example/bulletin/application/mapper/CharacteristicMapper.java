@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface CharacteristicMapper {
+
     @Mapping(target = "categoryId", source = "category.id")
     CharacteristicData toData(Characteristic entity);
 

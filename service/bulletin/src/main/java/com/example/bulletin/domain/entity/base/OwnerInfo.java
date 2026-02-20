@@ -1,24 +1,23 @@
 package com.example.bulletin.domain.entity.base;
 
-import com.example.bulletin.domain.entity.base.User.User;
+import com.example.bulletin.domain.entity.base.user.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 
 import java.util.UUID;
 
-@Data
 @Embeddable
+@AllArgsConstructor
 public class OwnerInfo {
-
-    @Column(name = "owner_id", nullable = false, insertable = false, updatable = false)
-    private UUID ownerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    protected OwnerInfo() {}
+
     public UUID getOwnerId() {
-        return ownerId;
+        return owner.getId();
     }
 
     public User getOwner() {
@@ -26,15 +25,17 @@ public class OwnerInfo {
     }
 
     public boolean isOwnedByUserId(UUID userId) {
-        return this.ownerId != null && this.ownerId.equals(userId);
+        return getOwnerId() != null &&
+                getOwnerId().equals(userId);
     }
 
     public boolean isOwnedByUser(User user) {
-        return this.ownerId != null && user != null && this.ownerId.equals(user.getId());
+        return getOwnerId() != null &&
+                user != null && getOwnerId().equals(user.getId());
     }
 
     public boolean hasOwner() {
-        return ownerId != null;
+        return getOwnerId() != null;
     }
 
 }

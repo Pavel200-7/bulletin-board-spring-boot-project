@@ -15,7 +15,7 @@ java {
 }
 
 jar {
-    archiveFileName = 'registration-listener-spi.jar'
+    archiveFileName = 'my-event-listener-spi.jar'
     archiveVersion = ''
 }
 
@@ -50,11 +50,11 @@ tasks.named('test') {
 task copySpiJar(type: Copy) {
     from jar
     into '../../../config/keycloak/spi-providers/'
-    rename { 'registration-listener-spi.jar' }
+    rename { 'my-event-listener-spi.jar' }
 }
 
 jar {
-    archiveBaseName = 'registration-listener-spi'
+    archiveBaseName = 'my-event-listener-spi'
     archiveVersion = ''
 
     from {

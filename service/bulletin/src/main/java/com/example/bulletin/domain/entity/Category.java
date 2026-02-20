@@ -45,15 +45,13 @@ public class Category {
         this.leaf = isLeaf;
     }
 
-    // CREATE
-
     public static Category createRoot(String name) {
         return new Category(name, null, false);
     }
 
     public Category createChild(String name) {
         if (this.leaf) {
-            throw new IllegalStateException("Cannot add child to leaf category");
+            throw new IllegalStateException("Cannot add child to leaf category.");
         }
         Category child = new Category(name, this, false);
         this.children.add(child);
@@ -62,28 +60,24 @@ public class Category {
 
     public Category createLeafyChild(String name) {
         if (this.leaf) {
-            throw new IllegalStateException("Cannot add child to leaf category");
+            throw new IllegalStateException("Cannot add child to leaf category.");
         }
         Category child = new Category(name, this, true);
         this.children.add(child);
         return child;
     }
 
-    // UPDATE
-
     public Category rename(String newName) {
         this.name = newName;
         return this;
     }
-
-    // DELETE
 
     public Category delete() {
         if (this.leaf) {
             throw new IllegalStateException("This category is leafy and can not be deleted this way.");
         }
         if (!this.children.isEmpty()) {
-            throw new IllegalStateException("This category has children and can not be deleted");
+            throw new IllegalStateException("This category has children and can not be deleted.");
         }
         return this;
     }
@@ -95,21 +89,15 @@ public class Category {
         return this;
     }
 
-    // CHARACTERISTICS
-
-    // CREATE
-
     public Characteristic addCharacteristic(String name) {
         Characteristic characteristic = Characteristic.createCharacteristic(name, this);
         this.characteristics.add(characteristic);
         return characteristic;
     }
 
-
-    // DELETE
-
     public Category removeCharacteristic(Characteristic characteristic) {
         this.characteristics.remove(characteristic);
         return this;
     }
+
 }

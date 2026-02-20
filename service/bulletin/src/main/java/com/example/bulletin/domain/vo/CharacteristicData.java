@@ -18,4 +18,5 @@ public class CharacteristicData {
         return Objects.equals(name, other.name) &&
                 Objects.equals(categoryId, other.categoryId);
     }
+
 }

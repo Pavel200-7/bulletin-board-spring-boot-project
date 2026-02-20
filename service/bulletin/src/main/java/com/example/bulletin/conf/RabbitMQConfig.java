@@ -18,20 +18,48 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue bulletinQueue() {
-        String queueName = QueueContract.BULLETIN_QUEUE;
-        return QueueBuilder.durable(queueName)
-                .withArgument("x-dead-letter-exchange", queueName.concat(".dlx"))
+    public Queue userRegisteredQueue() {
+        return QueueBuilder.durable(QueueContract.BULLETIN_USER_REGISTERED_QUEUE)
+                .withArgument("x-dead-letter-exchange", QueueContract.BULLETIN_USER_REGISTERED_QUEUE.concat(".dlx"))
+                .build();
+    }
+
+    // Очередь для блокировок
+    @Bean
+    public Queue userBlockedQueue() {
+        return QueueBuilder.durable(QueueContract.BULLETIN_USER_BLOCKED_QUEUE)
+                .withArgument("x-dead-letter-exchange", QueueContract.BULLETIN_USER_BLOCKED_QUEUE.concat(".dlx"))
+                .build();
+    }
+
+    // Очередь для разблокировок
+    @Bean
+    public Queue userUnblockedQueue() {
+        return QueueBuilder.durable(QueueContract.BULLETIN_USER_UNBLOCKED_QUEUE)
+                .withArgument("x-dead-letter-exchange", QueueContract.BULLETIN_USER_UNBLOCKED_QUEUE.concat(".dlx"))
                 .build();
     }
 
     @Bean
-    public Binding userCreatedBinding() {
-        return BindingBuilder.bind(bulletinQueue())
+    public Binding userRegisteredBinding() {
+        return BindingBuilder.bind(userRegisteredQueue())
                 .to(userExchange())
                 .with(EventType.USER_REGISTERED.getRoutingKey());
     }
 
+    @Bean
+    public Binding userBlockedBinding() {
+        return BindingBuilder.bind(userBlockedQueue())
+                .to(userExchange())
+                .with(EventType.USER_BLOCKED.getRoutingKey());
+    }
+
+    @Bean
+    public Binding userUnblockedBinding() {
+        return BindingBuilder.bind(userUnblockedQueue())
+                .to(userExchange())
+                .with(EventType.USER_UNBLOCKED.getRoutingKey());
+    }
 
     @Bean
     public JacksonJsonMessageConverter messageConverter() {

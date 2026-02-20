@@ -4,9 +4,9 @@ import com.example.bulletin.application.service.characteristic.data.request.*;
 import com.example.bulletin.application.service.characteristic.data.response.*;
 
 public interface CharacteristicService {
-    public GetCharacteristicResponse getCharacteristic(GetCharacteristicRequest request);
-    public GetCategoryCharacteristicsResponse getCategoryCharacteristics(GetCategoryCharacteristicsRequest request);
-    public CreateCharacteristicResponse createCharacteristic(CreateCharacteristicRequest request);
-    public RenameCharacteristicResponse renameCharacteristic(RenameCharacteristicRequest request);
-    public DeleteCharacteristicResponse deleteCharacteristic(DeleteCharacteristicRequest request);
+    GetCharacteristicResponse getCharacteristic(GetCharacteristicRequest request);
+    GetCategoryCharacteristicsResponse getCategoryCharacteristics(GetCategoryCharacteristicsRequest request);
+    CreateCharacteristicResponse createCharacteristic(CreateCharacteristicRequest request);
+    RenameCharacteristicResponse renameCharacteristic(RenameCharacteristicRequest request);
+    DeleteCharacteristicResponse deleteCharacteristic(DeleteCharacteristicRequest request);
 }

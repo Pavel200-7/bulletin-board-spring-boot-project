@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.service.characteristicvalue.data.response.data;
 
-import com.example.bulletin.application.service.characteristic_value.data.response.data.CharacteristicValueResponse;
+import com.example.bulletin.application.service.characteristicvalue.data.response.data.CharacteristicValueResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
