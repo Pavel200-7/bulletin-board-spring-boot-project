@@ -14,6 +14,7 @@ import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper mapper;
 
     @Override
+    @Transactional(readOnly = true)
     public GetCategoryResponse getCategory(GetCategoryRequest request) {
         Category category = categoryRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
@@ -38,6 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GetCategoryWithFamilyResponse getCategoryWithFamily(GetCategoryWithFamilyRequest request) {
         Category category = categoryRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
@@ -46,8 +49,10 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public GetRootCategoriesResponse getRootCategories(GetRootCategoriesRequest request) {
         List<Category> categories = categoryRepository.findByParentId(null);
+
         List<CategoryResponse> categoryResponse = categories.stream()
                 .map(c -> mapper.toResponse(c))
                 .collect(Collectors.toList());
@@ -55,6 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CreateRootCategoryResponse createRoot(CreateRootCategoryRequest request) {
         if (categoryRepository.existsByNameAndParentId(request.getName(), null)) {
             throw new DuplicateResourceException("There is a root category with such name.");
@@ -62,24 +68,29 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category root = Category.createRoot(request.getName());
         root = categoryRepository.save(root);
+
         CategoryResponse categoryResponse = mapper.toResponse(root);
         return new CreateRootCategoryResponse(categoryResponse);
     }
 
     @Override
+    @Transactional
     public CreateChildCategoryResponse createChild(CreateChildCategoryRequest request) {
         Category parent = checkParentCategory(request.getName(), request.getParentId());
         Category child = parent.createChild(request.getName());
         child = categoryRepository.save(child);
+
         CategoryResponse categoryResponse = mapper.toResponse(child);
         return new CreateChildCategoryResponse(categoryResponse);
     }
 
     @Override
+    @Transactional
     public CreateLeafyChildCategoryResponse createLeafyChild(CreateLeafyChildCategoryRequest request) {
         Category parent = checkParentCategory(request.getName(), request.getParentId());
         Category child = parent.createLeafyChild(request.getName());
         child = categoryRepository.save(child);
+
         CategoryResponse categoryResponse = mapper.toResponse(child);
         return new CreateLeafyChildCategoryResponse(categoryResponse);
     }
@@ -95,6 +106,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public RenameCategoryResponse renameCategory(RenameCategoryRequest request) {
         Category category = categoryRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
@@ -107,6 +119,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public DeleteCategoryResponse deleteCategory(DeleteCategoryRequest request) {
         Category category = categoryRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
@@ -117,6 +130,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public DeleteLeafCategoryResponse deleteLeafCategory(DeleteLeafCategoryRequest request) {
         Category category = categoryRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
@@ -128,7 +142,5 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.delete(category);
         return new DeleteLeafCategoryResponse();
     }
-
-
 
 }

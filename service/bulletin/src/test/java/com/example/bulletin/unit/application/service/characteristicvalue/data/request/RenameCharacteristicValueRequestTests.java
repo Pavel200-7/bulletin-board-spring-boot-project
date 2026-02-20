@@ -1,7 +1,6 @@
 package com.example.bulletin.unit.application.service.characteristicvalue.data.request;
 
-import com.example.bulletin.application.service.characteristic.data.request.RenameCharacteristicRequest;
-import com.example.bulletin.application.service.characteristic_value.data.request.RenameCharacteristicValueRequest;
+import com.example.bulletin.application.service.characteristicvalue.data.request.RenameCharacteristicValueRequest;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -41,10 +40,10 @@ public class RenameCharacteristicValueRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankCategoryId(UUID parentId) {
+    public void shouldForbidBlankId(UUID id) {
         // Arrange
         RenameCharacteristicValueRequest request = createValidRequestBuilder()
-                .id(parentId)
+                .id(id)
                 .build();
 
         // Act

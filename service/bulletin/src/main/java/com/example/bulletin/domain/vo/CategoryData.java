@@ -1,6 +1,5 @@
 package com.example.bulletin.domain.vo;
 
-
 import lombok.Builder;
 import lombok.Value;
 
@@ -21,5 +20,6 @@ public class CategoryData {
                 leaf == other.leaf &&
                 Objects.equals(parentId, other.parentId);
     }
+
 }
 

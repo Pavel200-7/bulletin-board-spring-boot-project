@@ -1,1 +1,1 @@
-com.example.keycloak_registration_listener_spi.keycloak.RegistrationEventListenerProviderFactory
+com.example.keycloak_registration_listener_spi.keycloak.MyEventListenerProviderFactory

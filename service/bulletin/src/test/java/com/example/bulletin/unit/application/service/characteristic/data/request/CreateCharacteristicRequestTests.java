@@ -39,10 +39,10 @@ public class CreateCharacteristicRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankCategoryId(UUID parentId) {
+    public void shouldForbidBlankCategoryId(UUID categoryId) {
         // Arrange
         CreateCharacteristicRequest request = createValidRequestBuilder()
-                .categoryId(parentId)
+                .categoryId(categoryId)
                 .build();
 
         // Act

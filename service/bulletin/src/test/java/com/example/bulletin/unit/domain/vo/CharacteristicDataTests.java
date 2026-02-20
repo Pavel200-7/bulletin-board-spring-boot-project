@@ -32,4 +32,5 @@ public class CharacteristicDataTests {
         // Assert
         assertTrue(result);
     }
+
 }

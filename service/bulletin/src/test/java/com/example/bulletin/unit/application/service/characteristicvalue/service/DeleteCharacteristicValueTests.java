@@ -2,8 +2,8 @@ package com.example.bulletin.unit.application.service.characteristicvalue.servic
 
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CharacteristicValueMapper;
-import com.example.bulletin.application.service.characteristic_value.CharacteristicValueServiceImpl;
-import com.example.bulletin.application.service.characteristic_value.data.request.DeleteCharacteristicValueRequest;
+import com.example.bulletin.application.service.characteristicvalue.CharacteristicValueServiceImpl;
+import com.example.bulletin.application.service.characteristicvalue.data.request.DeleteCharacteristicValueRequest;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.CharacteristicValue;

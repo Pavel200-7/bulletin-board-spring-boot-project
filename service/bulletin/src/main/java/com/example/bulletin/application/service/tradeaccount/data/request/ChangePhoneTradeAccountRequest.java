@@ -1,0 +1,26 @@
+package com.example.bulletin.application.service.tradeaccount.data.request;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ChangePhoneTradeAccountRequest {
+    @NotNull
+    private UUID id;
+    @NotBlank
+    @Pattern(
+            regexp = "^\\+?[0-9]{10,15}$",
+            message = "Phone number must contain 10-15 digits and may start with +"
+    )
+    private String phone;
+}

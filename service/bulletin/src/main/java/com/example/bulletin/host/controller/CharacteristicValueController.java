@@ -1,8 +1,8 @@
 package com.example.bulletin.host.controller;
 
-import com.example.bulletin.application.service.characteristic_value.CharacteristicValueService;
-import com.example.bulletin.application.service.characteristic_value.data.request.*;
-import com.example.bulletin.application.service.characteristic_value.data.response.*;
+import com.example.bulletin.application.service.characteristicvalue.CharacteristicValueService;
+import com.example.bulletin.application.service.characteristicvalue.data.request.*;
+import com.example.bulletin.application.service.characteristicvalue.data.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
