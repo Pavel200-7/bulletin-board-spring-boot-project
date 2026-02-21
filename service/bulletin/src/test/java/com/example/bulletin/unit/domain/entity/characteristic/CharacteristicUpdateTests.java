@@ -3,6 +3,7 @@ package com.example.bulletin.unit.domain.entity.characteristic;
 import com.example.bulletin.application.mapper.CharacteristicMapper;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
+import com.example.bulletin.domain.entity.CharacteristicValue;
 import com.example.bulletin.domain.vo.CharacteristicData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,38 @@ public class CharacteristicUpdateTests {
         assertFalse(characteristic.getPossibleValues().isEmpty());
         assertEquals(valueName,
                 characteristic.getPossibleValues().get(0).getName());
+    }
+
+    @Test
+    public void shouldRemovePossibleValue() {
+        // Arrange
+        Category category = Category.createRoot("root");
+        Characteristic characteristic = category.addCharacteristic("characteristic 1");
+        String valueName = "possible value 1";
+        CharacteristicValue value = characteristic.addPossibleValue(valueName);
+
+
+        // Act
+        characteristic.removePossibleValue(value);
+
+
+        // Assert
+        assertTrue(characteristic.getPossibleValues().isEmpty());
+    }
+
+    @Test
+    public void shouldThrowWhenPossibleValueIsOfAnotherCharacteristic() {
+        // Arrange
+        Category category = Category.createRoot("root");
+        Characteristic characteristic = category.addCharacteristic("characteristic 1");
+
+        Characteristic anotherCharacteristic = category.addCharacteristic("another characteristic");
+        String anotherValueName = "possible value 1";
+        CharacteristicValue anotherCharacteristicValue = anotherCharacteristic.addPossibleValue(anotherValueName);
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () ->
+                characteristic.removePossibleValue(anotherCharacteristicValue));
     }
 
 }

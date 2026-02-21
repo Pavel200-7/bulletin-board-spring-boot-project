@@ -2,58 +2,128 @@ package com.example.bulletin.domain.entity;
 
 import com.example.bulletin.domain.entity.base.BaseEntity;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
+import com.example.bulletin.domain.enums.BulletinStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Delegate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Data
 @Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@Getter
+@Setter
 @Table(name = "bulletins")
 public class Bulletin extends BaseEntity {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Embedded
     @Delegate
+    @Setter(AccessLevel.NONE)
     private OwnerInfo ownerInfo;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "price", nullable = false)
+    @Column(name = "price")
     private double price;
 
     @Column(name = "rating")
     private double rating;
 
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "status", nullable = false)
+    @Setter(AccessLevel.NONE)
+    private BulletinStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id")
+    @Setter(AccessLevel.NONE)
     private Category category;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "bulletin", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bulletin",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BulletinCharacteristic> characteristics = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "bulletin", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bulletin",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<BulletinImage> images = new ArrayList<>();
+
+    protected Bulletin() {}
+
+    private Bulletin(OwnerInfo ownerInfo) {
+        this.id = UUID.randomUUID();
+        this.status = BulletinStatus.DRAFT;
+        this.ownerInfo = ownerInfo;
+    }
+
+    public static Bulletin createDraft(OwnerInfo ownerInfo)
+            throws AccessDeniedException {
+        if (ownerInfo.getOwner().isBlocked()) {
+            throw new AccessDeniedException("Your account is blocked.");
+        }
+        return new Bulletin(ownerInfo);
+    }
+
+    public Bulletin setCategory(Category category) {
+        if (!category.isLeaf()) {
+            throw new IllegalStateException("Cannot set not leaf category.");
+        }
+        this.characteristics.clear();
+        this.category = category;
+        return this;
+    }
+
+    public BulletinCharacteristic addCharacteristic(Characteristic characteristic) {
+        if (this.category == null) {
+            throw new IllegalStateException("Category should be set before characteristics.");
+        }
+
+        if (!characteristic.getCategory().equals(this.category)) {
+            throw new IllegalStateException("This characteristics is not of chosen category.");
+        }
+
+        if (isCharacteristicAlreadyExists(characteristic)) {
+            throw new IllegalStateException("This characteristics is not unique for this bulletin.");
+        }
+
+        BulletinCharacteristic bulletinCharacteristic = BulletinCharacteristic.createBulletinCharacteristic(this, characteristic);
+        this.characteristics.add(bulletinCharacteristic);
+        return bulletinCharacteristic;
+    }
+
+    private boolean isCharacteristicAlreadyExists(Characteristic characteristic) {
+        return this.characteristics.stream()
+                .anyMatch(bc -> bc.getName().getId().equals(characteristic.getId()));
+    }
+
+    public void removeCharacteristic(BulletinCharacteristic characteristic) {
+        if (!this.characteristics.contains(characteristic)) {
+            throw new IllegalStateException("This characteristic is not present in this bulletin.");
+        }
+
+        if (!characteristic.getBulletin().equals(this)) {
+            throw new IllegalStateException("This characteristic belongs to another bulletin.");
+        }
+
+        this.characteristics.remove(characteristic);
+    }
 
 }

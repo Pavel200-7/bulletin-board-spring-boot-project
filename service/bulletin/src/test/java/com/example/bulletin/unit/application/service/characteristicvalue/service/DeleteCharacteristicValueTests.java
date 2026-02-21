@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,14 +55,15 @@ public class DeleteCharacteristicValueTests {
     @Captor
     private ArgumentCaptor<CharacteristicValue> characteristicValueCaptor;
 
-    private Category category = null;
     private Characteristic characteristic = null;
-    private CharacteristicValue characteristicValue = null;
 
     @BeforeEach
     public void setup() {
+
+        createCharacteristic();
+        CharacteristicValue characteristicValue = createCharacteristicValue();
         when(characteristicValueRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(createCharacteristicValue()));
+                .thenReturn(Optional.of(characteristicValue));
     }
 
     @Test
@@ -84,30 +86,23 @@ public class DeleteCharacteristicValueTests {
         service.deleteCharacteristicValue(request);
 
         // Assert
-        verify(characteristicValueRepository).delete(characteristicValue);
+        assertTrue(characteristic.getPossibleValues().isEmpty());
+        verify(characteristicRepository).save(characteristic);
     }
 
     public CharacteristicValue createCharacteristicValue() {
-        if (characteristicValue == null) {
-            Characteristic characteristic = createCharacteristic();
-            characteristicValue = characteristic.addPossibleValue("test value");
+        if (characteristic.getPossibleValues().isEmpty()) {
+            characteristic.addPossibleValue("test value");
         }
-        return characteristicValue;
+        return characteristic.getPossibleValues().get(0);
     }
 
     public Characteristic createCharacteristic() {
         if (characteristic == null) {
-            Category category = createCategory();
+            Category category = Category.createRoot("root");
             characteristic = category.addCharacteristic("characteristic");
         }
         return characteristic;
-    }
-
-    public Category createCategory() {
-        if (category == null) {
-            category = Category.createRoot("root");
-        }
-        return category;
     }
 
     public DeleteCharacteristicValueRequest createRequest() {

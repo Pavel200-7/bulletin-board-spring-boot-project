@@ -10,6 +10,7 @@ import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import com.example.bulletin.infrastructure.repository.CharacteristicRepository;
+import jakarta.validation.constraints.AssertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,13 +60,13 @@ public class DeleteCharacteristicTests {
 
     private ArgumentCaptor<Category> categoryCaptor;
     private Category category = null;
-    private Characteristic characteristic = null;
-
 
     @BeforeEach
     public void setup() {
+        createCategory();
+        Characteristic characteristic = createCharacteristic();
         when(characteristicRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(createCharacteristic()));
+                .thenReturn(Optional.of(characteristic));
     }
 
     @Test
@@ -87,15 +89,15 @@ public class DeleteCharacteristicTests {
         service.deleteCharacteristic(request);
 
         // Assert
-        verify(characteristicRepository).delete(characteristic);
+        assertTrue(category.getCharacteristics().isEmpty());
+        verify(categoryRepository).save(category);
     }
 
     public Characteristic createCharacteristic() {
-        if (characteristic == null) {
-            Category category = createCategory();
-            characteristic = category.addCharacteristic("old name");
+        if(category.getCharacteristics().isEmpty()) {
+            category.addCharacteristic("name");
         }
-        return characteristic;
+        return category.getCharacteristics().get(0);
     }
 
     public Category createCategory() {

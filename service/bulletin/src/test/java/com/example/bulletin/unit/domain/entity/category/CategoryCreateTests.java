@@ -12,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class CategoryCreateTest {
+public class CategoryCreateTests {
 
     @Autowired
     private CategoryMapper mapper;
@@ -79,21 +79,6 @@ public class CategoryCreateTest {
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () -> { leafCategory.createLeafyChild("child"); });
-    }
-
-    @Test
-    public void shouldAddCharacteristic() {
-        // Arrange
-        Category category = createLeafyParent();
-        String characteristicName = "characteristic 1";
-
-        // Act
-        category.addCharacteristic(characteristicName);
-
-        // Assert
-        assertFalse(category.getCharacteristics().isEmpty());
-        assertEquals(characteristicName,
-                category.getCharacteristics().get(0).getName());
     }
 
     private CategoryData expectedChildData(String name, UUID parentId, boolean isLeaf) {

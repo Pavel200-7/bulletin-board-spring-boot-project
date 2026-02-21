@@ -75,20 +75,6 @@ public class CategoryDeleteTests {
         assertThrows(IllegalStateException.class, () -> { notLeafyChild.deleteLeaf(); });
     }
 
-    @Test
-    public void shouldRemoveCharacteristic() {
-        // Arrange
-        Category category = createCategoryWithChildren();
-        category.addCharacteristic("characteristic");
-        Characteristic characteristic = category.getCharacteristics().get(0);
-
-        // Act
-        category.removeCharacteristic(characteristic);
-
-        // Assert
-        assertTrue(category.getCharacteristics().isEmpty());
-    }
-
     public Category createCategoryWithChildren() {
         Category root = Category.createRoot("root");
         root.createLeafyChild("child 1");

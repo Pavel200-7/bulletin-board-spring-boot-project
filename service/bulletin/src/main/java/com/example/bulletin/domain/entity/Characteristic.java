@@ -26,7 +26,10 @@ public class Characteristic {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "characteristic", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "characteristic",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<CharacteristicValue> possibleValues = new ArrayList<>();
 
@@ -51,6 +54,13 @@ public class Characteristic {
         CharacteristicValue value = CharacteristicValue.createCharacteristicValue(valueName, this);
         this.possibleValues.add(value);
         return value;
+    }
+
+    public void removePossibleValue(CharacteristicValue value) {
+        if (!value.getCharacteristic().equals(this)) {
+            throw new IllegalStateException("This is not characteristic value of existing characteristic.");
+        }
+        this.possibleValues.remove(value);
     }
 
 }
