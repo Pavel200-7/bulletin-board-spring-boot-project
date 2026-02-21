@@ -1,24 +1,17 @@
 package com.example.bulletin.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
-@Data
 @Entity
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 @Table(name = "bulletin_characteristics")
 public class BulletinCharacteristic {
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,5 +25,25 @@ public class BulletinCharacteristic {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "value_id", nullable = false)
     private CharacteristicValue value;
+
+    protected BulletinCharacteristic() {}
+
+    private BulletinCharacteristic(Bulletin bulletin, Characteristic name) {
+        this.id = UUID.randomUUID();
+        this.bulletin = bulletin;
+        this.name = name;
+    }
+
+    public static BulletinCharacteristic createBulletinCharacteristic(Bulletin bulletin, Characteristic name) {
+        return new BulletinCharacteristic(bulletin, name);
+    }
+
+    public BulletinCharacteristic setValue(CharacteristicValue value) {
+        if (!value.getCharacteristic().equals(this.name)) {
+            throw new IllegalStateException("This is not characteristic value of existing characteristic.");
+        }
+        this.value = value;
+        return this;
+    }
 
 }

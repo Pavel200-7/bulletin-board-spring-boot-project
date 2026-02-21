@@ -28,11 +28,17 @@ public class Category {
     @JoinColumn(name = "parent_id")
     private Category parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "parent",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Category> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "category",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Characteristic> characteristics = new ArrayList<>();
 
@@ -96,6 +102,9 @@ public class Category {
     }
 
     public Category removeCharacteristic(Characteristic characteristic) {
+        if (!characteristic.getCategory().equals(this)) {
+            throw new IllegalStateException("This is not characteristic value of existing characteristic.");
+        }
         this.characteristics.remove(characteristic);
         return this;
     }

@@ -81,7 +81,10 @@ public class CharacteristicValueServiceImpl implements CharacteristicValueServic
         CharacteristicValue characteristicValue = characteristicValueRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("A characteristic value with this id is not found."));
 
-        characteristicValueRepository.delete(characteristicValue);
+        Characteristic characteristic = characteristicValue.getCharacteristic();
+        characteristic.removePossibleValue(characteristicValue);
+
+        characteristicRepository.save(characteristic);
         return new DeleteCharacteristicValueResponse();
     }
 

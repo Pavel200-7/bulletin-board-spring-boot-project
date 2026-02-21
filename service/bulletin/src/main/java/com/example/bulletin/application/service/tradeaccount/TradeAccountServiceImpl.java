@@ -114,10 +114,8 @@ public class TradeAccountServiceImpl implements TradeAccountService {
                 ""
         );
 
-        log.info("тут 111");
         tradeAccount.setApproximateLocation(location);
         tradeAccount = tradeAccountRepository.save(tradeAccount);
-        log.info("тут 222");
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new SetApproximateLocationTradeAccountResponse(response);

@@ -86,7 +86,10 @@ public class CharacteristicServiceImpl implements CharacteristicService {
         Characteristic characteristic = characteristicRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("A characteristic with this id is not found."));
 
-        characteristicRepository.delete(characteristic);
+        Category category = characteristic.getCategory();
+        category.removeCharacteristic(characteristic);
+
+        categoryRepository.save(category);
         return new DeleteCharacteristicResponse();
     }
 

@@ -17,6 +17,7 @@ public class TradeAccount extends BaseEntity {
 
     @Id
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     @Embedded
