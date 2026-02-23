@@ -24,8 +24,6 @@ public class BulletinRemoveCharacteristicTests {
         Characteristic characteristic = createCharacteristic(category);
         BulletinCharacteristic added = bulletin.addCharacteristic(characteristic);
 
-        assertFalse(bulletin.getCharacteristics().isEmpty());
-
         // Act
         bulletin.removeCharacteristic(added);
 

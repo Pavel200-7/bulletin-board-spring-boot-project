@@ -51,7 +51,7 @@ public class CreateCharacteristicValueTests {
     private CharacteristicValueServiceImpl service;
 
     @Captor
-    private ArgumentCaptor<CharacteristicValue> characteristicValueCaptor;
+    private ArgumentCaptor<Characteristic> characteristicCaptor;
 
     private Category category = null;
     private Characteristic characteristic = null;
@@ -87,8 +87,10 @@ public class CreateCharacteristicValueTests {
         service.createCharacteristicValue(request);
 
         // Assert
-        verify(characteristicValueRepository).save(characteristicValueCaptor.capture());
-        CharacteristicValue actual = characteristicValueCaptor.getValue();
+        verify(characteristicRepository).save(characteristicCaptor.capture());
+        CharacteristicValue actual = characteristicCaptor.getValue()
+                .getPossibleValues()
+                .getFirst();
 
         assertThat(actual)
                 .usingRecursiveComparison()

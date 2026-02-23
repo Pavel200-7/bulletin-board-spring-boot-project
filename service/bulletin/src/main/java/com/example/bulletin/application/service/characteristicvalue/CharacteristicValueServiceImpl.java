@@ -56,7 +56,7 @@ public class CharacteristicValueServiceImpl implements CharacteristicValueServic
                 .orElseThrow(() -> new ResourceNotFoundException("A characteristic with this id is not found."));
 
         CharacteristicValue characteristicValue = characteristic.addPossibleValue(request.getName());
-        characteristicValueRepository.save(characteristicValue);
+        characteristicRepository.save(characteristic);
 
         CharacteristicValueResponse characteristicValueResponse = mapper.toResponse(characteristicValue);
         return new CreateCharacteristicValueResponse(characteristicValueResponse);

@@ -97,7 +97,8 @@ public class Bulletin extends BaseEntity {
             throw new IllegalStateException("Category should be set before characteristics.");
         }
 
-        if (!characteristic.getCategory().equals(this.category)) {
+        if (!characteristic.getCategory().getId()
+                .equals(this.category.getId())) {
             throw new IllegalStateException("This characteristics is not of chosen category.");
         }
 
@@ -112,19 +113,21 @@ public class Bulletin extends BaseEntity {
 
     private boolean isCharacteristicAlreadyExists(Characteristic characteristic) {
         return this.characteristics.stream()
-                .anyMatch(bc -> bc.getName().getId().equals(characteristic.getId()));
+                .anyMatch(bc -> bc.getName().getId()
+                        .equals(characteristic.getId()));
     }
 
     public void removeCharacteristic(BulletinCharacteristic characteristic) {
-        if (!this.characteristics.contains(characteristic)) {
-            throw new IllegalStateException("This characteristic is not present in this bulletin.");
-        }
+        BulletinCharacteristic bulletinCharacteristic = findCharacteristicById(characteristic.getId())
+                .orElseThrow(() ->  new IllegalStateException("This characteristic is not present in this bulletin."));
+        this.characteristics.remove(bulletinCharacteristic);
+    }
 
-        if (!characteristic.getBulletin().equals(this)) {
-            throw new IllegalStateException("This characteristic belongs to another bulletin.");
-        }
-
-        this.characteristics.remove(characteristic);
+    private Optional<BulletinCharacteristic> findCharacteristicById(UUID characteristicId) {
+        return this.characteristics.stream()
+                .filter(bc -> bc.getId()
+                        .equals(characteristicId))
+                .findFirst();
     }
 
     public BulletinCharacteristic setCharacteristicValue(CharacteristicValue value) {
@@ -162,7 +165,7 @@ public class Bulletin extends BaseEntity {
         BulletinImage existingImage = findImageById(image.getImageId())
                 .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
 
-        image.setMain();
+        existingImage.setMain();
         images.stream()
                 .filter(i -> !i.getImageId().equals(image.getImageId()))
                         .forEach(i -> i.unsetMain());

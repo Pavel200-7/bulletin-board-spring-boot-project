@@ -112,7 +112,9 @@ public class CreateChildTests {
 
         // Assert
         verify(categoryRepository).save(categoryCaptor.capture());
-        Category actual = categoryCaptor.getValue();
+        Category actual = categoryCaptor.getValue()
+                .getChildren()
+                .getFirst();
 
         assertThat(actual)
                 .usingRecursiveComparison()
