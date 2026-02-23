@@ -78,7 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CreateChildCategoryResponse createChild(CreateChildCategoryRequest request) {
         Category parent = checkParentCategory(request.getName(), request.getParentId());
         Category child = parent.createChild(request.getName());
-        child = categoryRepository.save(child);
+        categoryRepository.save(parent);
 
         CategoryResponse categoryResponse = mapper.toResponse(child);
         return new CreateChildCategoryResponse(categoryResponse);
@@ -89,7 +89,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CreateLeafyChildCategoryResponse createLeafyChild(CreateLeafyChildCategoryRequest request) {
         Category parent = checkParentCategory(request.getName(), request.getParentId());
         Category child = parent.createLeafyChild(request.getName());
-        child = categoryRepository.save(child);
+        categoryRepository.save(parent);
 
         CategoryResponse categoryResponse = mapper.toResponse(child);
         return new CreateLeafyChildCategoryResponse(categoryResponse);

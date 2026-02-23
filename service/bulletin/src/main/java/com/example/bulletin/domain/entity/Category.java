@@ -102,7 +102,8 @@ public class Category {
     }
 
     public Category removeCharacteristic(Characteristic characteristic) {
-        if (!characteristic.getCategory().equals(this)) {
+        if (!characteristic.getCategory().getId()
+                .equals(this.getId())) {
             throw new IllegalStateException("This is not characteristic value of existing characteristic.");
         }
         this.characteristics.remove(characteristic);

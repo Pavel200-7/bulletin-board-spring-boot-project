@@ -57,7 +57,8 @@ public class Characteristic {
     }
 
     public void removePossibleValue(CharacteristicValue value) {
-        if (!value.getCharacteristic().equals(this)) {
+        if (!value.getCharacteristic().getId()
+                .equals(this.getId())) {
             throw new IllegalStateException("This is not characteristic value of existing characteristic.");
         }
         this.possibleValues.remove(value);
