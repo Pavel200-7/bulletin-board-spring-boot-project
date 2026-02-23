@@ -1,46 +1,39 @@
 package com.example.bulletin.unit.domain.entity.characteristicvalue;
 
-import com.example.bulletin.application.mapper.CharacteristicValueMapper;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.CharacteristicValue;
 import com.example.bulletin.domain.vo.CharacteristicValueData;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 public class CharacteristicValueCreateTests {
-
-    @Autowired
-    private CharacteristicValueMapper mapper;
 
     @Test
     public void shouldCreateCharacteristicValue() {
         // Arrange
-        String characteristicValueName = "value 1";
+        String name = "value 1";
         Category category = createCategory();
         Characteristic characteristic = category.addCharacteristic("characteristic 1");
 
         CharacteristicValueData expected = CharacteristicValueData.builder()
                 .id(UUID.randomUUID())
-                .name(characteristicValueName)
+                .name(name)
                 .characteristicId(characteristic.getId())
                 .build();
 
         // Act
         CharacteristicValue characteristicValue = CharacteristicValue.createCharacteristicValue(
-                characteristicValueName,
+                name,
                 characteristic
         );
-        CharacteristicValueData actual = mapper.toData(characteristicValue);
 
         // Assert
-        assertTrue(expected.equalsData(actual));
+        assertEquals(name, characteristicValue.getName());
+        assertEquals(characteristic, characteristicValue.getCharacteristic());
     }
 
     private Category createCategory() {

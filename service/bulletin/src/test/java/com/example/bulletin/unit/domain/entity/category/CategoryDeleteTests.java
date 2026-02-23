@@ -1,14 +1,11 @@
 package com.example.bulletin.unit.domain.entity.category;
 
 import com.example.bulletin.domain.entity.Category;
-import com.example.bulletin.domain.entity.Characteristic;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest
 public class CategoryDeleteTests {
 
     @Test

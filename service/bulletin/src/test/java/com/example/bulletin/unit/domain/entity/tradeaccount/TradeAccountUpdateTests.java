@@ -1,59 +1,32 @@
 package com.example.bulletin.unit.domain.entity.tradeaccount;
 
-import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.Location;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
-import com.example.bulletin.domain.vo.TradeAccountData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class TradeAccountUpdateTests {
-
-    @Autowired
-    private TradeAccountMapper mapper;
 
     @Test
     public void shouldSetApproximateLocation() {
         // Arrange
-        TradeAccount tradeAccount = createUnapprovedTradeAccount();
+        TradeAccount tradeAccount = createBlankTradeAccount();
         Location location = createLocation();
-        TradeAccountData expected = mapper.toData(tradeAccount);
-        expected = TradeAccountData.builder()
-                .ownerId(expected.getOwnerId())
-                .name(expected.getName())
-                .phone(expected.getPhone())
-                .contacts(expected.getContacts())
-                .description(expected.getDescription())
-                .latitude(location.getLatitude())
-                .longitude(location.getLongitude())
-                .townName(location.getTownName())
-                .locationName(location.getLocationName())
-                .coordinatesExact(false)
-                .approved(false)
-                .imageId(expected.getImageId())
-                .build();
 
         // Act
         tradeAccount.setApproximateLocation(location);
-        TradeAccountData actual = mapper.toData(tradeAccount);
 
         // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .ignoringFields("id")
-                .isEqualTo(expected);
+        assertEquals(location, tradeAccount.getLocation());
+        assertFalse(tradeAccount.isCoordinatesExact());
     }
 
     @Test
@@ -70,70 +43,36 @@ public class TradeAccountUpdateTests {
     @Test
     public void shouldSetExactLocation() {
         // Arrange
-        TradeAccount tradeAccount = createUnapprovedTradeAccount();
+        TradeAccount tradeAccount = createBlankTradeAccount();
         Location location = createLocation();
-        TradeAccountData expected = mapper.toData(tradeAccount);
-        expected = TradeAccountData.builder()
-                .ownerId(expected.getOwnerId())
-                .name(expected.getName())
-                .phone(expected.getPhone())
-                .contacts(expected.getContacts())
-                .description(expected.getDescription())
-                .latitude(location.getLatitude())
-                .longitude(location.getLongitude())
-                .townName(location.getTownName())
-                .locationName(location.getLocationName())
-                .coordinatesExact(true)
-                .approved(false)
-                .imageId(expected.getImageId())
-                .build();
 
         // Act
         tradeAccount.setExactLocation(location);
-        TradeAccountData actual = mapper.toData(tradeAccount);
 
         // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .ignoringFields("id")
-                .isEqualTo(expected);
+
+        assertEquals(location, tradeAccount.getLocation());
+        assertTrue(tradeAccount.isCoordinatesExact());
     }
 
     @Test
     public void shouldApproveAccount() {
         // Arrange
-        TradeAccount tradeAccount = createTradeAccountWithExactLocation();
-        TradeAccountData expected = mapper.toData(tradeAccount);
-        expected = TradeAccountData.builder()
-                .ownerId(expected.getOwnerId())
-                .name(expected.getName())
-                .phone(expected.getPhone())
-                .contacts(expected.getContacts())
-                .description(expected.getDescription())
-                .latitude(expected.getLatitude())
-                .longitude(expected.getLongitude())
-                .townName(expected.getTownName())
-                .locationName(expected.getLocationName())
-                .coordinatesExact(true)
-                .approved(true)
-                .imageId(expected.getImageId())
-                .build();
+        TradeAccount tradeAccount = createTradeAccountReadyForApprove();
 
         // Act
         tradeAccount.approve();
-        TradeAccountData actual = mapper.toData(tradeAccount);
 
         // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .ignoringFields("id")
-                .isEqualTo(expected);
+        assertTrue(tradeAccount.isApproved());
+
     }
 
     @Test
     public void shouldThrowWhenApproveAccountWithoutExactLocation() {
         // Arrange
-        TradeAccount tradeAccount = createTradeAccountWithApproximateLocation();
+        TradeAccount tradeAccount = createTradeAccountReadyForApprove();
+        tradeAccount.setApproximateLocation(createLocation());
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
@@ -155,7 +94,7 @@ public class TradeAccountUpdateTests {
     @ValueSource(strings = "")
     public void shouldThrowWhenApproveAccountWithoutName(String name) {
         // Arrange
-        TradeAccount tradeAccount = createTradeAccountWithExactLocation();
+        TradeAccount tradeAccount = createTradeAccountReadyForApprove();
         tradeAccount.setName(name);
 
         // Act & Assert
@@ -168,7 +107,7 @@ public class TradeAccountUpdateTests {
     @ValueSource(strings = "")
     public void shouldThrowWhenApproveAccountWithoutPhone(String phone) {
         // Arrange
-        TradeAccount tradeAccount = createTradeAccountWithExactLocation();
+        TradeAccount tradeAccount = createTradeAccountReadyForApprove();
         tradeAccount.setPhone(phone);
 
         // Act & Assert
@@ -176,36 +115,27 @@ public class TradeAccountUpdateTests {
                 tradeAccount.approve());
     }
 
-    private TradeAccount createUnapprovedTradeAccount() {
-        OwnerInfo ownerInfo = createOwnerInfo();
-        TradeAccount tradeAccount = TradeAccount.createTradeAccount(ownerInfo);
-        tradeAccount.setName("Test Account");
-        tradeAccount.setPhone("+7 (999) 123-45-67");
-        tradeAccount.setImageId(UUID.randomUUID());
-        return tradeAccount;
-    }
-
-    private TradeAccount createTradeAccountWithExactLocation() {
-        TradeAccount tradeAccount = createUnapprovedTradeAccount();
-        tradeAccount.setExactLocation(createLocation());
-        return tradeAccount;
-    }
-
-    private TradeAccount createTradeAccountWithApproximateLocation() {
-        TradeAccount tradeAccount = createUnapprovedTradeAccount();
-        tradeAccount.setApproximateLocation(createLocation());
-        return tradeAccount;
-    }
-
     private TradeAccount createApprovedTradeAccount() {
-        TradeAccount tradeAccount = createTradeAccountWithExactLocation();
+        TradeAccount tradeAccount = createTradeAccountReadyForApprove();
         tradeAccount.approve();
         return tradeAccount;
     }
 
-    private OwnerInfo createOwnerInfo() {
+    private TradeAccount createTradeAccountReadyForApprove() {
+        TradeAccount tradeAccount = createBlankTradeAccount();
+        tradeAccount.setName("Test Account");
+        tradeAccount.setPhone("+7 (999) 123-45-67");
+        tradeAccount.setImageId(UUID.randomUUID());
+
+        tradeAccount.setExactLocation(createLocation());
+
+        return tradeAccount;
+    }
+
+    private TradeAccount createBlankTradeAccount() {
         User user = User.createUser(UUID.randomUUID(), "owner@example.com");
-        return new OwnerInfo(user);
+        OwnerInfo ownerInfo = new OwnerInfo(user);
+        return TradeAccount.createTradeAccount(ownerInfo);
     }
 
     private Location createLocation() {

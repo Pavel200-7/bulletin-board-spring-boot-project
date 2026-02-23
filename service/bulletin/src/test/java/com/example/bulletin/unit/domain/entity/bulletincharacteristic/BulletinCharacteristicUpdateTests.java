@@ -1,34 +1,16 @@
 package com.example.bulletin.unit.domain.entity.bulletincharacteristic;
 
-import com.example.bulletin.application.mapper.BulletinCharacteristicMapper;
-import com.example.bulletin.application.mapper.CharacteristicMapper;
-import com.example.bulletin.application.mapper.CharacteristicValueMapper;
 import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
-import com.example.bulletin.domain.vo.BulletinCharacteristicData;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-
-@SpringBootTest
 public class BulletinCharacteristicUpdateTests {
-
-    @Autowired
-    private BulletinCharacteristicMapper bulletinCharacteristicMapper;
-
-    @Autowired
-    private CharacteristicMapper characteristicMapper;
-
-    @Autowired
-    private CharacteristicValueMapper characteristicValueMapper;
 
     private Category categoryAggregate = null;
 
@@ -38,43 +20,33 @@ public class BulletinCharacteristicUpdateTests {
         // Arrange
         Bulletin bulletin = createBulletin();
         Category category = createCategoryAggregate();
-        Characteristic characteristic = category.getCharacteristics().get(0);
-        CharacteristicValue characteristicValue = characteristic.getPossibleValues().get(0);
+        Characteristic characteristic = category.getCharacteristics()
+                .getFirst();
+        CharacteristicValue characteristicValue = characteristic.getPossibleValues()
+                .getFirst();
 
         BulletinCharacteristic bulletinCharacteristic = BulletinCharacteristic.createBulletinCharacteristic(bulletin, characteristic);
 
-
-        BulletinCharacteristicData expected = BulletinCharacteristicData.builder()
-                .id(UUID.randomUUID())
-                .bulletinId(bulletin.getId())
-                .name(characteristicMapper.toData(characteristic))
-                .value(characteristicValueMapper.toData(characteristicValue))
-                .build();
-
         // Act
-        bulletinCharacteristic = bulletinCharacteristic.setValue(characteristicValue);
-        BulletinCharacteristicData actual = bulletinCharacteristicMapper.toData(bulletinCharacteristic);
+        bulletinCharacteristic.setValue(characteristicValue);
 
         // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .ignoringFields("id")
-                .isEqualTo(expected);
+        assertEquals(characteristicValue,
+                bulletinCharacteristic.getValue());
     }
 
     @Test
-    public void shouldThrowWhenValueIsOfAnotherCharacteristic()
+    public void shouldThrowWhenValueIsOfCharacteristicNotExistingInBulletin()
             throws AccessDeniedException {
         // Arrange
         Bulletin bulletin = createBulletin();
         Category category = createCategoryAggregate();
-        Characteristic characteristic = category.getCharacteristics().get(0);
+        Characteristic characteristic = category.getCharacteristics()
+                .getFirst();
+        BulletinCharacteristic bulletinCharacteristic = BulletinCharacteristic.createBulletinCharacteristic(bulletin, characteristic);
 
         Characteristic anotherCharacteristic = category.addCharacteristic("another characteristic");
         CharacteristicValue anotherCharacteristicValue = anotherCharacteristic.addPossibleValue("another characteristic value");
-
-
-        BulletinCharacteristic bulletinCharacteristic = BulletinCharacteristic.createBulletinCharacteristic(bulletin, characteristic);
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
