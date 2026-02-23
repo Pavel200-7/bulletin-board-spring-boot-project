@@ -1,14 +1,11 @@
 package com.example.bulletin.unit.domain.entity.bulletin.update;
 
-import com.example.bulletin.application.mapper.BulletinMapper;
-import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.file.AccessDeniedException;
@@ -19,11 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class BulletinAddCharacteristicTests {
-
-    @Autowired
-    private BulletinMapper mapper;
-    @Autowired
-    private CategoryMapper categoryMapper;
 
     @Test
     public void shouldAddCharacteristic()
@@ -99,13 +91,14 @@ public class BulletinAddCharacteristicTests {
         return bulletin;
     }
 
-    public Category createLeafyCategory() {
+    private Category createLeafyCategory() {
         Category root = Category.createRoot("root");
         return root.createLeafyChild("child 1");
     }
 
-    public Characteristic createCharacteristic(Category category) {
+    private Characteristic createCharacteristic(Category category) {
         Characteristic characteristic = category.addCharacteristic("characteristic");
         return characteristic;
     }
+
 }
