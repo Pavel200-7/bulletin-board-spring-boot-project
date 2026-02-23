@@ -22,11 +22,11 @@ public class BulletinSetCategoryTests {
         Category category = createLeafyCategory();
 
         // Act
-        bulletin = bulletin.setCategory(category);
+        bulletin.setCategory(category);
 
         // Assert
         assertNotNull(bulletin.getCategory());
-        assertTrue(category.equals(bulletin.getCategory()));
+        assertEquals(category, bulletin.getCategory());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class BulletinSetCategoryTests {
         bulletin.addCharacteristic(createCharacteristic(category));
 
         // Act
-        bulletin = bulletin.setCategory(category);
+        bulletin.setCategory(category);
 
         // Assert
         assertTrue(bulletin.getCharacteristics().isEmpty());

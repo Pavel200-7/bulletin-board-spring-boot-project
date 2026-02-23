@@ -1,25 +1,17 @@
 package com.example.bulletin.unit.domain.entity.bulletinimage;
 
-import com.example.bulletin.application.mapper.BulletinImageMapper;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.BulletinImage;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
-import com.example.bulletin.domain.vo.BulletinImageData;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 public class BulletinImageCreateTests {
-
-    @Autowired
-    private BulletinImageMapper mapper;
 
     @Test
     public void shouldCreateBulletinImage()
@@ -28,18 +20,12 @@ public class BulletinImageCreateTests {
         Bulletin bulletin = createBulletin();
         UUID imageId = UUID.randomUUID();
 
-        BulletinImageData expected = BulletinImageData.builder()
-                .id(UUID.randomUUID())
-                .bulletinId(bulletin.getId())
-                .imageId(imageId)
-                .build();
-
         // Act
         BulletinImage bulletinImage = BulletinImage.createBulletinImage(bulletin, imageId);
-        BulletinImageData actual = mapper.toData(bulletinImage);
 
         // Assert
-        assertTrue(expected.equalsData(actual));
+        assertEquals(bulletin, bulletinImage.getBulletin());
+        assertEquals(imageId, bulletinImage.getImageId());
     }
 
     private Bulletin createBulletin()
