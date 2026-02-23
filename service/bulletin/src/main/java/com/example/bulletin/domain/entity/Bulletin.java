@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -124,6 +125,18 @@ public class Bulletin extends BaseEntity {
         }
 
         this.characteristics.remove(characteristic);
+    }
+
+    public BulletinCharacteristic setCharacteristicValue(CharacteristicValue value) {
+        var bulletinCharacteristic = findBulletinCharacteristicByCharacteristic(value.getCharacteristic())
+                .orElseThrow(() -> new IllegalStateException("There is no characteristic this value owned."));
+        return bulletinCharacteristic.setValue(value);
+    }
+
+    private Optional<BulletinCharacteristic> findBulletinCharacteristicByCharacteristic(Characteristic characteristic) {
+        return this.characteristics.stream()
+                .filter(c -> c.getName().equals(characteristic))
+                .findFirst();
     }
 
 }

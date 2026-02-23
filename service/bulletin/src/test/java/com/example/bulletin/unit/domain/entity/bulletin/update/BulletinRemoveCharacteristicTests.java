@@ -1,7 +1,5 @@
 package com.example.bulletin.unit.domain.entity.bulletin.update;
 
-import com.example.bulletin.application.mapper.BulletinMapper;
-import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.BulletinCharacteristic;
 import com.example.bulletin.domain.entity.Category;
@@ -9,21 +7,13 @@ import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class BulletinRemoveCharacteristicTests {
-
-    @Autowired
-    private BulletinMapper mapper;
-    @Autowired
-    private CategoryMapper categoryMapper;
 
     @Test
     public void shouldRemoveCharacteristic()
@@ -44,13 +34,14 @@ public class BulletinRemoveCharacteristicTests {
     }
 
     @Test
-    public void shouldThrowWhenCharacteristicNotPresent()
+    public void shouldThrowWhenCharacteristicIsNotExist()
             throws AccessDeniedException {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
+
         Characteristic characteristic = createCharacteristic(category);
-        BulletinCharacteristic added = bulletin.addCharacteristic(characteristic);
+        bulletin.addCharacteristic(characteristic);
 
         Bulletin anotherBulletin = createBulletinWithSetCategory(category);
         Characteristic anotherCharacteristic = createCharacteristic(category);
