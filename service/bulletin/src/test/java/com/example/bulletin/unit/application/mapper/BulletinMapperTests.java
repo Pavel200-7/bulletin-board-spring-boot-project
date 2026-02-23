@@ -44,7 +44,7 @@ public class BulletinMapperTests {
     @Test
     void shouldConvertCorrectlyFromEntityToData() {
         // Arrange
-        BulletinData expected =createExpectedBulletinData();
+        BulletinData expected = createExpectedBulletinDataBuilder().build();
 
         // Act
         BulletinData actual = bulletinMapper.toData(bulletin);
@@ -58,19 +58,8 @@ public class BulletinMapperTests {
     void shouldHandleEmptyCharacteristics() {
         // Arrange
         bulletin.getCharacteristics().clear();
-        BulletinData expected = BulletinData.builder()
-                .id(bulletin.getId())
-                .ownerId(bulletin.getOwnerInfo().getOwnerId())
-                .title(bulletin.getTitle())
-                .description(bulletin.getDescription())
-                .price(bulletin.getPrice())
-                .rating(bulletin.getRating())
-                .status(bulletin.getStatus())
-                .category(categoryMapper.toData(bulletin.getCategory()))
+        BulletinData expected = createExpectedBulletinDataBuilder()
                 .characteristics(List.of())
-                .images(bulletin.getImages().stream()
-                        .map(bulletinImageMapper::toData)
-                        .toList())
                 .build();
 
         // Act
@@ -84,18 +73,7 @@ public class BulletinMapperTests {
     void shouldHandleEmptyImages() {
         // Arrange
         bulletin.getImages().clear();
-        BulletinData expected = BulletinData.builder()
-                .id(bulletin.getId())
-                .ownerId(bulletin.getOwnerInfo().getOwnerId())
-                .title(bulletin.getTitle())
-                .description(bulletin.getDescription())
-                .price(bulletin.getPrice())
-                .rating(bulletin.getRating())
-                .status(bulletin.getStatus())
-                .category(categoryMapper.toData(bulletin.getCategory()))
-                .characteristics(bulletin.getCharacteristics().stream()
-                        .map(bulletinCharacteristicMapper::toData)
-                        .collect(Collectors.toList()))
+        BulletinData expected = createExpectedBulletinDataBuilder()
                 .images(List.of())
                 .build();
 
@@ -108,7 +86,7 @@ public class BulletinMapperTests {
 
     private Bulletin createBulletin()
             throws AccessDeniedException {
-        User user = createUser();
+        User user = User.createUser(UUID.randomUUID(), "owner@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
 
         Bulletin bulletin = Bulletin.createDraft(ownerInfo);
@@ -120,18 +98,16 @@ public class BulletinMapperTests {
         Category category = createCategory();
         bulletin.setCategory(category);
 
-        // Добавляем характеристики
         BulletinCharacteristic characteristic = createBulletinCharacteristic(bulletin);
         bulletin.getCharacteristics().add(characteristic);
 
-        // Добавляем изображения
         BulletinImage image = createBulletinImage(bulletin);
         bulletin.getImages().add(image);
 
         return bulletin;
     }
 
-    private BulletinData createExpectedBulletinData() {
+    private BulletinData.BulletinDataBuilder createExpectedBulletinDataBuilder() {
         CategoryData categoryData = categoryMapper.toData(bulletin.getCategory());
         List<BulletinCharacteristicData> characteristicsData = bulletin.getCharacteristics().stream()
                 .map(bulletinCharacteristicMapper::toData)
@@ -150,12 +126,7 @@ public class BulletinMapperTests {
                 .status(bulletin.getStatus())
                 .category(categoryData)
                 .characteristics(characteristicsData)
-                .images(imagesData)
-                .build();
-    }
-
-    private User createUser() {
-        return User.createUser(UUID.randomUUID(), "owner@example.com");
+                .images(imagesData);
     }
 
     private Category createCategory() {
