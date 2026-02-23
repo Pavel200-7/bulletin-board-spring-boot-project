@@ -9,10 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BulletinCharacteristicDataTests {
 
-    UUID bulletinId = null;
-    CharacteristicData characteristic = null;
-    CharacteristicValueData characteristicValue = null;
-
     @Test
     void shouldReturnTrueWhenAllFieldsMatchExceptId() {
         // Arrange
@@ -67,7 +63,7 @@ public class BulletinCharacteristicDataTests {
 
     private BulletinCharacteristicData.BulletinCharacteristicDataBuilder createDataBuilder() {
 
-        UUID bulletinId = getBulletinId();
+        UUID bulletinId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
         CharacteristicData characteristic = getCharacteristic();
         CharacteristicValueData characteristicValue = getCharacteristicValue();
@@ -79,35 +75,22 @@ public class BulletinCharacteristicDataTests {
                 .value(characteristicValue);
     }
 
-    private UUID getBulletinId() {
-        if (this.bulletinId == null) {
-            this.bulletinId = UUID.randomUUID();
-        }
-        return this.bulletinId;
-    }
-
     private CharacteristicData getCharacteristic() {
-        if (this.characteristic == null) {
-            UUID categoryId = UUID.randomUUID();
-            this.characteristic = CharacteristicData.builder()
-                    .id(UUID.randomUUID())
-                    .name("characteristic 1")
-                    .categoryId(categoryId)
-                    .build();
-        }
-        return this.characteristic;
+        UUID categoryId = UUID.fromString("11111111-1111-1111-1111-111111111112");;
+        return CharacteristicData.builder()
+                .id(UUID.fromString("11111111-1111-1111-1111-111111111113"))
+                .name("characteristic 1")
+                .categoryId(categoryId)
+                .build();
     }
 
     private CharacteristicValueData getCharacteristicValue() {
-        if (this.characteristicValue == null) {
-            CharacteristicData characteristic = getCharacteristic();
-            this.characteristicValue = CharacteristicValueData.builder()
-                    .id(UUID.randomUUID())
-                    .name("characteristic value")
-                    .characteristicId(characteristic.getId())
-                    .build();
-        }
-        return this.characteristicValue;
+        CharacteristicData characteristic = getCharacteristic();
+        return CharacteristicValueData.builder()
+                .id(UUID.fromString("11111111-1111-1111-1111-111111111114"))
+                .name("characteristic value")
+                .characteristicId(characteristic.getId())
+                .build();
     }
 
 }
