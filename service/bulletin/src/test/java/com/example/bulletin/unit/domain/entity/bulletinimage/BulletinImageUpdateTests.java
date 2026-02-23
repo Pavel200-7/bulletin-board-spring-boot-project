@@ -9,26 +9,45 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BulletinImageCreateTests {
+public class BulletinImageUpdateTests {
 
     @Test
-    public void shouldCreateBulletinImage()
+    public void shouldSetMain()
             throws AccessDeniedException {
         // Arrange
-        Bulletin bulletin = createBulletin();
-        UUID imageId = UUID.randomUUID();
+        BulletinImage bulletinImage = createBulletinImage();
 
         // Act
-        BulletinImage bulletinImage = BulletinImage.createBulletinImage(bulletin, imageId);
+        bulletinImage.setMain();
 
         // Assert
-        assertEquals(bulletin, bulletinImage.getBulletin());
-        assertEquals(imageId, bulletinImage.getImageId());
+        assertTrue(bulletinImage.isMain());
+    }
+
+    @Test
+    public void shouldUnsetMain()
+            throws AccessDeniedException {
+        // Arrange
+        BulletinImage bulletinImage = createBulletinImage();
+        bulletinImage.setMain();
+
+        // Act
+        bulletinImage.unsetMain();
+
+        // Assert
         assertFalse(bulletinImage.isMain());
     }
+
+    private BulletinImage createBulletinImage()
+            throws AccessDeniedException {
+        Bulletin bulletin = createBulletin();
+        UUID imageId = UUID.randomUUID();
+        return BulletinImage.createBulletinImage(bulletin, imageId);
+    }
+
 
     private Bulletin createBulletin()
             throws AccessDeniedException {

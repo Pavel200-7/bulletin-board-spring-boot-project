@@ -58,4 +58,5 @@ public class CharacteristicValueMapperTests {
         CharacteristicValue characteristicValue = characteristic.addPossibleValue("test value");
         return characteristicValue;
     }
+
 }

@@ -102,4 +102,5 @@ public class TradeAccountMapperTests {
     private Location createLocation() {
         return new Location(55.7558, 37.6173, "Moscow", "Moscow, some street...");
     }
+
 }

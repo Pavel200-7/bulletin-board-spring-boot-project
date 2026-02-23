@@ -135,7 +135,43 @@ public class Bulletin extends BaseEntity {
 
     private Optional<BulletinCharacteristic> findBulletinCharacteristicByCharacteristic(Characteristic characteristic) {
         return this.characteristics.stream()
-                .filter(c -> c.getName().equals(characteristic))
+                .filter(c -> c.getName().getId()
+                        .equals(characteristic.getId()))
+                .findFirst();
+    }
+
+    public BulletinImage addImage(UUID imageId) {
+        BulletinImage image = BulletinImage.createBulletinImage(this, imageId);
+        this.images.add(image);
+        return image;
+    }
+
+    public void removeImage(BulletinImage image) {
+        BulletinImage existingImage = findImageById(image.getImageId())
+                .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
+
+        this.images.remove(image);
+    }
+
+    private boolean isImageExists(BulletinImage image) {
+        return this.images.stream()
+                .anyMatch(bi -> bi.getImageId().equals(image.getImageId()));
+    }
+
+    public BulletinImage setMainImage(BulletinImage image) {
+        BulletinImage existingImage = findImageById(image.getImageId())
+                .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
+
+        image.setMain();
+        images.stream()
+                .filter(i -> !i.getImageId().equals(image.getImageId()))
+                        .forEach(i -> i.unsetMain());
+        return image;
+    }
+
+    private Optional<BulletinImage> findImageById(UUID imageId) {
+        return this.images.stream()
+                .filter(i -> i.getImageId().equals(imageId))
                 .findFirst();
     }
 
