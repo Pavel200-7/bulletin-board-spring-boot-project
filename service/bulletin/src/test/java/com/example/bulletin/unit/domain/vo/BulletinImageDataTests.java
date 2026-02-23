@@ -33,4 +33,5 @@ public class BulletinImageDataTests {
         // Assert
         assertTrue(result);
     }
+
 }

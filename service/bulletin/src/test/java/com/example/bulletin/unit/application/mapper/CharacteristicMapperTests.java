@@ -56,4 +56,5 @@ public class CharacteristicMapperTests {
         category.addCharacteristic("characteristic");
         return category.getCharacteristics().get(0);
     }
+
 }

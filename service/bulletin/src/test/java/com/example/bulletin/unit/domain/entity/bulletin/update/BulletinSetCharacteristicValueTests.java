@@ -41,7 +41,7 @@ public class BulletinSetCharacteristicValueTests {
         Characteristic characteristic =  category.addCharacteristic("size");
 
         bulletin.setCategory(category);
-        bulletin.addCharacteristic(characteristic);
+        BulletinCharacteristic bulletinCharacteristic = bulletin.addCharacteristic(characteristic);
 
         CharacteristicValue value = characteristic.addPossibleValue("small");
 
@@ -49,7 +49,6 @@ public class BulletinSetCharacteristicValueTests {
         bulletin.setCharacteristicValue(value);
 
         // Assert
-        BulletinCharacteristic bulletinCharacteristic =  bulletin.getCharacteristics().get(0);
         assertNotNull(bulletinCharacteristic.getValue());
         assertEquals(value, bulletinCharacteristic.getValue());
     }
@@ -58,8 +57,7 @@ public class BulletinSetCharacteristicValueTests {
             throws AccessDeniedException {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
-        Bulletin bulletin = Bulletin.createDraft(ownerInfo);
-        return bulletin;
+        return Bulletin.createDraft(ownerInfo);
     }
 
     private Category createCategory() {

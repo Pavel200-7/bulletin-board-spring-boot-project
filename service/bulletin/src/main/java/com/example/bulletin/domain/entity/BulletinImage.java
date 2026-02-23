@@ -20,17 +20,30 @@ public class BulletinImage {
     @Column(name = "image_id", nullable = false)
     private UUID imageId;
 
+    @Column(name = "main")
+    private boolean main;
+
     protected BulletinImage() {}
 
     private BulletinImage(Bulletin bulletin, UUID imageId) {
         this.id = UUID.randomUUID();
         this.bulletin = bulletin;
         this.imageId = imageId;
+        this.main = false;
     }
 
     public static BulletinImage createBulletinImage(Bulletin bulletin, UUID imageId){
         return new BulletinImage(bulletin, imageId);
     }
 
+    public BulletinImage setMain() {
+        this.main = true;
+        return this;
+    }
+
+    public BulletinImage unsetMain() {
+        this.main = false;
+        return this;
+    }
 }
 

@@ -1,7 +1,6 @@
-package com.example.bulletin.unit.domain.entity.bulletinimage;
+package com.example.bulletin.unit.domain.entity.bulletin.update;
 
 import com.example.bulletin.domain.entity.Bulletin;
-import com.example.bulletin.domain.entity.BulletinImage;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
@@ -9,25 +8,22 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class BulletinImageCreateTests {
+public class BulletinAddImageTests {
 
     @Test
-    public void shouldCreateBulletinImage()
+    public void shouldAddImage()
             throws AccessDeniedException {
         // Arrange
-        Bulletin bulletin = createBulletin();
         UUID imageId = UUID.randomUUID();
+        Bulletin bulletin = createBulletin();
 
         // Act
-        BulletinImage bulletinImage = BulletinImage.createBulletinImage(bulletin, imageId);
+        bulletin.addImage(imageId);
 
         // Assert
-        assertEquals(bulletin, bulletinImage.getBulletin());
-        assertEquals(imageId, bulletinImage.getImageId());
-        assertFalse(bulletinImage.isMain());
+        assertFalse(bulletin.getImages().isEmpty());
     }
 
     private Bulletin createBulletin()

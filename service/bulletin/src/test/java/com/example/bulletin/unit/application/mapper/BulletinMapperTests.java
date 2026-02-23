@@ -148,4 +148,5 @@ public class BulletinMapperTests {
     private BulletinImage createBulletinImage(Bulletin bulletin) {
         return BulletinImage.createBulletinImage(bulletin, UUID.randomUUID());
     }
+
 }
