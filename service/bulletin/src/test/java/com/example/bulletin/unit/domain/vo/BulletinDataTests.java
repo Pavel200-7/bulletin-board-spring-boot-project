@@ -4,7 +4,6 @@ import com.example.bulletin.domain.enums.BulletinStatus;
 import com.example.bulletin.domain.vo.*;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +12,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BulletinDataTests {
 
-    BulletinData.BulletinDataBuilder bulletinDataBuilder = null;
+    private final UUID OWNER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private final UUID BULLETIN_ID = UUID.fromString("11111111-1111-1111-1111-111111111112");
+
+    private final UUID PARENT_CATEGORY_ID = UUID.fromString("11111111-1111-1111-1111-111111111113");
+    private final UUID CATEGORY_ID = UUID.fromString("11111111-1111-1111-1111-111111111114");
+
+    private final UUID CHARACTERISTIC_ID = UUID.fromString("11111111-1111-1111-1111-111111111115");
+    private final UUID CHARACTERISTIC_VALUE_ID = UUID.fromString("11111111-1111-1111-1111-111111111116");
+
+    private final UUID IMAGE_ID = UUID.fromString("11111111-1111-1111-1111-111111111117");
 
     @Test
     void shouldReturnTrueWhenAllFieldsMatchExceptId() {
@@ -54,25 +62,13 @@ public class BulletinDataTests {
         // Arrange
         BulletinData data1 = createDataBuilder().build();
 
-        BulletinCharacteristicData originalCharacteristic = data1.getCharacteristics().get(0);
-
-        CharacteristicData modifiedCharacteristicData = CharacteristicData.builder()
-                .id(originalCharacteristic.getName().getId())
-                .categoryId(originalCharacteristic.getName().getCategoryId())
-                .name("another name")
-                .build();
-
-        BulletinCharacteristicData modifiedBulletinCharacteristic = BulletinCharacteristicData.builder()
-                .id(originalCharacteristic.getId())
-                .bulletinId(originalCharacteristic.getBulletinId())
-                .name(modifiedCharacteristicData)
-                .value(originalCharacteristic.getValue())
-                .build();
-
-        List<BulletinCharacteristicData> modifiedCharacteristics = List.of(modifiedBulletinCharacteristic);
+        BulletinCharacteristicData anotherBulletinCharacteristic = createBulletinCharacteristicData(
+                "another characteristic",
+                "another value"
+        );
 
         BulletinData data2 = createDataBuilder()
-                .characteristics(modifiedCharacteristics)
+                .characteristics(List.of(anotherBulletinCharacteristic))
                 .build();
 
         // Act
@@ -87,18 +83,11 @@ public class BulletinDataTests {
         // Arrange
         BulletinData data1 = createDataBuilder().build();
 
-        BulletinImageData originalImage = data1.getImages().get(0);
-
-        BulletinImageData modifiedImage = BulletinImageData.builder()
-                .id(originalImage.getId())
-                .bulletinId(originalImage.getBulletinId())
-                .imageId(UUID.fromString("22222222-2222-2222-2222-222222222222"))
-                .build();
-
-        List<BulletinImageData> modifiedImages = List.of(modifiedImage);
+        UUID anotherImageId = UUID.fromString("11111111-1111-1111-1111-111111111118");
+        BulletinImageData anotherImage = createBulletinImage(anotherImageId);
 
         BulletinData data2 = createDataBuilder()
-                .images(modifiedImages)
+                .images(List.of(anotherImage))
                 .build();
 
         // Act
@@ -109,79 +98,67 @@ public class BulletinDataTests {
     }
 
     private BulletinData.BulletinDataBuilder createDataBuilder() {
-        if (this.bulletinDataBuilder != null) {
-            return this.bulletinDataBuilder;
-        }
-
-        UUID bulletinId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        UUID ownerId = UUID.fromString("11111111-1111-1111-1111-111111111112");
-
         CategoryData categoryData = createCategoryData();
-        UUID categoryId = categoryData.getId();
-
-        List<BulletinCharacteristicData> bulletinCharacteristicsData = new ArrayList<>();
-        BulletinCharacteristicData bulletinCharacteristicData = createBulletinCharacteristicData(bulletinId, categoryId);
-        bulletinCharacteristicsData.add(bulletinCharacteristicData);
-
-        List<BulletinImageData> bulletinImagesData = new ArrayList<>();
-        BulletinImageData imageData = createBulletinImage(bulletinId);
-        bulletinImagesData.add(imageData);
+        BulletinCharacteristicData bulletinCharacteristicData = createBulletinCharacteristicData(
+                "characteristic 1",
+                "value 1");
+        BulletinImageData imageData = createBulletinImage(IMAGE_ID);
 
         return BulletinData.builder()
-                .id(bulletinId)
-                .ownerId(ownerId)
+                .id(BULLETIN_ID)
+                .ownerId(OWNER_ID)
                 .title("title")
                 .description("description")
                 .price(1000)
                 .rating(0)
                 .status(BulletinStatus.DRAFT)
                 .category(categoryData)
-                .characteristics(bulletinCharacteristicsData)
-                .images(bulletinImagesData);
+                .characteristics(List.of(bulletinCharacteristicData))
+                .images(List.of(imageData));
     }
 
     private CategoryData createCategoryData() {
         return CategoryData.builder()
-                .id(UUID.fromString("11111111-1111-1111-1111-111111111113"))
+                .id(CATEGORY_ID)
                 .name("category 1")
-                .parentId(UUID.fromString("11111111-1111-1111-1111-111111111114"))
+                .parentId(PARENT_CATEGORY_ID)
                 .leaf(true)
                 .build();
     }
 
-    private BulletinCharacteristicData createBulletinCharacteristicData(UUID bulletinId, UUID categoryId) {
-        CharacteristicData characteristic = getCharacteristic(categoryId);
-        CharacteristicValueData characteristicValue = getCharacteristicValue(characteristic.getId());
+    private BulletinCharacteristicData createBulletinCharacteristicData(String characteristicName, String valueName) {
+        CharacteristicData characteristic = getCharacteristic(characteristicName);
+        CharacteristicValueData characteristicValue = getCharacteristicValue(valueName);
 
         return BulletinCharacteristicData.builder()
                 .id(UUID.randomUUID())
-                .bulletinId(bulletinId)
+                .bulletinId(BULLETIN_ID)
                 .name(characteristic)
                 .value(characteristicValue)
                 .build();
     }
 
-    private CharacteristicData getCharacteristic(UUID categoryId) {
+    private CharacteristicData getCharacteristic(String name) {
         return CharacteristicData.builder()
-                .id(UUID.fromString("11111111-1111-1111-1111-111111111115"))
-                .name("characteristic 1")
-                .categoryId(categoryId)
+                .id(CHARACTERISTIC_ID)
+                .name(name)
+                .categoryId(CATEGORY_ID)
                 .build();
     }
 
-    private CharacteristicValueData getCharacteristicValue(UUID characteristicId) {
+    private CharacteristicValueData getCharacteristicValue(String name) {
             return CharacteristicValueData.builder()
-                    .id(UUID.fromString("11111111-1111-1111-1111-111111111116"))
-                    .name("characteristic value")
-                    .characteristicId(characteristicId)
+                    .id(CHARACTERISTIC_VALUE_ID)
+                    .name(name)
+                    .characteristicId(CHARACTERISTIC_ID)
                     .build();
     }
 
-    private BulletinImageData createBulletinImage(UUID bulletinId) {
+    private BulletinImageData createBulletinImage(UUID imageId) {
         return BulletinImageData.builder()
-                .id(UUID.fromString("11111111-1111-1111-1111-111111111117"))
-                .bulletinId(bulletinId)
-                .imageId(UUID.fromString("11111111-1111-1111-1111-111111111118"))
+                .id(UUID.randomUUID())
+                .bulletinId(BULLETIN_ID)
+                .imageId(imageId)
                 .build();
     }
 
