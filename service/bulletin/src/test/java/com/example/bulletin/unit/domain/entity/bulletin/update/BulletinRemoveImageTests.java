@@ -22,7 +22,7 @@ public class BulletinRemoveImageTests {
         BulletinImage image = bulletin.addImage(imageId);
 
         // Act
-        bulletin.removeImage(image);
+        bulletin.removeImage(image.getId());
 
         // Assert
         assertTrue(bulletin.getImages().isEmpty());
@@ -35,11 +35,11 @@ public class BulletinRemoveImageTests {
         UUID imageId = UUID.randomUUID();
         Bulletin bulletin = createBulletin();
         BulletinImage image = bulletin.addImage(imageId);
-        bulletin.removeImage(image);
+        bulletin.removeImage(image.getId());
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
-                bulletin.removeImage(image));
+                bulletin.removeImage(image.getId()));
     }
 
     private Bulletin createBulletin()

@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -101,13 +102,17 @@ public class Category {
         return characteristic;
     }
 
-    public Category removeCharacteristic(Characteristic characteristic) {
-        if (!characteristic.getCategory().getId()
-                .equals(this.getId())) {
-            throw new IllegalStateException("This is not characteristic value of existing characteristic.");
-        }
+    public Category removeCharacteristic(UUID removingId) {
+        Characteristic characteristic = findCharacteristic(removingId)
+                .orElseThrow(() -> new IllegalStateException("This is not characteristic value of existing characteristic."));
         this.characteristics.remove(characteristic);
         return this;
+    }
+
+    private Optional<Characteristic> findCharacteristic(UUID id) {
+        return characteristics.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst();
     }
 
 }

@@ -50,7 +50,7 @@ public class CharacteristicUpdateTests {
         CharacteristicValue value = characteristic.addPossibleValue(valueName);
 
         // Act
-        characteristic.removePossibleValue(value);
+        characteristic.removePossibleValue(value.getId());
 
         // Assert
         assertTrue(characteristic.getPossibleValues()
@@ -69,7 +69,7 @@ public class CharacteristicUpdateTests {
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
-                characteristic.removePossibleValue(anotherCharacteristicValue));
+                characteristic.removePossibleValue(anotherCharacteristicValue.getId()));
     }
 
 }

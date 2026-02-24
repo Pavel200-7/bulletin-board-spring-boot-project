@@ -21,7 +21,7 @@ public class BulletinSetMainImageTests {
         BulletinImage image = bulletin.addImage(UUID.randomUUID());
 
         // Act
-        bulletin.setMainImage(image);
+        bulletin.setMainImage(image.getId());
 
         // Assert
         assertTrue(image.isMain());
@@ -33,11 +33,11 @@ public class BulletinSetMainImageTests {
         // Arrange
         Bulletin bulletin = createBulletin();
         BulletinImage image = bulletin.addImage(UUID.randomUUID());
-        bulletin.removeImage(image);
+        bulletin.removeImage(image.getId());
 
         // Act
         assertThrows(IllegalStateException.class, () ->
-                bulletin.setMainImage(image));
+                bulletin.setMainImage(image.getId()));
     }
 
     @Test
@@ -48,10 +48,10 @@ public class BulletinSetMainImageTests {
         BulletinImage image1 = bulletin.addImage(UUID.randomUUID());
         BulletinImage image2 = bulletin.addImage(UUID.randomUUID());
 
-        bulletin.setMainImage(image1);
+        bulletin.setMainImage(image1.getId());
 
         // Act
-        bulletin.setMainImage(image2);
+        bulletin.setMainImage(image2.getId());
 
         // Assert
         assertFalse(image1.isMain());

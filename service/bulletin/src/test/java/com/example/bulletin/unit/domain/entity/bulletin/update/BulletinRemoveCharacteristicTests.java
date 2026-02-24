@@ -25,7 +25,7 @@ public class BulletinRemoveCharacteristicTests {
         BulletinCharacteristic added = bulletin.addCharacteristic(characteristic);
 
         // Act
-        bulletin.removeCharacteristic(added);
+        bulletin.removeCharacteristic(added.getId());
 
         // Assert
         assertTrue(bulletin.getCharacteristics().isEmpty());
@@ -47,7 +47,7 @@ public class BulletinRemoveCharacteristicTests {
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
-                bulletin.removeCharacteristic(anotherAdded));
+                bulletin.removeCharacteristic(anotherAdded.getId()));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class BulletinRemoveCharacteristicTests {
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
-                bulletin.removeCharacteristic(notAdded));
+                bulletin.removeCharacteristic(notAdded.getId()));
 
     }
 
@@ -84,7 +84,7 @@ public class BulletinRemoveCharacteristicTests {
         assertEquals(3, bulletin.getCharacteristics().size());
 
         // Act
-        bulletin.removeCharacteristic(added2);
+        bulletin.removeCharacteristic(added2.getId());
 
         // Assert
         assertEquals(2, bulletin.getCharacteristics().size());
@@ -105,7 +105,7 @@ public class BulletinRemoveCharacteristicTests {
         assertEquals(1, bulletin.getCharacteristics().size());
 
         // Act
-        bulletin.removeCharacteristic(added);
+        bulletin.removeCharacteristic(added.getId());
         assertTrue(bulletin.getCharacteristics().isEmpty());
 
         // Act (again)

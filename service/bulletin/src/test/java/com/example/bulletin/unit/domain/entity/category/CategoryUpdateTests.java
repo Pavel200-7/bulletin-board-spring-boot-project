@@ -47,7 +47,7 @@ public class CategoryUpdateTests {
         Characteristic characteristic = category.getCharacteristics().get(0);
 
         // Act
-        category.removeCharacteristic(characteristic);
+        category.removeCharacteristic(characteristic.getId());
 
         // Assert
         assertTrue(category.getCharacteristics()
@@ -65,7 +65,7 @@ public class CategoryUpdateTests {
 
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
-                category.removeCharacteristic(anotherCharacteristic));
+                category.removeCharacteristic(anotherCharacteristic.getId()));
     }
 
     public Category createCategory() {
