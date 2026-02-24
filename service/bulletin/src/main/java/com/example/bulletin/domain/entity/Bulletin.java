@@ -93,55 +93,60 @@ public class Bulletin extends BaseEntity {
     }
 
     public BulletinCharacteristic addCharacteristic(Characteristic characteristic) {
+        validateForAddCharacteristic(characteristic);
+        BulletinCharacteristic bulletinCharacteristic = BulletinCharacteristic.createBulletinCharacteristic(this, characteristic);
+        this.characteristics.add(bulletinCharacteristic);
+        return bulletinCharacteristic;
+    }
+
+    private void validateForAddCharacteristic(Characteristic characteristic) {
         if (this.category == null) {
             throw new IllegalStateException("Category should be set before characteristics.");
         }
 
-        if (!characteristic.getCategory().getId()
-                .equals(this.category.getId())) {
+        if (!characteristic.getCategory()
+                .getId().equals(this.category.getId())) {
             throw new IllegalStateException("This characteristics is not of chosen category.");
         }
 
         if (isCharacteristicAlreadyExists(characteristic)) {
             throw new IllegalStateException("This characteristics is not unique for this bulletin.");
         }
-
-        BulletinCharacteristic bulletinCharacteristic = BulletinCharacteristic.createBulletinCharacteristic(this, characteristic);
-        this.characteristics.add(bulletinCharacteristic);
-        return bulletinCharacteristic;
     }
 
     private boolean isCharacteristicAlreadyExists(Characteristic characteristic) {
         return this.characteristics.stream()
-                .anyMatch(bc -> bc.getName().getId()
-                        .equals(characteristic.getId()));
+                .anyMatch(bc -> bc.getName()
+                        .getId().equals(characteristic.getId()));
     }
 
-    public void removeCharacteristic(BulletinCharacteristic characteristic) {
-        BulletinCharacteristic bulletinCharacteristic = findCharacteristicById(characteristic.getId())
+    public void removeCharacteristic(UUID removingId) {
+        BulletinCharacteristic bulletinCharacteristic = findCharacteristic(removingId)
                 .orElseThrow(() ->  new IllegalStateException("This characteristic is not present in this bulletin."));
         this.characteristics.remove(bulletinCharacteristic);
     }
 
-    private Optional<BulletinCharacteristic> findCharacteristicById(UUID characteristicId) {
+    private Optional<BulletinCharacteristic> findCharacteristic(UUID id) {
         return this.characteristics.stream()
                 .filter(bc -> bc.getId()
-                        .equals(characteristicId))
+                        .equals(id))
                 .findFirst();
     }
 
     public BulletinCharacteristic setCharacteristicValue(CharacteristicValue value) {
-        var bulletinCharacteristic = findBulletinCharacteristicByCharacteristic(value.getCharacteristic())
+        Characteristic characteristicValueOwned = value.getCharacteristic();
+        var bulletinCharacteristic = findCharacteristicByNameId(characteristicValueOwned.getId())
                 .orElseThrow(() -> new IllegalStateException("There is no characteristic this value owned."));
         return bulletinCharacteristic.setValue(value);
     }
 
-    private Optional<BulletinCharacteristic> findBulletinCharacteristicByCharacteristic(Characteristic characteristic) {
+    private Optional<BulletinCharacteristic> findCharacteristicByNameId(UUID id) {
         return this.characteristics.stream()
-                .filter(c -> c.getName().getId()
-                        .equals(characteristic.getId()))
+                .filter(bc -> bc.getName().getId()
+                        .equals(id))
                 .findFirst();
     }
+
 
     public BulletinImage addImage(UUID imageId) {
         BulletinImage image = BulletinImage.createBulletinImage(this, imageId);
@@ -149,10 +154,9 @@ public class Bulletin extends BaseEntity {
         return image;
     }
 
-    public void removeImage(BulletinImage image) {
-        BulletinImage existingImage = findImageById(image.getImageId())
+    public void removeImage(UUID removingId) {
+        BulletinImage image = findImage(removingId)
                 .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
-
         this.images.remove(image);
     }
 
@@ -161,20 +165,20 @@ public class Bulletin extends BaseEntity {
                 .anyMatch(bi -> bi.getImageId().equals(image.getImageId()));
     }
 
-    public BulletinImage setMainImage(BulletinImage image) {
-        BulletinImage existingImage = findImageById(image.getImageId())
+    public BulletinImage setMainImage(UUID imageId) {
+        BulletinImage image = findImage(imageId)
                 .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
 
-        existingImage.setMain();
+        image.setMain();
         images.stream()
-                .filter(i -> !i.getImageId().equals(image.getImageId()))
+                .filter(i -> !i.getId().equals(imageId))
                         .forEach(i -> i.unsetMain());
         return image;
     }
 
-    private Optional<BulletinImage> findImageById(UUID imageId) {
+    private Optional<BulletinImage> findImage(UUID imageId) {
         return this.images.stream()
-                .filter(i -> i.getImageId().equals(imageId))
+                .filter(i -> i.getId().equals(imageId))
                 .findFirst();
     }
 

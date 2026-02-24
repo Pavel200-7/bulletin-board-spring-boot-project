@@ -65,13 +65,16 @@ public class TradeAccount extends BaseEntity {
     }
 
     public TradeAccount setApproximateLocation(Location location) {
-        if (this.approved) {
-            throw new IllegalStateException("Cannot set approximate location for approved account.");
-        }
-
+        validateForSetApproximateLocation();
         this.location = location;
         this.coordinatesExact = false;
         return this;
+    }
+
+    private void validateForSetApproximateLocation() {
+        if (this.approved) {
+            throw new IllegalStateException("Cannot set approximate location for approved account.");
+        }
     }
 
     public TradeAccount setExactLocation(Location location) {

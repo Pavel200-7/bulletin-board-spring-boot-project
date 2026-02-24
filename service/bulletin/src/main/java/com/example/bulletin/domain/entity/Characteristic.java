@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -56,12 +57,16 @@ public class Characteristic {
         return value;
     }
 
-    public void removePossibleValue(CharacteristicValue value) {
-        if (!value.getCharacteristic().getId()
-                .equals(this.getId())) {
-            throw new IllegalStateException("This is not characteristic value of existing characteristic.");
-        }
+    public void removePossibleValue(UUID removingId) {
+        CharacteristicValue value = findCharacteristicValue(removingId)
+                .orElseThrow(() -> new IllegalStateException("This is not characteristic value of existing characteristic."));
         this.possibleValues.remove(value);
+    }
+
+    private Optional<CharacteristicValue> findCharacteristicValue(UUID id) {
+        return possibleValues.stream()
+                .filter(cv -> cv.getId().equals(id))
+                .findFirst();
     }
 
 }
