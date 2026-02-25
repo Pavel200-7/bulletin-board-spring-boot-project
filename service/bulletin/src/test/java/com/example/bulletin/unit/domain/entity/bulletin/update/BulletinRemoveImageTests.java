@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BulletinRemoveImageTests {
 
     @Test
-    public void shouldRemoveImage()
-            throws AccessDeniedException {
+    public void shouldRemoveImage() {
         // Arrange
         UUID imageId = UUID.randomUUID();
         Bulletin bulletin = createBulletin();
@@ -29,8 +28,7 @@ public class BulletinRemoveImageTests {
     }
 
     @Test
-    public void shouldThrowWhenImageIsNotFound()
-            throws AccessDeniedException {
+    public void shouldThrowWhenImageIsNotFound() {
         // Arrange
         UUID imageId = UUID.randomUUID();
         Bulletin bulletin = createBulletin();
@@ -42,8 +40,7 @@ public class BulletinRemoveImageTests {
                 bulletin.removeImage(image.getId()));
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

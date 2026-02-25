@@ -16,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BulletinRemoveCharacteristicTests {
 
     @Test
-    public void shouldRemoveCharacteristic()
-            throws AccessDeniedException {
+    public void shouldRemoveCharacteristic() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -32,8 +31,7 @@ public class BulletinRemoveCharacteristicTests {
     }
 
     @Test
-    public void shouldThrowWhenCharacteristicIsNotExist()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCharacteristicIsNotExist() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -51,8 +49,7 @@ public class BulletinRemoveCharacteristicTests {
     }
 
     @Test
-    public void shouldThrowWhenCharacteristicBelongsToAnotherBulletin()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCharacteristicBelongsToAnotherBulletin() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -67,8 +64,7 @@ public class BulletinRemoveCharacteristicTests {
     }
 
     @Test
-    public void shouldRemoveOnlySpecifiedCharacteristicWhenMultipleExist()
-            throws AccessDeniedException {
+    public void shouldRemoveOnlySpecifiedCharacteristicWhenMultipleExist() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -94,8 +90,7 @@ public class BulletinRemoveCharacteristicTests {
     }
 
     @Test
-    public void shouldAllowAddingSameCharacteristicAfterRemoval()
-            throws AccessDeniedException {
+    public void shouldAllowAddingSameCharacteristicAfterRemoval() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -116,15 +111,13 @@ public class BulletinRemoveCharacteristicTests {
         assertTrue(bulletin.getCharacteristics().contains(addedAgain));
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);
     }
 
-    private Bulletin createBulletinWithSetCategory(Category category)
-            throws AccessDeniedException {
+    private Bulletin createBulletinWithSetCategory(Category category) {
         Bulletin bulletin = createBulletin();
         bulletin.setCategory(category);
         return bulletin;

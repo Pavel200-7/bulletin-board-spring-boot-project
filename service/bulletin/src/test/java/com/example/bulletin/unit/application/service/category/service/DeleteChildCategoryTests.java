@@ -3,7 +3,7 @@ package com.example.bulletin.unit.application.service.category.service;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
-import com.example.bulletin.application.service.category.data.request.DeleteCategoryRequest;
+import com.example.bulletin.application.service.category.data.request.DeleteChildCategoryRequest;
 import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
@@ -11,8 +11,6 @@ import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class DeleteCategoryTests {
+public class DeleteChildCategoryTests {
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -49,39 +47,44 @@ public class DeleteCategoryTests {
     @Mock
     private Category category;
 
+    @Mock
+    private Category parentCategory;
+
+
     @BeforeEach
     public void setup() {
         when(categoryRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(category));
+                .thenReturn(Optional.of(parentCategory));
     }
 
     @Test
     public void shouldThrowWhenNotFound() {
         // Arrange
-        DeleteCategoryRequest request = createRequest();
+        DeleteChildCategoryRequest request = createRequest();
         when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {service.deleteCategory(request); } );
+        assertThrows(ResourceNotFoundException.class, () -> {service.deleteChildCategory(request); } );
     }
 
     @Test
     public void shouldDelete() {
         // Arrange
-        DeleteCategoryRequest request = createRequest();
+        DeleteChildCategoryRequest request = createRequest();
 
         // Act
-        service.deleteCategory(request);
+        service.deleteChildCategory(request);
 
         // Assert
-        verify(category).delete();
-        verify(categoryRepository).delete(category);
+        verify(parentCategory).removeChild(any(UUID.class));
+        verify(categoryRepository).save(parentCategory);
     }
 
-    public DeleteCategoryRequest createRequest() {
-        return DeleteCategoryRequest.builder()
-                .id(UUID.randomUUID())
+    public DeleteChildCategoryRequest createRequest() {
+        return DeleteChildCategoryRequest.builder()
+                .parentId(UUID.randomUUID())
+                .childId(UUID.randomUUID())
                 .build();
     }
 

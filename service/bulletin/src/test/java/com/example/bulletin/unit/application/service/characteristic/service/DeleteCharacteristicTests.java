@@ -2,7 +2,6 @@ package com.example.bulletin.unit.application.service.characteristic.service;
 
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CharacteristicMapper;
-import com.example.bulletin.application.service.category.data.request.DeleteCategoryRequest;
 import com.example.bulletin.application.service.characteristic.CharacteristicServiceImpl;
 import com.example.bulletin.application.service.characteristic.data.request.DeleteCharacteristicRequest;
 import com.example.bulletin.application.service.characteristic.helper.inter.CharacteristicHierarchyPolicy;
@@ -10,7 +9,6 @@ import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import com.example.bulletin.infrastructure.repository.CharacteristicRepository;
-import jakarta.validation.constraints.AssertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

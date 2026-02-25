@@ -1,6 +1,5 @@
 package com.example.bulletin.application.service.category.data.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +11,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteLeafCategoryRequest {
-    private UUID id;
+public class DeleteChildCategoryRequest {
+    private UUID parentId;
+    private UUID childId;
 }

@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteLeafCategoryResponse {
+public class DeleteChildCategoryResponse {
     private boolean succeed = true;
 }

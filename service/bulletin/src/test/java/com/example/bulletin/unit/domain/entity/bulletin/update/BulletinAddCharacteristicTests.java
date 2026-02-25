@@ -18,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class BulletinAddCharacteristicTests {
 
     @Test
-    public void shouldAddCharacteristic()
-            throws AccessDeniedException {
+    public void shouldAddCharacteristic() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -34,8 +33,7 @@ public class BulletinAddCharacteristicTests {
     }
 
     @Test
-    public void shouldThrowWhenCategoryIsNull()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCategoryIsNull() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletin();
@@ -48,8 +46,7 @@ public class BulletinAddCharacteristicTests {
     }
 
     @Test
-    public void shouldThrowWhenCharacteristicIsNotOfCategory()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCharacteristicIsNotOfCategory() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -63,8 +60,7 @@ public class BulletinAddCharacteristicTests {
     }
 
     @Test
-    public void shouldThrowWhenCharacteristicIsNotUnique()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCharacteristicIsNotUnique() {
         // Arrange
         Category category = createLeafyCategory();
         Bulletin bulletin = createBulletinWithSetCategory(category);
@@ -76,16 +72,14 @@ public class BulletinAddCharacteristicTests {
                 bulletin.addCharacteristic(characteristic));
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         Bulletin bulletin = Bulletin.createDraft(ownerInfo);
         return bulletin;
     }
 
-    private Bulletin createBulletinWithSetCategory(Category category)
-            throws AccessDeniedException {
+    private Bulletin createBulletinWithSetCategory(Category category) {
         Bulletin bulletin = createBulletin();
         bulletin.setCategory(category);
         return bulletin;

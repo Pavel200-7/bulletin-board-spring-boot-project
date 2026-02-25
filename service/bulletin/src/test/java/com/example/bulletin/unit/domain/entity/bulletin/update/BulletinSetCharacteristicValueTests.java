@@ -12,8 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BulletinSetCharacteristicValueTests {
 
     @Test
-    public void shouldThrowWhenCharacteristicOfInputValueIsNotFound()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCharacteristicOfInputValueIsNotFound() {
         // Arrange
         Bulletin bulletin = createBulletin();
 
@@ -32,8 +31,7 @@ public class BulletinSetCharacteristicValueTests {
     }
 
     @Test
-    public void shouldSetCharacteristicValue()
-            throws AccessDeniedException {
+    public void shouldSetCharacteristicValue() {
         // Arrange
         Bulletin bulletin = createBulletin();
 
@@ -53,8 +51,7 @@ public class BulletinSetCharacteristicValueTests {
         assertEquals(value, bulletinCharacteristic.getValue());
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

@@ -79,21 +79,32 @@ public class Category {
         return this;
     }
 
-    public Category delete() {
-        if (this.leaf) {
-            throw new IllegalStateException("This category is leafy and can not be deleted this way.");
-        }
-        if (!this.children.isEmpty()) {
-            throw new IllegalStateException("This category has children and can not be deleted.");
-        }
+    public Category removeChild(UUID deletingId) {
+        Category child = findCategory(deletingId)
+                .orElseThrow(() -> new IllegalStateException("This is not category of the parent."));
+        child.delete();
         return this;
     }
 
-    public Category deleteLeaf() {
-        if (!this.leaf) {
-            throw new IllegalStateException("This category is not leafy and can not be deleted this way.");
+    private void delete() {
+        if (!this.children.isEmpty()) {
+            throw new IllegalStateException("This category has children and can not be deleted.");
         }
-        return this;
+        parent.removeChild(this);
+    }
+
+    private void removeChild(Category child) {
+        if (child.parent != this) {
+            throw new IllegalStateException("Child not found");
+        }
+        this.children.remove(child);
+        child.parent = null;
+    }
+
+    private Optional<Category> findCategory(UUID id) {
+        return children.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst();
     }
 
     public Characteristic addCharacteristic(String name) {
