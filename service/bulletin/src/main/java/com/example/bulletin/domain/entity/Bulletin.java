@@ -8,8 +8,8 @@ import lombok.*;
 import lombok.experimental.Delegate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import com.example.bulletin.application.exception.AccessDeniedException;
 
-import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,8 +75,7 @@ public class Bulletin extends BaseEntity {
         this.ownerInfo = ownerInfo;
     }
 
-    public static Bulletin createDraft(OwnerInfo ownerInfo)
-            throws AccessDeniedException {
+    public static Bulletin createDraft(OwnerInfo ownerInfo) {
         if (ownerInfo.getOwner().isBlocked()) {
             throw new AccessDeniedException("Your account is blocked.");
         }
@@ -142,8 +141,8 @@ public class Bulletin extends BaseEntity {
 
     private Optional<BulletinCharacteristic> findCharacteristicByNameId(UUID id) {
         return this.characteristics.stream()
-                .filter(bc -> bc.getName().getId()
-                        .equals(id))
+                .filter(bc -> bc.getName()
+                        .getId().equals(id))
                 .findFirst();
     }
 
@@ -158,11 +157,6 @@ public class Bulletin extends BaseEntity {
         BulletinImage image = findImage(removingId)
                 .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
         this.images.remove(image);
-    }
-
-    private boolean isImageExists(BulletinImage image) {
-        return this.images.stream()
-                .anyMatch(bi -> bi.getImageId().equals(image.getImageId()));
     }
 
     public BulletinImage setMainImage(UUID imageId) {

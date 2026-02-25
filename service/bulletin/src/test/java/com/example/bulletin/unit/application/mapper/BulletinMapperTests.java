@@ -36,8 +36,7 @@ public class BulletinMapperTests {
     private Bulletin bulletin;
 
     @BeforeEach
-    void setUp()
-            throws AccessDeniedException {
+    void setUp() {
         bulletin = createBulletin();
     }
 
@@ -84,8 +83,7 @@ public class BulletinMapperTests {
         assertTrue(expected.equalsData(actual));
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "owner@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
 

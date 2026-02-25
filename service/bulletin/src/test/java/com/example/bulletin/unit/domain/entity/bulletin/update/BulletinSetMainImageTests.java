@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BulletinSetMainImageTests {
 
     @Test
-    public void shouldSetMain()
-            throws AccessDeniedException {
+    public void shouldSetMain() {
         // Arrange
         Bulletin bulletin = createBulletin();
         BulletinImage image = bulletin.addImage(UUID.randomUUID());
@@ -28,8 +27,7 @@ public class BulletinSetMainImageTests {
     }
 
     @Test
-    public void assertThrowsWhenImageNotFound()
-            throws AccessDeniedException {
+    public void assertThrowsWhenImageNotFound() {
         // Arrange
         Bulletin bulletin = createBulletin();
         BulletinImage image = bulletin.addImage(UUID.randomUUID());
@@ -41,8 +39,7 @@ public class BulletinSetMainImageTests {
     }
 
     @Test
-    public void shouldUnsetMainInOtherImages()
-            throws AccessDeniedException {
+    public void shouldUnsetMainInOtherImages() {
         // Arrange
         Bulletin bulletin = createBulletin();
         BulletinImage image1 = bulletin.addImage(UUID.randomUUID());
@@ -57,8 +54,7 @@ public class BulletinSetMainImageTests {
         assertFalse(image1.isMain());
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

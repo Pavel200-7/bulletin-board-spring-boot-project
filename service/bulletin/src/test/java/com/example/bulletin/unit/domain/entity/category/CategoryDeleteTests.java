@@ -3,78 +3,43 @@ package com.example.bulletin.unit.domain.entity.category;
 import com.example.bulletin.domain.entity.Category;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class CategoryDeleteTests {
 
     @Test
-    public void shouldApproveWhenNoChildren() {
+    public void shouldRemoveChildWhenNoChildren() {
         // Arrange
         Category parentCategory = createCategoryWithChildren();
-        parentCategory.getChildren().clear();
-        Category expected = parentCategory;
+        Category child = parentCategory.getChildren()
+                .getFirst();
+        UUID childId = child.getId();
 
         // Act
-        Category actual = parentCategory.delete();
+        parentCategory.removeChild(childId);
 
         // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .isEqualTo(expected);
-
+        assertTrue(parentCategory.getChildren().isEmpty());
     }
 
     @Test
     public void shouldThrowWhenHasChildren() {
         // Arrange
         Category parentCategory = createCategoryWithChildren();
+        Category child = parentCategory.getChildren()
+                .getFirst();
+        child.createLeafyChild("2 level child");
+        UUID childId = child.getId();
 
         // Act & Assert
-        assertThrows(IllegalStateException.class, () -> { parentCategory.delete(); });
-    }
-
-    @Test
-    public void shouldThrowWhenLeafy() {
-        // Arrange
-        Category parentCategory = createCategoryWithChildren();
-        Category leafyChild = parentCategory.getChildren().get(0);
-
-        // Act & Assert
-        assertThrows(IllegalStateException.class, () -> { leafyChild.delete(); });
-    }
-
-    @Test
-    public void shouldApproveWhenLeafy() {
-        // Arrange
-        Category parentCategory = createCategoryWithChildren();
-        Category leafyChild = parentCategory.getChildren().get(0);
-        Category expected = leafyChild;
-
-
-        // Act
-        Category actual = leafyChild.deleteLeaf();
-
-        // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .isEqualTo(expected);
-
-    }
-
-    @Test
-    public void shouldThrowWhenNotLeafy() {
-        // Arrange
-        Category parentCategory = createCategoryWithChildren();
-        Category notLeafyChild = parentCategory.createChild("not leafy");
-
-        // Act & Assert
-        assertThrows(IllegalStateException.class, () -> { notLeafyChild.deleteLeaf(); });
+        assertThrows(IllegalStateException.class, () -> { parentCategory.removeChild(childId); });
     }
 
     public Category createCategoryWithChildren() {
         Category root = Category.createRoot("root");
-        root.createLeafyChild("child 1");
+        root.createChild("child 1");
         return root;
     }
 

@@ -13,8 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class BulletinAddImageTests {
 
     @Test
-    public void shouldAddImage()
-            throws AccessDeniedException {
+    public void shouldAddImage() {
         // Arrange
         UUID imageId = UUID.randomUUID();
         Bulletin bulletin = createBulletin();
@@ -26,8 +25,7 @@ public class BulletinAddImageTests {
         assertFalse(bulletin.getImages().isEmpty());
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

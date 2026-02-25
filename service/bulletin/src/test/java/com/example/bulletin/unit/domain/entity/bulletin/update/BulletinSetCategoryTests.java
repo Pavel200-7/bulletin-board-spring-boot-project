@@ -15,8 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BulletinSetCategoryTests {
 
     @Test
-    public void shouldSetCategory()
-            throws AccessDeniedException {
+    public void shouldSetCategory() {
         // Arrange
         Bulletin bulletin = createBulletin();
         Category category = createLeafyCategory();
@@ -30,8 +29,7 @@ public class BulletinSetCategoryTests {
     }
 
     @Test
-    public void shouldThrowWhenCategoryIsNotLeafy()
-            throws AccessDeniedException {
+    public void shouldThrowWhenCategoryIsNotLeafy() {
         // Arrange
         Bulletin bulletin = createBulletin();
         Category category = createNotLeafyCategory();
@@ -42,8 +40,7 @@ public class BulletinSetCategoryTests {
     }
 
     @Test
-    public void shouldResetCharacteristicsAfterSetCategory()
-            throws AccessDeniedException {
+    public void shouldResetCharacteristicsAfterSetCategory() {
         // Arrange
         Category category = createLeafyCategory();
 
@@ -58,8 +55,7 @@ public class BulletinSetCategoryTests {
         assertTrue(bulletin.getCharacteristics().isEmpty());
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

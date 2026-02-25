@@ -11,6 +11,5 @@ public interface CategoryService {
     CreateChildCategoryResponse createChild(CreateChildCategoryRequest request);
     CreateLeafyChildCategoryResponse createLeafyChild(CreateLeafyChildCategoryRequest request);
     RenameCategoryResponse renameCategory(RenameCategoryRequest request);
-    DeleteCategoryResponse deleteCategory(DeleteCategoryRequest request);
-    DeleteLeafCategoryResponse deleteLeafCategory(DeleteLeafCategoryRequest request);
+    DeleteChildCategoryResponse deleteChildCategory(DeleteChildCategoryRequest request);
 }

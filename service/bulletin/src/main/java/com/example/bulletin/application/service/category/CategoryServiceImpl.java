@@ -120,27 +120,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public DeleteCategoryResponse deleteCategory(DeleteCategoryRequest request) {
-        Category category = categoryRepository.findById(request.getId())
+    public DeleteChildCategoryResponse deleteChildCategory(DeleteChildCategoryRequest request) {
+        Category parentCategory = categoryRepository.findById(request.getParentId())
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
-
-        category.delete();
-        categoryRepository.delete(category);
-        return new DeleteCategoryResponse();
-    }
-
-    @Override
-    @Transactional
-    public DeleteLeafCategoryResponse deleteLeafCategory(DeleteLeafCategoryRequest request) {
-        Category category = categoryRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
-        if (bulletinRepository.existsByCategoryId(request.getId())) {
-            throw new IllegalStateException("There are bulletins described with this category.");
-        }
-
-        category.deleteLeaf();
-        categoryRepository.delete(category);
-        return new DeleteLeafCategoryResponse();
+        parentCategory.removeChild(request.getChildId());
+        categoryRepository.save(parentCategory);
+        return new DeleteChildCategoryResponse();
     }
 
 }

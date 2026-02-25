@@ -55,15 +55,9 @@ public class CategoryController {
         return ResponseEntity.ok(service.renameCategory(request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable UUID id) {
-        service.deleteCategory(new DeleteCategoryRequest(id));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/leaf/{id}")
-    public ResponseEntity<Void> deleteLeafCategory(@PathVariable UUID id) {
-        service.deleteLeafCategory(new DeleteLeafCategoryRequest(id));
+    @DeleteMapping("/{parentId}/children/{childId}")
+    public ResponseEntity<Void> deleteChildCategory(@PathVariable UUID parentId, @PathVariable UUID childId) {
+        service.deleteChildCategory(new DeleteChildCategoryRequest(parentId, childId));
         return ResponseEntity.noContent().build();
     }
 

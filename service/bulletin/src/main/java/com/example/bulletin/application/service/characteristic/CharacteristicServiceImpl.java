@@ -93,4 +93,6 @@ public class CharacteristicServiceImpl implements CharacteristicService {
         return new DeleteCharacteristicResponse();
     }
 
+
+
 }
