@@ -86,11 +86,15 @@ public class Category {
         return this;
     }
 
-    private void delete() {
+    public void delete() {
         if (!this.children.isEmpty()) {
             throw new IllegalStateException("This category has children and can not be deleted.");
         }
-        parent.removeChild(this);
+        Category owner = parent;
+        if (owner != null) {
+            parent.removeChild(this);
+            this.parent = null;
+        }
     }
 
     private void removeChild(Category child) {
@@ -98,7 +102,6 @@ public class Category {
             throw new IllegalStateException("Child not found");
         }
         this.children.remove(child);
-        child.parent = null;
     }
 
     private Optional<Category> findCategory(UUID id) {
@@ -115,7 +118,15 @@ public class Category {
 
     public Category removeCharacteristic(UUID removingId) {
         Characteristic characteristic = findCharacteristic(removingId)
-                .orElseThrow(() -> new IllegalStateException("This is not characteristic value of existing characteristic."));
+                .orElseThrow(() -> new IllegalStateException("This is not characteristic of the category."));
+        characteristic.delete();
+        return this;
+    }
+
+    Category removeCharacteristic(Characteristic characteristic) {
+        if(characteristic.getCategory() != this) {
+            throw new IllegalStateException("This is not characteristic of the category.");
+        }
         this.characteristics.remove(characteristic);
         return this;
     }

@@ -24,26 +24,9 @@ public class CharacteristicController {
         return ResponseEntity.ok(service.getCharacteristic(request));
     }
 
-    @GetMapping("/category_characteristics/{categoryId}")
-    public ResponseEntity<GetCategoryCharacteristicsResponse> getCategoryCharacteristics(@PathVariable UUID categoryId) {
-        GetCategoryCharacteristicsRequest request = new GetCategoryCharacteristicsRequest(categoryId);
-        return ResponseEntity.ok(service.getCategoryCharacteristics(request));
-    }
-
-    @PostMapping
-    public ResponseEntity<CreateCharacteristicResponse> createCharacteristic(@Valid @RequestBody CreateCharacteristicRequest request) {
-        return ResponseEntity.ok(service.createCharacteristic(request));
-    }
-
     @PutMapping("/name")
     public ResponseEntity<RenameCharacteristicResponse> renameCharacteristic(@Valid @RequestBody RenameCharacteristicRequest request) {
         return ResponseEntity.ok(service.renameCharacteristic(request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCharacteristic(@Valid @PathVariable UUID id) {
-        service.deleteCharacteristic(new DeleteCharacteristicRequest(id));
-        return ResponseEntity.noContent().build();
     }
 
 }

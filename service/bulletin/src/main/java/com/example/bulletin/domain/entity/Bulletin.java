@@ -119,9 +119,17 @@ public class Bulletin extends BaseEntity {
                         .getId().equals(characteristic.getId()));
     }
 
-    public void removeCharacteristic(UUID removingId) {
+    public Bulletin removeCharacteristic(UUID removingId) {
         BulletinCharacteristic bulletinCharacteristic = findCharacteristic(removingId)
                 .orElseThrow(() ->  new IllegalStateException("This characteristic is not present in this bulletin."));
+        bulletinCharacteristic.delete();
+        return this;
+    }
+
+    void removeCharacteristic(BulletinCharacteristic bulletinCharacteristic) {
+        if (bulletinCharacteristic.getBulletin() != this) {
+            throw new IllegalStateException("This characteristic is not present in this bulletin.");
+        }
         this.characteristics.remove(bulletinCharacteristic);
     }
 
@@ -153,12 +161,6 @@ public class Bulletin extends BaseEntity {
         return image;
     }
 
-    public void removeImage(UUID removingId) {
-        BulletinImage image = findImage(removingId)
-                .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
-        this.images.remove(image);
-    }
-
     public BulletinImage setMainImage(UUID imageId) {
         BulletinImage image = findImage(imageId)
                 .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
@@ -166,8 +168,22 @@ public class Bulletin extends BaseEntity {
         image.setMain();
         images.stream()
                 .filter(i -> !i.getId().equals(imageId))
-                        .forEach(i -> i.unsetMain());
+                .forEach(i -> i.unsetMain());
         return image;
+    }
+
+    public Bulletin removeImage(UUID removingId) {
+        BulletinImage image = findImage(removingId)
+                .orElseThrow(() -> new IllegalStateException("Image not found in bulletin"));
+        image.delete();
+        return this;
+    }
+
+    void removeImage(BulletinImage bulletinImage) {
+        if (bulletinImage.getBulletin() != this) {
+            throw new IllegalStateException("Image not found in bulletin");
+        }
+        this.images.remove(bulletinImage);
     }
 
     private Optional<BulletinImage> findImage(UUID imageId) {

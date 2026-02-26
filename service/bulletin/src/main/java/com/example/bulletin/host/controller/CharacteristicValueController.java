@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/characteristic_value")
+@RequestMapping("/api/v1/characteristic-value")
 public class CharacteristicValueController {
 
     private final CharacteristicValueService service;
@@ -23,25 +23,9 @@ public class CharacteristicValueController {
         return ResponseEntity.ok(service.getCharacteristicValue(request));
     }
 
-    @GetMapping("/by_characteristic/{characteristicId}")
-    public ResponseEntity<GetCharacteristicValuesResponse> getCharacteristicValues(@PathVariable UUID characteristicId) {
-        GetCharacteristicValuesRequest request = new GetCharacteristicValuesRequest(characteristicId);
-        return ResponseEntity.ok(service.getCharacteristicValues(request));
-    }
-
-    @PostMapping
-    public ResponseEntity<CreateCharacteristicValueResponse> createCharacteristicValue(@Valid @RequestBody CreateCharacteristicValueRequest request) {
-        return ResponseEntity.ok(service.createCharacteristicValue(request));
-    }
-
     @PutMapping("/name")
     public ResponseEntity<RenameCharacteristicValueResponse> renameCharacteristicValue(@Valid @RequestBody RenameCharacteristicValueRequest request) {
         return ResponseEntity.ok(service.renameCharacteristicValue(request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCharacteristicValue(@Valid @PathVariable UUID id) {
-        service.deleteCharacteristicValue(new DeleteCharacteristicValueRequest(id));
-        return ResponseEntity.noContent().build();
-    }
 }

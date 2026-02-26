@@ -83,12 +83,9 @@ public class CharacteristicServiceImpl implements CharacteristicService {
     @Override
     @Transactional
     public DeleteCharacteristicResponse deleteCharacteristic(DeleteCharacteristicRequest request) {
-        Characteristic characteristic = characteristicRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("A characteristic with this id is not found."));
-
-        Category category = characteristic.getCategory();
-        category.removeCharacteristic(characteristic.getId());
-
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("A category with this id is not found."));
+        category.removeCharacteristic(request.getCharacteristicId());
         categoryRepository.save(category);
         return new DeleteCharacteristicResponse();
     }

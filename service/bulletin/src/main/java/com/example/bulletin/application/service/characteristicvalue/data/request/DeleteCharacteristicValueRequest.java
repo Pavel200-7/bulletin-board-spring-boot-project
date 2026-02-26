@@ -12,5 +12,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteCharacteristicValueRequest {
-    private UUID id;
+    private UUID characteristicId;
+    private UUID characteristicValueId;
 }

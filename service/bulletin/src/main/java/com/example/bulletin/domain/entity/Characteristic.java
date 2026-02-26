@@ -51,16 +51,32 @@ public class Characteristic {
         return this;
     }
 
+    void delete() {
+        Category owner = this.category;
+        if (owner != null) {
+            owner.removeCharacteristic(this);
+            this.category = null;
+        }
+    }
+
     public CharacteristicValue addPossibleValue(String valueName) {
         CharacteristicValue value = CharacteristicValue.createCharacteristicValue(valueName, this);
         this.possibleValues.add(value);
         return value;
     }
 
-    public void removePossibleValue(UUID removingId) {
+    public Characteristic removePossibleValue(UUID removingId) {
         CharacteristicValue value = findCharacteristicValue(removingId)
-                .orElseThrow(() -> new IllegalStateException("This is not characteristic value of existing characteristic."));
-        this.possibleValues.remove(value);
+                .orElseThrow(() -> new IllegalStateException("This is not characteristic value of the characteristic."));
+        value.delete();
+        return this;
+    }
+
+    void removePossibleValue(CharacteristicValue characteristicValue) {
+        if (characteristicValue.getCharacteristic() != this) {
+            throw new IllegalStateException("This is not characteristic value of the characteristic.");
+        }
+        this.possibleValues.remove(characteristicValue);
     }
 
     private Optional<CharacteristicValue> findCharacteristicValue(UUID id) {

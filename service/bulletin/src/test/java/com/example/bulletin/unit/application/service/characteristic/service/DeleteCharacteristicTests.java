@@ -63,15 +63,15 @@ public class DeleteCharacteristicTests {
     public void setup() {
         createCategory();
         Characteristic characteristic = createCharacteristic();
-        when(characteristicRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(characteristic));
+        when(categoryRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(category));
     }
 
     @Test
     public void shouldThrowWhenNotFound() {
         // Arrange
         DeleteCharacteristicRequest request = createRequest();
-        when(characteristicRepository.findById(any(UUID.class)))
+        when(categoryRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
@@ -91,23 +91,26 @@ public class DeleteCharacteristicTests {
         verify(categoryRepository).save(category);
     }
 
-    public Characteristic createCharacteristic() {
+    private Characteristic createCharacteristic() {
         if(category.getCharacteristics().isEmpty()) {
             category.addCharacteristic("name");
         }
-        return category.getCharacteristics().get(0);
+        return category.getCharacteristics()
+                .getFirst();
     }
 
-    public Category createCategory() {
+    private Category createCategory() {
         if (category == null) {
             category = Category.createRoot("root");
         }
         return category;
     }
 
-    public DeleteCharacteristicRequest createRequest() {
+    private DeleteCharacteristicRequest createRequest() {
+        UUID characteristicId = createCharacteristic().getId();
         return DeleteCharacteristicRequest.builder()
-                .id(UUID.randomUUID())
+                .categoryId(UUID.randomUUID())
+                .characteristicId(characteristicId)
                 .build();
     }
 
