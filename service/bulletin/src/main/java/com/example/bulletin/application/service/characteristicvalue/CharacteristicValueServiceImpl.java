@@ -78,12 +78,9 @@ public class CharacteristicValueServiceImpl implements CharacteristicValueServic
     @Override
     @Transactional
     public DeleteCharacteristicValueResponse deleteCharacteristicValue(DeleteCharacteristicValueRequest request) {
-        CharacteristicValue characteristicValue = characteristicValueRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("A characteristic value with this id is not found."));
-
-        Characteristic characteristic = characteristicValue.getCharacteristic();
-        characteristic.removePossibleValue(characteristicValue.getId());
-
+        Characteristic characteristic = characteristicRepository.findById(request.getCharacteristicId())
+                .orElseThrow(() -> new ResourceNotFoundException("A characteristic with this id is not found."));
+        characteristic.removePossibleValue(request.getCharacteristicValueId());
         characteristicRepository.save(characteristic);
         return new DeleteCharacteristicValueResponse();
     }

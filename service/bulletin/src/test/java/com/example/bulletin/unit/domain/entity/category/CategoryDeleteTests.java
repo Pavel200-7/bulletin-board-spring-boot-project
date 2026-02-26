@@ -37,6 +37,24 @@ public class CategoryDeleteTests {
         assertThrows(IllegalStateException.class, () -> { parentCategory.removeChild(childId); });
     }
 
+    @Test
+    public void shouldDelete() {
+        // Arrange
+        Category root = Category.createRoot("root");
+
+        // Act & Assert
+        assertDoesNotThrow(() -> { root.delete(); } );
+    }
+
+    @Test
+    public void shouldThrowWhenRootHasChildren() {
+        // Arrange
+        Category root = createCategoryWithChildren();
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> { root.delete(); });
+    }
+
     public Category createCategoryWithChildren() {
         Category root = Category.createRoot("root");
         root.createChild("child 1");

@@ -39,11 +39,20 @@ public class BulletinCharacteristic {
     }
 
     public BulletinCharacteristic setValue(CharacteristicValue value) {
-        if (!value.getCharacteristic().equals(this.name)) {
+        if (!value.getCharacteristic()
+                .getId().equals(this.name.getId())) {
             throw new IllegalStateException("This is not characteristic value of existing characteristic.");
         }
         this.value = value;
         return this;
+    }
+
+    void delete() {
+        Bulletin owner = this.bulletin;
+        if (owner != null) {
+            owner.removeCharacteristic(this);
+            this.bulletin = null;
+        }
     }
 
 }

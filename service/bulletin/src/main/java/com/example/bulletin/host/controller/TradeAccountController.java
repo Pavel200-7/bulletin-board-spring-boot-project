@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/trade_account")
+@RequestMapping("/api/v1/trade-account")
 public class TradeAccountController {
 
     private final TradeAccountService service;
@@ -43,13 +43,13 @@ public class TradeAccountController {
         return ResponseEntity.ok(service.changeDescription(request));
     }
 
-    @PutMapping("/approximate_location")
+    @PutMapping("/approximate-location")
     public ResponseEntity<SetApproximateLocationTradeAccountResponse> setApproximateLocation(
             @Valid @RequestBody SetApproximateLocationTradeAccountRequest request) {
         return ResponseEntity.ok(service.setApproximateLocation(request));
     }
 
-    @PutMapping("/exact_location")
+    @PutMapping("/exact-location")
     public ResponseEntity<SetExactLocationTradeAccountResponse> setExactLocation(
             @Valid @RequestBody SetExactLocationTradeAccountRequest request) {
         return ResponseEntity.ok(service.SetExactLocation(request));

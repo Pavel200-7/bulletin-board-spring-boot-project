@@ -45,5 +45,14 @@ public class BulletinImage {
         this.main = false;
         return this;
     }
+
+    void delete() {
+        Bulletin owner = this.bulletin;
+        if (owner != null) {
+            owner.removeImage(this);
+            this.bulletin = null;
+        }
+    }
+
 }
 

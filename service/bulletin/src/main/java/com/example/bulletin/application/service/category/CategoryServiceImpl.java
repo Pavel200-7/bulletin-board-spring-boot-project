@@ -128,4 +128,13 @@ public class CategoryServiceImpl implements CategoryService {
         return new DeleteChildCategoryResponse();
     }
 
+    @Override
+    public DeleteRootCategoryResponse deleteRootCategory(DeleteRootCategoryRequest request) {
+        Category rootCategory = categoryRepository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
+        rootCategory.delete();
+        categoryRepository.delete(rootCategory);
+        return null;
+    }
+
 }

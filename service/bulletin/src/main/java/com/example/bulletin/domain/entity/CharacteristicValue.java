@@ -38,4 +38,12 @@ public class CharacteristicValue {
         return this;
     }
 
+    void delete() {
+        Characteristic owner = this.characteristic;
+        if (owner != null) {
+            owner.removePossibleValue(this);
+            this.characteristic = null;
+        }
+    }
+
 }

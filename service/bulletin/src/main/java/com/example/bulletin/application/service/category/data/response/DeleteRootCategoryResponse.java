@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteChildCategoryResponse {
+public class DeleteRootCategoryResponse {
     @Builder.Default
     private boolean succeed = true;
 }

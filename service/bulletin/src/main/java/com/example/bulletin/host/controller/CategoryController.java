@@ -45,7 +45,7 @@ public class CategoryController {
         return ResponseEntity.ok(service.createChild(request));
     }
 
-    @PostMapping("/leafy_child")
+    @PostMapping("/leafy-child")
     public ResponseEntity<CreateLeafyChildCategoryResponse> createLeafyChild(@Valid @RequestBody CreateLeafyChildCategoryRequest request) {
         return ResponseEntity.ok(service.createLeafyChild(request));
     }
@@ -58,6 +58,12 @@ public class CategoryController {
     @DeleteMapping("/{parentId}/children/{childId}")
     public ResponseEntity<Void> deleteChildCategory(@PathVariable UUID parentId, @PathVariable UUID childId) {
         service.deleteChildCategory(new DeleteChildCategoryRequest(parentId, childId));
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/root/{id}")
+    public ResponseEntity<Void> deleteRootCategory(@PathVariable UUID id) {
+        service.deleteRootCategory(new DeleteRootCategoryRequest(id));
         return ResponseEntity.noContent().build();
     }
 

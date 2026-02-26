@@ -62,15 +62,15 @@ public class DeleteCharacteristicValueTests {
 
         createCharacteristic();
         CharacteristicValue characteristicValue = createCharacteristicValue();
-        when(characteristicValueRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(characteristicValue));
+        when(characteristicRepository.findById(any(UUID.class)))
+                .thenReturn(Optional.of(characteristic));
     }
 
     @Test
     public void shouldThrowWhenNotFound() {
         // Arrange
         DeleteCharacteristicValueRequest request = createRequest();
-        when(characteristicValueRepository.findById(any(UUID.class)))
+        when(characteristicRepository.findById(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
@@ -90,14 +90,15 @@ public class DeleteCharacteristicValueTests {
         verify(characteristicRepository).save(characteristic);
     }
 
-    public CharacteristicValue createCharacteristicValue() {
+    private CharacteristicValue createCharacteristicValue() {
         if (characteristic.getPossibleValues().isEmpty()) {
             characteristic.addPossibleValue("test value");
         }
-        return characteristic.getPossibleValues().get(0);
+        return characteristic.getPossibleValues()
+                .getFirst();
     }
 
-    public Characteristic createCharacteristic() {
+    private Characteristic createCharacteristic() {
         if (characteristic == null) {
             Category category = Category.createRoot("root");
             characteristic = category.addCharacteristic("characteristic");
@@ -105,9 +106,11 @@ public class DeleteCharacteristicValueTests {
         return characteristic;
     }
 
-    public DeleteCharacteristicValueRequest createRequest() {
+    private DeleteCharacteristicValueRequest createRequest() {
+        UUID characteristicValueId = createCharacteristicValue().getId();
         return DeleteCharacteristicValueRequest.builder()
-                .id(UUID.randomUUID())
+                .characteristicId(UUID.randomUUID())
+                .characteristicValueId(characteristicValueId)
                 .build();
     }
 
