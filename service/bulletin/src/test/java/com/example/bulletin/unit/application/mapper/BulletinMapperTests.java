@@ -121,7 +121,6 @@ public class BulletinMapperTests {
                 .description(bulletin.getDescription())
                 .price(bulletin.getPrice())
                 .rating(bulletin.getRating())
-                .status(bulletin.getStatus())
                 .category(categoryData)
                 .characteristics(characteristicsData)
                 .images(imagesData);

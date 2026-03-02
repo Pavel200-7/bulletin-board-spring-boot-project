@@ -18,7 +18,6 @@ public class BulletinData {
     private String description;
     private double price;
     private double rating;
-    private BulletinStatus status;
     private CategoryData category;
     private List<BulletinCharacteristicData> characteristics;
      private List<BulletinImageData> images;
@@ -30,7 +29,6 @@ public class BulletinData {
                 Objects.equals(description, other.description) &&
                 Objects.equals(price, other.price) &&
                 Objects.equals(rating, other.rating) &&
-                Objects.equals(status, other.status) &&
                 (category == null && other.category == null || category.equalsData(other.category)) &&
                 isCharacteristicsEqual(other) &&
                 isImagesEqual(other);

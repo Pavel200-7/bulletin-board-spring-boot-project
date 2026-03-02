@@ -111,7 +111,6 @@ public class BulletinDataTests {
                 .description("description")
                 .price(1000)
                 .rating(0)
-                .status(BulletinStatus.DRAFT)
                 .category(categoryData)
                 .characteristics(List.of(bulletinCharacteristicData))
                 .images(List.of(imageData));

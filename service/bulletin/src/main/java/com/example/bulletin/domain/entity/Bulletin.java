@@ -43,11 +43,6 @@ public class Bulletin extends BaseEntity {
     @Column(name = "rating")
     private double rating;
 
-    @Enumerated(EnumType.ORDINAL)
-    @Column(name = "status", nullable = false)
-    @Setter(AccessLevel.NONE)
-    private BulletinStatus status;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @Setter(AccessLevel.NONE)
@@ -71,7 +66,6 @@ public class Bulletin extends BaseEntity {
 
     private Bulletin(OwnerInfo ownerInfo) {
         this.id = UUID.randomUUID();
-        this.status = BulletinStatus.DRAFT;
         this.ownerInfo = ownerInfo;
     }
 

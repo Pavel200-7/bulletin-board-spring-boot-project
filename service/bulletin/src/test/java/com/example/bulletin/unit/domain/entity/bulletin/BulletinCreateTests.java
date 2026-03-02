@@ -24,8 +24,6 @@ public class BulletinCreateTests {
         // Assert
         assertEquals(ownerInfo.getOwner(),
                 bulletin.getOwner());
-        assertEquals(BulletinStatus.DRAFT,
-                bulletin.getStatus());
     }
 
 }
