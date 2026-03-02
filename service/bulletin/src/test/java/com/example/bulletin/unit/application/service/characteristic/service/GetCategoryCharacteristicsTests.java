@@ -3,10 +3,7 @@ package com.example.bulletin.unit.application.service.characteristic.service;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CharacteristicMapper;
 import com.example.bulletin.application.service.characteristic.CharacteristicServiceImpl;
-import com.example.bulletin.application.service.characteristic.data.request.CreateCharacteristicRequest;
 import com.example.bulletin.application.service.characteristic.data.request.GetCategoryCharacteristicsRequest;
-import com.example.bulletin.application.service.characteristic.data.request.GetCharacteristicRequest;
-import com.example.bulletin.application.service.characteristic.data.response.CreateCharacteristicResponse;
 import com.example.bulletin.application.service.characteristic.data.response.data.CharacteristicResponse;
 import com.example.bulletin.application.service.characteristic.helper.inter.CharacteristicHierarchyPolicy;
 import com.example.bulletin.domain.entity.Category;
@@ -57,9 +54,6 @@ public class GetCategoryCharacteristicsTests {
     @InjectMocks
     private CharacteristicServiceImpl service;
 
-    @Captor
-
-    private ArgumentCaptor<Category> categoryCaptor;
     private Category category = null;
     private Characteristic characteristic = null;
 
@@ -111,7 +105,7 @@ public class GetCategoryCharacteristicsTests {
         GetCategoryCharacteristicsRequest request = createRequest();
 
         CharacteristicResponse characteristicResponse = mapperHelper.toResponse(createCharacteristic());
-        List<CharacteristicResponse> expected = new ArrayList();
+        List<CharacteristicResponse> expected = new ArrayList<>();
         expected.add(characteristicResponse);
 
 
