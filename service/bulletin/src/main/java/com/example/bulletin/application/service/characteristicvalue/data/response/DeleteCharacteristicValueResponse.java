@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeleteCharacteristicValueResponse {
+    @Builder.Default
     private boolean succeed = true;
 }

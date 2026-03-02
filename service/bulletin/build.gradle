@@ -23,6 +23,12 @@ configurations {
 repositories {
 	mavenCentral()
     mavenLocal()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+}
+
+ext {
+    springStatemachineVersion = '3.2.0'
 }
 
 dependencies {
@@ -49,6 +55,9 @@ dependencies {
 
     runtimeOnly 'org.postgresql:postgresql'
 
+    implementation 'org.springframework.statemachine:spring-statemachine-starter'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-amqp-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
@@ -56,6 +65,12 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.statemachine:spring-statemachine-bom:${springStatemachineVersion}"
+    }
 }
 
 tasks.named('test') {
