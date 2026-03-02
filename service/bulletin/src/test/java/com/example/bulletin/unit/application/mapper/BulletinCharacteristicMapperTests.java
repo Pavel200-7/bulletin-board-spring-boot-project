@@ -1,8 +1,6 @@
 package com.example.bulletin.unit.application.mapper;
 
-import com.example.bulletin.application.mapper.BulletinCharacteristicMapper;
-import com.example.bulletin.application.mapper.CharacteristicMapper;
-import com.example.bulletin.application.mapper.CharacteristicValueMapper;
+import com.example.bulletin.application.mapper.*;
 import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,9 +28,10 @@ public class BulletinCharacteristicMapperTests {
     @Autowired
     private CharacteristicValueMapper characteristicValueMapper;
 
+
+
     @Test
-    public void shouldConvertCorrectlyFromEntityToData()
-            throws AccessDeniedException {
+    public void shouldConvertCorrectlyFromEntityToData() {
         // Arrange
         BulletinCharacteristic bulletinCharacteristic = createBulletinCharacteristic();
 
@@ -56,8 +54,7 @@ public class BulletinCharacteristicMapperTests {
     }
 
     @Test
-    public void shouldHandleNullValue()
-            throws AccessDeniedException {
+    public void shouldHandleNullValue() {
         // Arrange
         BulletinCharacteristic bulletinCharacteristic = createBulletinCharacteristicWithNullValue();
 
@@ -78,8 +75,7 @@ public class BulletinCharacteristicMapperTests {
         assertTrue(expected.equalsData(actual));
     }
 
-    private BulletinCharacteristic createBulletinCharacteristic()
-            throws AccessDeniedException {
+    private BulletinCharacteristic createBulletinCharacteristic() {
         Category category = Category.createRoot("test");
         Characteristic characteristic = category.addCharacteristic("test characteristic");
         CharacteristicValue value = characteristic.addPossibleValue("test value");
@@ -94,8 +90,7 @@ public class BulletinCharacteristicMapperTests {
         return bulletinCharacteristic;
     }
 
-    private BulletinCharacteristic createBulletinCharacteristicWithNullValue()
-            throws AccessDeniedException {
+    private BulletinCharacteristic createBulletinCharacteristicWithNullValue() {
         Category category = Category.createRoot("test");
         Characteristic characteristic = category.addCharacteristic("test characteristic");
 
