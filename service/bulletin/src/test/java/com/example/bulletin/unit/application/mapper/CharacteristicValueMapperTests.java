@@ -1,7 +1,7 @@
 package com.example.bulletin.unit.application.mapper;
 
 import com.example.bulletin.application.mapper.CharacteristicValueMapper;
-import com.example.bulletin.application.service.characteristicvalue.data.response.data.CharacteristicValueResponse;
+import com.example.bulletin.application.data.response.CharacteristicValueResponse;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.CharacteristicValue;

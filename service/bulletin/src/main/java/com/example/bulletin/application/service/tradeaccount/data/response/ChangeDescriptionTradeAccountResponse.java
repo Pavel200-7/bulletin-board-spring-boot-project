@@ -1,6 +1,6 @@
 package com.example.bulletin.application.service.tradeaccount.data.response;
 
-import com.example.bulletin.application.service.tradeaccount.data.response.data.TradeAccountResponse;
+import com.example.bulletin.application.data.response.TradeAccountResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

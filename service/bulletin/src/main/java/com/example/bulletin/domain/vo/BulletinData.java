@@ -1,6 +1,6 @@
 package com.example.bulletin.domain.vo;
 
-import com.example.bulletin.domain.enums.BulletinStatus;
+import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import lombok.Builder;
 import lombok.Value;
 
@@ -18,6 +18,7 @@ public class BulletinData {
     private String description;
     private double price;
     private double rating;
+    private BulletinState state;
     private CategoryData category;
     private List<BulletinCharacteristicData> characteristics;
      private List<BulletinImageData> images;
@@ -29,6 +30,7 @@ public class BulletinData {
                 Objects.equals(description, other.description) &&
                 Objects.equals(price, other.price) &&
                 Objects.equals(rating, other.rating) &&
+                Objects.equals(state, other.state) &&
                 (category == null && other.category == null || category.equalsData(other.category)) &&
                 isCharacteristicsEqual(other) &&
                 isImagesEqual(other);

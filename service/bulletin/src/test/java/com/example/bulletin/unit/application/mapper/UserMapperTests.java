@@ -1,7 +1,7 @@
 package com.example.bulletin.unit.application.mapper;
 
 import com.example.bulletin.application.mapper.UserMapper;
-import com.example.bulletin.application.service.user.data.response.data.UserResponse;
+import com.example.bulletin.application.data.response.UserResponse;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.vo.UserData;
 import org.junit.jupiter.api.Test;

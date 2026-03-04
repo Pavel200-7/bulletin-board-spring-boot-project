@@ -3,7 +3,7 @@ package com.example.bulletin.unit.domain.entity.bulletin;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
-import com.example.bulletin.domain.enums.BulletinStatus;
+import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -24,6 +24,8 @@ public class BulletinCreateTests {
         // Assert
         assertEquals(ownerInfo.getOwner(),
                 bulletin.getOwner());
+        assertEquals(BulletinState.CREATED,
+                bulletin.getState());
     }
 
 }

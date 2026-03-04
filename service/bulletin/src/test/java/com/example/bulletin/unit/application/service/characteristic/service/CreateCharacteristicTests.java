@@ -5,7 +5,7 @@ import com.example.bulletin.application.mapper.CharacteristicMapper;
 import com.example.bulletin.application.service.characteristic.CharacteristicServiceImpl;
 import com.example.bulletin.application.service.characteristic.data.request.CreateCharacteristicRequest;
 import com.example.bulletin.application.service.characteristic.data.response.CreateCharacteristicResponse;
-import com.example.bulletin.application.service.characteristic.data.response.data.CharacteristicResponse;
+import com.example.bulletin.application.data.response.CharacteristicResponse;
 import com.example.bulletin.application.service.characteristic.helper.inter.CharacteristicHierarchyPolicy;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;

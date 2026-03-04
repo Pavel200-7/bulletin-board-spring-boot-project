@@ -1,6 +1,6 @@
 package com.example.bulletin.application.service.characteristic.data.response;
 
-import com.example.bulletin.application.service.characteristic.data.response.data.CharacteristicResponse;
+import com.example.bulletin.application.data.response.CharacteristicResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

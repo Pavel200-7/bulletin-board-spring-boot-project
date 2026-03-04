@@ -2,12 +2,9 @@ package com.example.bulletin.unit.application.service.characteristic.service;
 
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CharacteristicMapper;
-import com.example.bulletin.application.service.category.data.request.GetCategoryRequest;
-import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
 import com.example.bulletin.application.service.characteristic.CharacteristicServiceImpl;
-import com.example.bulletin.application.service.characteristic.data.request.DeleteCharacteristicRequest;
 import com.example.bulletin.application.service.characteristic.data.request.GetCharacteristicRequest;
-import com.example.bulletin.application.service.characteristic.data.response.data.CharacteristicResponse;
+import com.example.bulletin.application.data.response.CharacteristicResponse;
 import com.example.bulletin.application.service.characteristic.helper.inter.CharacteristicHierarchyPolicy;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;

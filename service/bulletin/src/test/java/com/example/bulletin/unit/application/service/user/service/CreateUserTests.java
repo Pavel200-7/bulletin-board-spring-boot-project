@@ -5,7 +5,7 @@ import com.example.bulletin.application.mapper.UserMapper;
 import com.example.bulletin.application.service.user.UserServiceImpl;
 import com.example.bulletin.application.service.user.data.request.CreateUserRequest;
 import com.example.bulletin.application.service.user.data.response.CreateUserResponse;
-import com.example.bulletin.application.service.user.data.response.data.UserResponse;
+import com.example.bulletin.application.data.response.UserResponse;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
