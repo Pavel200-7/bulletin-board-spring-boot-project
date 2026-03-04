@@ -16,9 +16,11 @@
 //    @Bean
 //    @Profile("!test")
 //    public JwtDecoder jwtDecoder() {
+//        // Для запроса ключей
 //        NimbusJwtDecoder decoder = NimbusJwtDecoder
 //                .withJwkSetUri(properties.getDockerUri().concat("/protocol/openid-connect/certs"))
 //                .build();
+//        // для валидации подписи jwt
 //        decoder.setJwtValidator(
 //                JwtValidators.createDefaultWithIssuer(
 //                        properties.getOutUri().concat("/protocol/openid-connect/auth")

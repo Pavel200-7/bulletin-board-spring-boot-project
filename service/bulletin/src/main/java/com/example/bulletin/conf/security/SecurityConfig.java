@@ -18,6 +18,8 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -57,8 +59,6 @@ public class SecurityConfig {
         );
     }
 
-
-
     @Bean
     @Profile("!test") // Авторизацию тестировать пока не планируется.
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
@@ -68,8 +68,11 @@ public class SecurityConfig {
 //                        .requestMatchers("/*").permitAll()
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer((oauth2) -> oauth2
-                        .jwt(Customizer.withDefaults())
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .decoder(jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -100,9 +103,22 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-//    @Bean
-//    public JwtDecoder jwtDecoder() {
-//        return JwtDecoders.fromIssuerLocation(properties.getOutUri());
-//    }
+    @Bean
+    @Profile("!test")
+    public JwtDecoder jwtDecoder() {
+        log.info("Creating JwtDecoder...");
+        log.info("  - JWK Set URI: {}", properties.getDockerUri().concat("/protocol/openid-connect/certs"));
+        log.info("  - Expected issuer: {}", properties.getOutUri());
+
+        NimbusJwtDecoder decoder = NimbusJwtDecoder
+                .withJwkSetUri(properties.getDockerUri().concat("/protocol/openid-connect/certs"))
+                .build();
+
+        decoder.setJwtValidator(
+                JwtValidators.createDefaultWithIssuer(properties.getOutUri())
+        );
+
+        return decoder;
+    }
 
 }
