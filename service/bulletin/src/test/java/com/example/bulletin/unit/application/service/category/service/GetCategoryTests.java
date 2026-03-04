@@ -4,7 +4,7 @@ import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
 import com.example.bulletin.application.service.category.data.request.GetCategoryRequest;
-import com.example.bulletin.application.service.category.data.response.data.CategoryResponse;
+import com.example.bulletin.application.data.response.CategoryResponse;
 import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;

@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.domain.vo;
 
-import com.example.bulletin.domain.enums.BulletinStatus;
+import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import com.example.bulletin.domain.vo.*;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +37,23 @@ public class BulletinDataTests {
 
         // Assert
         assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnFalseWhenDifferentState() {
+        // Arrange
+        BulletinData data1 = createDataBuilder()
+                .build();
+
+        BulletinData data2 = createDataBuilder()
+                .state(BulletinState.ACTIVE)
+                .build();
+
+        // Act
+        boolean result = data1.equalsData(data2);
+
+        // Assert
+        assertFalse(result);
     }
 
     @Test
@@ -111,6 +128,7 @@ public class BulletinDataTests {
                 .description("description")
                 .price(1000)
                 .rating(0)
+                .state(BulletinState.CREATED)
                 .category(categoryData)
                 .characteristics(List.of(bulletinCharacteristicData))
                 .images(List.of(imageData));

@@ -2,7 +2,7 @@ package com.example.bulletin.domain.entity;
 
 import com.example.bulletin.domain.entity.base.BaseEntity;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
-import com.example.bulletin.domain.enums.BulletinStatus;
+import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Delegate;
@@ -43,6 +43,10 @@ public class Bulletin extends BaseEntity {
     @Column(name = "rating")
     private double rating;
 
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private BulletinState state;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     @Setter(AccessLevel.NONE)
@@ -67,6 +71,7 @@ public class Bulletin extends BaseEntity {
     private Bulletin(OwnerInfo ownerInfo) {
         this.id = UUID.randomUUID();
         this.ownerInfo = ownerInfo;
+        this.state = BulletinState.CREATED;
     }
 
     public static Bulletin createDraft(OwnerInfo ownerInfo) {

@@ -5,7 +5,7 @@ import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.UserMapper;
 import com.example.bulletin.application.service.user.data.request.*;
 import com.example.bulletin.application.service.user.data.response.*;
-import com.example.bulletin.application.service.user.data.response.data.UserResponse;
+import com.example.bulletin.application.data.response.UserResponse;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

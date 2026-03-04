@@ -1,5 +1,8 @@
 package com.example.bulletin.unit.application.mapper;
 
+import com.example.bulletin.application.data.response.BulletinCharacteristicResponse;
+import com.example.bulletin.application.data.response.CharacteristicResponse;
+import com.example.bulletin.application.data.response.CharacteristicValueResponse;
 import com.example.bulletin.application.mapper.*;
 import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
@@ -54,7 +57,7 @@ public class BulletinCharacteristicMapperTests {
     }
 
     @Test
-    public void shouldHandleNullValue() {
+    public void shouldHandleNullValueWhenConvertToData() {
         // Arrange
         BulletinCharacteristic bulletinCharacteristic = createBulletinCharacteristicWithNullValue();
 
@@ -69,6 +72,51 @@ public class BulletinCharacteristicMapperTests {
 
         // Act
         BulletinCharacteristicData actual = mapper.toData(bulletinCharacteristic);
+
+        // Assert
+        assertNotNull(actual);
+        assertTrue(expected.equalsData(actual));
+    }
+
+    @Test
+    public void shouldConvertCorrectlyFromEntityToResponse() {
+        // Arrange
+        BulletinCharacteristic bulletinCharacteristic = createBulletinCharacteristic();
+
+        CharacteristicResponse characteristicResponse = characteristicMapper.toResponse(bulletinCharacteristic.getName());
+        CharacteristicValueResponse valueResponse = characteristicValueMapper.toResponse(bulletinCharacteristic.getValue());
+
+        BulletinCharacteristicResponse expected = BulletinCharacteristicResponse.builder()
+                .id(bulletinCharacteristic.getId())
+                .bulletinId(bulletinCharacteristic.getBulletin().getId())
+                .name(characteristicResponse)
+                .value(valueResponse)
+                .build();
+
+        // Act
+        BulletinCharacteristicResponse actual = mapper.toResponse(bulletinCharacteristic);
+
+        // Assert
+        assertNotNull(actual);
+        assertTrue(expected.equalsData(actual));
+    }
+
+    @Test
+    public void shouldHandleNullValueWhenConvertToResponse() {
+        // Arrange
+        BulletinCharacteristic bulletinCharacteristic = createBulletinCharacteristicWithNullValue();
+
+        CharacteristicResponse characteristicResponse = characteristicMapper.toResponse(bulletinCharacteristic.getName());
+
+        BulletinCharacteristicResponse expected = BulletinCharacteristicResponse.builder()
+                .id(bulletinCharacteristic.getId())
+                .bulletinId(bulletinCharacteristic.getBulletin().getId())
+                .name(characteristicResponse)
+                .value(null)
+                .build();
+
+        // Act
+        BulletinCharacteristicResponse actual = mapper.toResponse(bulletinCharacteristic);
 
         // Assert
         assertNotNull(actual);

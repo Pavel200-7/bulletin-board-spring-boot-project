@@ -1,5 +1,6 @@
 package com.example.bulletin.application.mapper;
 
+import com.example.bulletin.application.data.response.BulletinResponse;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.vo.BulletinData;
 import org.mapstruct.Mapper;
@@ -17,4 +18,10 @@ public interface BulletinMapper {
     @Mapping(target = "characteristics", source = "characteristics")
     @Mapping(target = "images", source = "images")
     BulletinData toData(Bulletin entity);
+
+    @Mapping(target = "ownerId", source = "ownerInfo.owner.id")
+    @Mapping(target = "category", source = "category")
+    @Mapping(target = "characteristics", source = "characteristics")
+    @Mapping(target = "images", source = "images")
+    BulletinResponse toResponse(Bulletin entity);
 }

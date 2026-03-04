@@ -1,5 +1,6 @@
 package com.example.bulletin.unit.application.mapper;
 
+import com.example.bulletin.application.data.response.BulletinImageResponse;
 import com.example.bulletin.application.mapper.BulletinImageMapper;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.BulletinImage;
@@ -22,8 +23,7 @@ public class BulletinImageMapperTests {
     private BulletinImageMapper mapper;
 
     @Test
-    public void shouldConvertCorrectlyFromEntityToData()
-            throws AccessDeniedException {
+    public void shouldConvertCorrectlyFromEntityToData() {
         // Arrange
         Bulletin bulletin = createBulletin();
         UUID imageId = UUID.randomUUID();
@@ -42,8 +42,27 @@ public class BulletinImageMapperTests {
         assertTrue(expected.equalsData(actual));
     }
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    @Test
+    public void shouldConvertCorrectlyFromEntityToResponse() {
+        // Arrange
+        Bulletin bulletin = createBulletin();
+        UUID imageId = UUID.randomUUID();
+        BulletinImage bulletinImage = BulletinImage.createBulletinImage(bulletin, imageId);
+
+        BulletinImageResponse expected = BulletinImageResponse.builder()
+                .id(bulletinImage.getId())
+                .bulletinId(bulletin.getId())
+                .imageId(imageId)
+                .build();
+
+        // Act
+        BulletinImageResponse actual = mapper.toResponse(bulletinImage);
+
+        // Assert
+        assertTrue(expected.equalsData(actual));
+    }
+
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

@@ -18,4 +18,5 @@ public class BulletinImageData {
         return Objects.equals(bulletinId, other.bulletinId) &&
                 Objects.equals(imageId, other.imageId);
     }
+
 }
