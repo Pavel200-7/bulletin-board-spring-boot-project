@@ -5,11 +5,13 @@ import com.example.bulletin.application.service.category.helper.impl.CategoryFam
 import com.example.bulletin.domain.entity.Category;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@ActiveProfiles("test")
 public class CategoryFamilyResponseBuilderTests {
 
     private CategoryFamilyResponseBuilderImpl responseBuilder;

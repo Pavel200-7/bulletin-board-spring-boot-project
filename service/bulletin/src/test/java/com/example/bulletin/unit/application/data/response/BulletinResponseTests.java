@@ -8,6 +8,7 @@ import com.example.bulletin.application.data.response.CharacteristicResponse;
 import com.example.bulletin.application.data.response.CharacteristicValueResponse;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ActiveProfiles("test")
 public class BulletinResponseTests {
 
     private final UUID OWNER_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");

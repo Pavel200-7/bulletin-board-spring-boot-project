@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 
 @Configuration
@@ -24,7 +25,6 @@ public class RabbitMQConfig {
                 .build();
     }
 
-    // Очередь для блокировок
     @Bean
     public Queue userBlockedQueue() {
         return QueueBuilder.durable(QueueContract.BULLETIN_USER_BLOCKED_QUEUE)
@@ -32,7 +32,6 @@ public class RabbitMQConfig {
                 .build();
     }
 
-    // Очередь для разблокировок
     @Bean
     public Queue userUnblockedQueue() {
         return QueueBuilder.durable(QueueContract.BULLETIN_USER_UNBLOCKED_QUEUE)

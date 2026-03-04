@@ -2,9 +2,11 @@ package com.example.bulletin.unit.domain.entity.category;
 
 import com.example.bulletin.domain.entity.Category;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 public class CategoryCreateTests {
 
     @Test
