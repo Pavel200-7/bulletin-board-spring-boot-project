@@ -4,11 +4,13 @@ import com.example.bulletin.application.data.response.BulletinCharacteristicResp
 import com.example.bulletin.application.data.response.CharacteristicResponse;
 import com.example.bulletin.application.data.response.CharacteristicValueResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ActiveProfiles("test")
 public class BulletinCharacteristicResponseTests {
 
     @Test

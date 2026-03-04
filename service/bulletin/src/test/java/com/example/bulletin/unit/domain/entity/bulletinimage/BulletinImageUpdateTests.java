@@ -5,6 +5,7 @@ import com.example.bulletin.domain.entity.BulletinImage;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ActiveProfiles("test")
 public class BulletinImageUpdateTests {
 
     @Test

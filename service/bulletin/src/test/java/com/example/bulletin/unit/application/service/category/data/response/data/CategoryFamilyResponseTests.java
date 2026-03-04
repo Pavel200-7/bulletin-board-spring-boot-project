@@ -2,11 +2,13 @@ package com.example.bulletin.unit.application.service.category.data.response.dat
 
 import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ActiveProfiles("test")
 public class CategoryFamilyResponseTests {
 
     @Test

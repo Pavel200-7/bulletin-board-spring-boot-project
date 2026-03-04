@@ -4,12 +4,13 @@ import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+@ActiveProfiles("test")
 public class BulletinAddImageTests {
 
     @Test

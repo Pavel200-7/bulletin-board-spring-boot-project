@@ -4,12 +4,14 @@ import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 public class BulletinCharacteristicUpdateTests {
 
     private Category categoryAggregate = null;

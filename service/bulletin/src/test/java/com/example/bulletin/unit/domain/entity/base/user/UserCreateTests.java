@@ -1,15 +1,15 @@
 package com.example.bulletin.unit.domain.entity.base.user;
 
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@ActiveProfiles("test")
 public class UserCreateTests {
 
     @Test

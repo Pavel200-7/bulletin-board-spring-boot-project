@@ -17,18 +17,23 @@ services:
       - RABBITMQ_PASSWORD=rmpassword
       
       # Keycloak
-      - KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/oAuth
+      - KEYCLOAK_ISSUER_URI=http://localhost:8080/realms/oAuth
+      - DOCKER_KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/oAuth
       - KEYCLOAK_CLIENT_ID=myclient
-      - KEYCLOAK_CLIENT_SECRET=pioyMQ3oVnPpiJqXzQOfA1TpoJSf4mWm
+      - KEYCLOAK_CLIENT_SECRET=sYXnZMAiSY4ouudztjv73iHyPr5H0dQC
       
       # Server
       - SERVER_PORT=8080 
     networks:
       app-net:
+    
     depends_on:
-      - keycloak
-      - postgres
-      - rabbitmq
+      keycloak:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
   
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2
@@ -37,7 +42,8 @@ services:
      - ./config/keycloak/import:/opt/keycloak/data/import:ro 
      - ./config/keycloak/spi-providers:/opt/keycloak/providers
     ports:
-      - 8090:8080
+      - 8080:8080
+      - 9000:9000
     environment:
       # БД 
       - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak_db
@@ -57,17 +63,17 @@ services:
       - KC_SMTP_PASSWORD=prvepeophfnvnjlm
       - KC_SMTP_STARTTLS=true
       - KC_SMTP_AUTH=true
-      # RabbitMQ для моего кастомного event listener провайдера
-      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQHOST=rabbitmq
-      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQPORT=15672
-      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQUSERNAME=rmuser
-      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQPASSWORD=rmpassword
-      # - KC_SPI_EVENTS_LISTENER_REGISTRATION_EVENT_LISTENER_RABBITMQVIRTUALHOST=/
       # Разное
       - KC_HOSTNAME=localhost
       - KC_HOSTNAME_PORT=8080
       - KC_HOSTNAME_STRICT=false
-      # - KC_LOG_LEVEL=debug
+      - KC_HEALTH_ENABLED=true
+    healthcheck:
+      test: ['CMD-SHELL', '[ -f /tmp/HealthCheck.java ] || echo "public class HealthCheck { public static void main(String[] args) throws java.lang.Throwable { System.exit(java.net.HttpURLConnection.HTTP_OK == ((java.net.HttpURLConnection)new java.net.URL(args[0]).openConnection()).getResponseCode() ? 0 : 1); } }" > /tmp/HealthCheck.java && java /tmp/HealthCheck.java http://localhost:9000/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
     command: 
       - start-dev
       - --import-realm
@@ -82,8 +88,10 @@ services:
     networks:
       - app-net
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   postgres:
     image: postgres:17
@@ -98,6 +106,12 @@ services:
       PGDATA: /var/lib/postgresql/data
     networks:
       app-net:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dbuser"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -109,7 +123,8 @@ services:
     networks:
       app-net:
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   rabbitmq:
     image: rabbitmq:3.10.7-management
@@ -127,6 +142,12 @@ services:
       - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
     networks:
       app-net:
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   app-net:

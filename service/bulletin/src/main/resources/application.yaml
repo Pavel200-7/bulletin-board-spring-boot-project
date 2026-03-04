@@ -37,17 +37,24 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/oAuth}
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/oAuth}
       client:
         provider:
           keycloak:
-            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/oAuth}
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/oAuth}
             user-name-attribute: preferred_username
         registration:
           keycloak:
             client-id: ${KEYCLOAK_CLIENT_ID:myclient}
             client-secret: ${KEYCLOAK_CLIENT_SECRET:jeWE38sfUCQJhplYyeJ7IwcMk8P27fVh}
             scope: openid
+app:
+  keycloak:
+    client-id: ${KEYCLOAK_CLIENT_ID:myclient}
+    client-secret: ${KEYCLOAK_CLIENT_SECRET:jeWE38sfUCQJhplYyeJ7IwcMk8P27fVh}
+    out-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/oAuth}
+    docker-uri: ${DOCKER_KEYCLOAK_ISSUER_URI:http://keycloak:8080/realms/oAuth}
 
 server:
   port: ${SERVER_PORT:8080}
+

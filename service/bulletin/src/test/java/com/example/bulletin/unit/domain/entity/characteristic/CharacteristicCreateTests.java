@@ -3,9 +3,11 @@ package com.example.bulletin.unit.domain.entity.characteristic;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test")
 public class CharacteristicCreateTests {
 
     @Test

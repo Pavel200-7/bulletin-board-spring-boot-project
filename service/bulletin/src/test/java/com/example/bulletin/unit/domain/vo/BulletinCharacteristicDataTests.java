@@ -2,11 +2,13 @@ package com.example.bulletin.unit.domain.vo;
 
 import com.example.bulletin.domain.vo.*;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ActiveProfiles("test")
 public class BulletinCharacteristicDataTests {
 
     @Test

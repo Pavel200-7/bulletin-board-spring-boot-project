@@ -6,15 +6,14 @@ import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@ActiveProfiles("test")
 public class BulletinAddCharacteristicTests {
 
     @Test
