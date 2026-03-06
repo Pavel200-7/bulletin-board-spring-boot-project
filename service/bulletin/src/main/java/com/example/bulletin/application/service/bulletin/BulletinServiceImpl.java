@@ -24,14 +24,6 @@ public class BulletinServiceImpl implements BulletinService {
 
     @Override
     public CreateBulletinResponse createBulletin(CreateBulletinRequest request) {
-
-        // TODO:
-        //  Когда будет реализован механизм авторизации нужно заставить
-        //  эту ручку извлекать userinfo и вставлять в bulletin.
-
-        // TODO:
-        //  Ладно, авторизация все равно потом будет нужна, сделаю ее сейчас, только коммит сделаю.
-
         // Bulletin bulletin = Bulletin.createDraft()
 
         return null;

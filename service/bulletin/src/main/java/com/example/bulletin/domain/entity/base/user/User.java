@@ -1,5 +1,6 @@
 package com.example.bulletin.domain.entity.base.user;
 
+import com.example.bulletin.domain.entity.TradeAccount;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
