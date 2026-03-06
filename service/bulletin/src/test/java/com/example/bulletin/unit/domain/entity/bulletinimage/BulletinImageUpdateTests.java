@@ -7,7 +7,6 @@ import com.example.bulletin.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BulletinImageUpdateTests {
 
     @Test
-    public void shouldSetMain()
-            throws AccessDeniedException {
+    public void shouldSetMain() {
         // Arrange
         BulletinImage bulletinImage = createBulletinImage();
 
@@ -30,8 +28,7 @@ public class BulletinImageUpdateTests {
     }
 
     @Test
-    public void shouldUnsetMain()
-            throws AccessDeniedException {
+    public void shouldUnsetMain() {
         // Arrange
         BulletinImage bulletinImage = createBulletinImage();
         bulletinImage.setMain();
@@ -43,16 +40,14 @@ public class BulletinImageUpdateTests {
         assertFalse(bulletinImage.isMain());
     }
 
-    private BulletinImage createBulletinImage()
-            throws AccessDeniedException {
+    private BulletinImage createBulletinImage() {
         Bulletin bulletin = createBulletin();
         UUID imageId = UUID.randomUUID();
         return BulletinImage.createBulletinImage(bulletin, imageId);
     }
 
 
-    private Bulletin createBulletin()
-            throws AccessDeniedException {
+    private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return Bulletin.createDraft(ownerInfo);

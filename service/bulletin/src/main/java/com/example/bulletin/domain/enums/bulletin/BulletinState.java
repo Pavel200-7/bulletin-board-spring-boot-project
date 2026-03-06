@@ -16,7 +16,6 @@ public enum BulletinState {
     APPROVED,
 
     PUBLISHED,
-    CLOSED,
 
     COMPLETED;
 }

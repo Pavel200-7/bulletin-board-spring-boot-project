@@ -5,5 +5,4 @@ import com.example.bulletin.application.service.bulletin.data.response.CreateBul
 
 public interface BulletinService {
     CreateBulletinResponse createBulletin(CreateBulletinRequest request);
-
 }
