@@ -14,10 +14,13 @@ import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 
 import java.util.*;
 
-@Profile("!test")
 @Component
 @RequiredArgsConstructor
 public class BulletinStateMachineServiceImpl implements BulletinStateMachineService {
@@ -25,6 +28,17 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
     private final StateMachineFactory<BulletinState, BulletinEvent> factory;
     private final BulletinRepository bulletinRepository;
     private final BulletinStateChangeListener stateChangeListener;
+
+    @Override
+    public void sendEvent(UUID bulletinId, BulletinEvent event) throws BindException {
+        StateMachine<BulletinState, BulletinEvent> machine = restore(bulletinId);
+        boolean accepted = machine.sendEvent(event);
+
+        BindingResult errors = getValidationErrors(machine);
+        if (!accepted && errors.hasErrors()) {
+            throw new BindException(errors);
+        }
+    }
 
     @Override
     public StateMachine<BulletinState, BulletinEvent> restore(UUID bulletinId) {
@@ -55,8 +69,16 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
         Map<String, Object> variables = new HashMap<>();
         variables.put(BulletinSMHeaderContract.BULLETIN_ID_HEADER, bulletin.getId());
         variables.put(BulletinSMHeaderContract.BULLETIN_HEADER, bulletin);
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, new ArrayList<String>());
+
+        Errors emptyErrorsHoled = new BeanPropertyBindingResult(Bulletin.class, "bulletin");
+        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, emptyErrorsHoled);
         return variables;
+    }
+
+    private BindingResult getValidationErrors(StateMachine<BulletinState, BulletinEvent> machine) {
+        return (BindingResult) machine.getExtendedState()
+                .getVariables()
+                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
     }
 
 }

@@ -5,7 +5,6 @@ import com.example.bulletin.domain.enums.bulletin.BulletinState;
 
 import org.springframework.statemachine.guard.Guard;
 
-
 public interface BulletinGuards {
     Guard<BulletinState, BulletinEvent> checkIfCanBeApprovedGuard();
     Guard<BulletinState, BulletinEvent> checkIfUserCanBeABulletinPublisherGuard();
