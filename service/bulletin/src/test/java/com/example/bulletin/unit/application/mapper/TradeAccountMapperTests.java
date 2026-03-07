@@ -2,12 +2,14 @@ package com.example.bulletin.unit.application.mapper;
 
 import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.application.data.response.TradeAccountResponse;
+import com.example.bulletin.application.mapper.UserMapper;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.Location;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.vo.TradeAccountData;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -16,12 +18,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class TradeAccountMapperTests {
 
-    @Autowired
-    private TradeAccountMapper mapper;
+    private TradeAccountMapper mapper = Mappers.getMapper(
+            TradeAccountMapper.class);
 
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {

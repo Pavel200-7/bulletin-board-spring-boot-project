@@ -8,21 +8,18 @@ import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.vo.BulletinImageData;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.nio.file.AccessDeniedException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class BulletinImageMapperTests {
 
-    @Autowired
-    private BulletinImageMapper mapper;
+    private BulletinImageMapper mapper = Mappers.getMapper(
+            BulletinImageMapper.class);
 
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {

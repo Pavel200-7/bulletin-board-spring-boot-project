@@ -5,8 +5,9 @@ import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.vo.CategoryData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CategoryMapper {
 
     @Mapping(target = "parentId", source = "parent.id")

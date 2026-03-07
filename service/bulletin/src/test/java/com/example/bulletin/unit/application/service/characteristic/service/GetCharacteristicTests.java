@@ -5,23 +5,18 @@ import com.example.bulletin.application.mapper.CharacteristicMapper;
 import com.example.bulletin.application.service.characteristic.CharacteristicServiceImpl;
 import com.example.bulletin.application.service.characteristic.data.request.GetCharacteristicRequest;
 import com.example.bulletin.application.data.response.CharacteristicResponse;
-import com.example.bulletin.application.service.characteristic.helper.inter.CharacteristicHierarchyPolicy;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.entity.Characteristic;
-import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import com.example.bulletin.infrastructure.repository.CharacteristicRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
@@ -32,23 +27,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class GetCharacteristicTests {
 
-    @Autowired
-    private CharacteristicMapper mapperHelper;
+    private CharacteristicMapper mapperHelper = Mappers.getMapper(
+            CharacteristicMapper.class);
 
     @Mock
     private CharacteristicRepository characteristicRepository;
-
-    @Mock
-    private CategoryRepository categoryRepository;
-
-    @Mock
-    private CharacteristicHierarchyPolicy hierarchyPolicy;
 
     @Mock
     private CharacteristicMapper mapper;
@@ -56,12 +44,8 @@ public class GetCharacteristicTests {
     @InjectMocks
     private CharacteristicServiceImpl service;
 
-    @Captor
-
-    private ArgumentCaptor<Category> categoryCaptor;
     private Category category = null;
     private Characteristic characteristic = null;
-
 
     @BeforeEach
     public void setup() {

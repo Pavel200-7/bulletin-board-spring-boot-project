@@ -5,18 +5,18 @@ import com.example.bulletin.application.data.response.CategoryResponse;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.domain.vo.CategoryData;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class CategoryMapperTests {
 
-    @Autowired
-    private CategoryMapper mapper;
+    private CategoryMapper mapper = Mappers.getMapper(
+            CategoryMapper.class);
 
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {

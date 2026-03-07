@@ -5,6 +5,7 @@ import com.example.bulletin.application.data.response.UserResponse;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.vo.UserData;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,12 +14,11 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class UserMapperTests {
 
-    @Autowired
-    private UserMapper mapper;
+    private UserMapper mapper = Mappers.getMapper(
+            UserMapper.class);
 
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {

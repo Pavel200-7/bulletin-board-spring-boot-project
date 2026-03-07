@@ -13,15 +13,12 @@ import com.example.bulletin.infrastructure.repository.CharacteristicValueReposit
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
@@ -34,14 +31,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class GetCharacteristicValuesTests {
 
-    @Autowired
-    private CharacteristicValueMapper mapperHelper;
+    private CharacteristicValueMapper mapperHelper = Mappers.getMapper(
+            CharacteristicValueMapper.class);
 
     @Mock
     private CharacteristicValueRepository characteristicValueRepository;
@@ -54,9 +50,6 @@ public class GetCharacteristicValuesTests {
 
     @InjectMocks
     private CharacteristicValueServiceImpl service;
-
-    @Captor
-    private ArgumentCaptor<CharacteristicValue> characteristicValueCaptor;
 
     private Category category = null;
     private Characteristic characteristic = null;
