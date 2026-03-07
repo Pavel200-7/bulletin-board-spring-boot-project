@@ -7,8 +7,6 @@ import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
-import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
-import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,24 +19,18 @@ import org.mockito.quality.Strictness;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.validation.Validator;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class BulletinGuardCheckIfUserIsOwnerGuardTests {
-
-    @Mock
-    private Validator validator;
 
     @Mock
     private SecurityService securityService;
@@ -88,10 +80,10 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         // Assert
         assertTrue(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertTrue(errors.isEmpty());
+        assertFalse(errors.hasErrors());
     }
 
     @Test
@@ -106,11 +98,15 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertEquals(1, errors.size());
-        assertEquals("Bulletin not found", errors.get(0));
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getErrorCount());
+
+        ObjectError globalError = errors.getGlobalError();
+        assertNotNull(globalError);
+        assertEquals("Bulletin not found", globalError.getDefaultMessage());
     }
 
     @Test
@@ -128,11 +124,15 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertEquals(1, errors.size());
-        assertEquals("You are not the owner of this bulletin", errors.get(0));
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getErrorCount());
+
+        ObjectError globalError = errors.getGlobalError();
+        assertNotNull(globalError);
+        assertEquals("You are not the owner of this bulletin", globalError.getDefaultMessage());
     }
 
     @Test
@@ -146,18 +146,22 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertEquals(1, errors.size());
-        assertEquals("You are not the owner of this bulletin", errors.get(0));
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getErrorCount());
+
+        ObjectError globalError = errors.getGlobalError();
+        assertNotNull(globalError);
+        assertEquals("You are not the owner of this bulletin", globalError.getDefaultMessage());
     }
 
     @Test
     public void shouldClearPreviousErrorsOnSuccess() {
         // Arrange
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
-                List.of("Some old error"));
+        Errors previousErrors = mock(Errors.class);
+        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
 
         when(securityService.getCurrentUserIdAsUUID()).thenReturn(userId);
         when(bulletin.getOwnerInfo().isOwnedByUserId(userId)).thenReturn(true);
@@ -168,10 +172,10 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         // Assert
         assertTrue(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertTrue(errors.isEmpty());
+        assertFalse(errors.hasErrors());
     }
 
     @Test
@@ -185,10 +189,15 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertEquals(1, errors.size());
+        assertEquals(1, errors.getErrorCount());
     }
 
+    private String getObjectErrorMes(Errors errors) {
+        return errors.getGlobalErrors()
+                .getFirst()
+                .getDefaultMessage();
+    }
 }

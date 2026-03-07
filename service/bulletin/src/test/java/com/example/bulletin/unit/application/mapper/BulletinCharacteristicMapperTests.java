@@ -33,8 +33,6 @@ public class BulletinCharacteristicMapperTests {
     @Autowired
     private CharacteristicValueMapper characteristicValueMapper;
 
-
-
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {
         // Arrange
