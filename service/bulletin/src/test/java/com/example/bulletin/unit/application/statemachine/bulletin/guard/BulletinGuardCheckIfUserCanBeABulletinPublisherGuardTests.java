@@ -22,6 +22,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.validation.Errors;
 
 import java.util.*;
 
@@ -58,8 +59,6 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
     @BeforeEach
     void setup() {
         variables = new HashMap<>();
-        extendedState.getVariables().put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
-                new ArrayList<String>());
         user = User.createUser(UUID.randomUUID(), "test@example.com");
 
         when(context.getExtendedState())
@@ -98,10 +97,10 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = ((List<String>) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER));
-        assertFalse(errors.isEmpty());
-        assertEquals(errors.getFirst(), "User with this id is not found.");
+        Errors errors = (Errors) variables
+                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+        assertTrue(errors.hasErrors());
+        assertEquals(getObjectErrorMes(errors), "User with this id is not found.");
     }
 
     @Test
@@ -115,10 +114,10 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = ((List<String>) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER));
-        assertFalse(errors.isEmpty());
-        assertEquals(errors.getFirst(), "User with this id is blocked.");
+        Errors errors = (Errors) variables
+                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+        assertTrue(errors.hasErrors());
+        assertEquals(getObjectErrorMes(errors), "User with this id is blocked.");
     }
 
     @Test
@@ -132,10 +131,10 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = ((List<String>) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER));
-        assertFalse(errors.isEmpty());
-        assertEquals(errors.getFirst(), "User with this id does not have trade account.");
+        Errors errors = (Errors) variables
+                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+        assertTrue(errors.hasErrors());
+        assertEquals(getObjectErrorMes(errors), "User with this id does not have trade account.");
 
     }
 
@@ -152,11 +151,10 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = ((List<String>) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER));
-        assertFalse(errors.isEmpty());
-        assertEquals(errors.getFirst(), "Trade account of this user is not approved.");
-
+        Errors errors = (Errors) variables
+                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+        assertTrue(errors.hasErrors());
+        assertEquals(getObjectErrorMes(errors), "Trade account of this user is not approved.");
     }
 
 
@@ -173,6 +171,12 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
     private TradeAccount createBlankTradeAccount(User user) {
         OwnerInfo ownerInfo = new OwnerInfo(user);
         return TradeAccount.createTradeAccount(ownerInfo);
+    }
+
+    private String getObjectErrorMes(Errors errors) {
+        return errors.getGlobalErrors()
+                .getFirst()
+                .getDefaultMessage();
     }
 
 }

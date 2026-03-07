@@ -86,7 +86,7 @@ public class RenameTradeAccountRequestTests {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"gd", "d", "af"})
+    @ValueSource(strings = {"gd", "va", "af"})
     public void shouldForbidSmallName(String name) {
         // Arrange
         RenameTradeAccountRequest request = createValidRequestBuilder()

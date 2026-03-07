@@ -1,7 +1,6 @@
-package com.example.bulletin.application.statemachine.bulletin.guard.helper;
+package com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto;
 
 import com.example.bulletin.domain.entity.BulletinCharacteristic;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;

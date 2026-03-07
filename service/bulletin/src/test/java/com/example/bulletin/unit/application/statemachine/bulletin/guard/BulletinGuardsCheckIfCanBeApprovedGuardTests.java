@@ -2,14 +2,12 @@ package com.example.bulletin.unit.application.statemachine.bulletin.guard;
 
 import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuardsImpl;
-import com.example.bulletin.application.statemachine.bulletin.guard.helper.BulletinApproveValidationDto;
+import com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto.BulletinApproveValidationDto;
 import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
-import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
-import com.example.bulletin.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,15 +17,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
+import org.springframework.validation.*;
+
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
-
-import java.util.*;
 
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
@@ -51,8 +47,6 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
     @BeforeEach
     void setup() {
         variables = new HashMap<>();
-        extendedState.getVariables().put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
-                new ArrayList<String>());
 
         User user = User.createUser(UUID.randomUUID(), "test@example.com");
         OwnerInfo ownerInfo = new OwnerInfo(user);
@@ -80,10 +74,10 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         assertTrue(result);
         verify(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
 
-        List<String> validationResult = ((List<String>) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER));
-        assertNotNull(validationResult);
-        assertTrue(validationResult.isEmpty());
+        Errors errors = (Errors) variables
+                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+        assertNotNull(errors);
+        assertFalse(errors.hasErrors());
     }
 
     @Test
@@ -99,10 +93,15 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         assertFalse(result);
         verify(validator, never()).validate(any(), any(Errors.class));
 
-        List<String> validationResult = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
-        assertNotNull(validationResult);
-        assertEquals(1, validationResult.size());
+        assertNotNull(errors);
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getErrorCount());
+
+        ObjectError globalError = errors.getGlobalError();
+        assertNotNull(globalError);
+        assertEquals("Bulletin not found", globalError.getDefaultMessage());
     }
 
     @Test
@@ -127,12 +126,13 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         assertFalse(result);
         verify(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
 
-        List<String> validationResult = (List<String>) extendedState.getVariables()
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
-        assertNotNull(validationResult);
-        assertEquals(3, validationResult.size());
+        assertNotNull(errors);
+        assertTrue(errors.hasErrors());
+        assertEquals(3, errors.getErrorCount());
+        assertEquals(3, errors.getFieldErrorCount());
     }
-
 
     @Test
     public void shouldPreserveErrorOrder() {
@@ -160,9 +160,15 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> validationResult = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
-        assertEquals(expectedErrors, validationResult);
+        assertNotNull(errors);
+        assertEquals(2, errors.getErrorCount());
+
+        List<FieldError> fieldErrors = errors.getFieldErrors();
+        assertEquals(2, fieldErrors.size());
+        assertEquals(expectedErrors.get(0), fieldErrors.get(0).getDefaultMessage());
+        assertEquals(expectedErrors.get(1), fieldErrors.get(1).getDefaultMessage());
     }
 
     @Test
@@ -171,8 +177,9 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         setupValidBulletin();
         when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
                 .thenReturn(bulletin);
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
-                List.of("Old error"));
+
+        Errors previousErrors = mock(Errors.class);
+        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
 
         doAnswer(invocation -> null)
                 .when(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
@@ -183,9 +190,11 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         // Assert
         assertTrue(result);
 
-        List<String> validationResult = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
-        assertTrue(validationResult.isEmpty());
+        assertNotNull(errors);
+        assertFalse(errors.hasErrors());
+        assertNotEquals(previousErrors, errors);
     }
 
     private void setupValidBulletin() {
@@ -202,6 +211,12 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         bc.setValue(value);
 
         bulletin.addImage(UUID.randomUUID());
+    }
+
+    private String getObjectErrorMes(Errors errors) {
+        return errors.getGlobalErrors()
+                .getFirst()
+                .getDefaultMessage();
     }
 
 }

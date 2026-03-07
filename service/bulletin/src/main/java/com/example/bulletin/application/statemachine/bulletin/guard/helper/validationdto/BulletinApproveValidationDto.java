@@ -1,4 +1,4 @@
-package com.example.bulletin.application.statemachine.bulletin.guard.helper;
+package com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto;
 
 import com.example.bulletin.domain.entity.Bulletin;
 import jakarta.validation.constraints.*;

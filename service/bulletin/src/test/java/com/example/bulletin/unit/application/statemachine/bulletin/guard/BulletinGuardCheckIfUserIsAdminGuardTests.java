@@ -16,6 +16,8 @@ import org.mockito.quality.Strictness;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 
 import java.util.*;
 
@@ -59,10 +61,10 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         // Assert
         assertTrue(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertTrue(errors.isEmpty());
+        assertFalse(errors.hasErrors());
 
         verify(securityService, times(1)).isAdmin();
     }
@@ -78,11 +80,15 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertEquals(1, errors.size());
-        assertEquals("Only administrators can perform this action", errors.get(0));
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getErrorCount());
+
+        ObjectError globalError = errors.getGlobalError();
+        assertNotNull(globalError);
+        assertEquals("Only administrators can perform this action", globalError.getDefaultMessage());
 
         verify(securityService, times(1)).isAdmin();
     }
@@ -90,7 +96,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
     @Test
     public void shouldClearPreviousErrorsOnSuccess() {
         // Arrange
-        List<String> previousErrors = Arrays.asList("Some previous error", "Another error");
+        Errors previousErrors = mock(Errors.class);
         variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
 
         when(securityService.isAdmin()).thenReturn(true);
@@ -101,17 +107,17 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         // Assert
         assertTrue(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertTrue(errors.isEmpty());
+        assertFalse(errors.hasErrors());
         assertNotEquals(previousErrors, errors);
     }
 
     @Test
     public void shouldOverwriteErrorsOnFailure() {
         // Arrange
-        List<String> previousErrors = Arrays.asList("Some previous error");
+        Errors previousErrors = mock(Errors.class);
         variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
 
         when(securityService.isAdmin()).thenReturn(false);
@@ -122,12 +128,22 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         // Assert
         assertFalse(result);
 
-        List<String> errors = (List<String>) variables
+        Errors errors = (Errors) variables
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
         assertNotNull(errors);
-        assertEquals(1, errors.size());
-        assertEquals("Only administrators can perform this action", errors.get(0));
+        assertTrue(errors.hasErrors());
+        assertEquals(1, errors.getErrorCount());
+
+        ObjectError globalError = errors.getGlobalError();
+        assertNotNull(globalError);
+        assertEquals("Only administrators can perform this action", globalError.getDefaultMessage());
         assertNotEquals(previousErrors, errors);
+    }
+
+    private String getObjectErrorMes(Errors errors) {
+        return errors.getGlobalErrors()
+                .getFirst()
+                .getDefaultMessage();
     }
 
 }

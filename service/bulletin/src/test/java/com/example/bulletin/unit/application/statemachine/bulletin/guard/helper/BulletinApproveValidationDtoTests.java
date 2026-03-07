@@ -1,8 +1,8 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard.helper;
 
-import com.example.bulletin.application.statemachine.bulletin.guard.helper.BulletinApproveValidationDto;
-import com.example.bulletin.application.statemachine.bulletin.guard.helper.CharacteristicValidationDto;
-import com.example.bulletin.application.statemachine.bulletin.guard.helper.ImageValidationDto;
+import com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto.BulletinApproveValidationDto;
+import com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto.CharacteristicValidationDto;
+import com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto.ImageValidationDto;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
