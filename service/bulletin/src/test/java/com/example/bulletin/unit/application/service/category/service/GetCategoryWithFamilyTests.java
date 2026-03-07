@@ -1,13 +1,11 @@
 package com.example.bulletin.unit.application.service.category.service;
 
 import com.example.bulletin.application.exception.ResourceNotFoundException;
-import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.CategoryServiceImpl;
 import com.example.bulletin.application.service.category.data.request.GetCategoryWithFamilyRequest;
 import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
-import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,17 +34,10 @@ public class GetCategoryWithFamilyTests {
     private CategoryRepository categoryRepository;
 
     @Mock
-    private BulletinRepository bulletinRepository;
-
-    @Mock
     private CategoryFamilyResponseBuilder responseBuilder;
-
-    @Mock
-    private CategoryMapper mapper;
 
     @InjectMocks
     private CategoryServiceImpl service;
-
 
     private Category category = null;
 

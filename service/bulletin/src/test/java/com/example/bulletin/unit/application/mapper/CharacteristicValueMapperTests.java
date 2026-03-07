@@ -7,18 +7,18 @@ import com.example.bulletin.domain.entity.Characteristic;
 import com.example.bulletin.domain.entity.CharacteristicValue;
 import com.example.bulletin.domain.vo.CharacteristicValueData;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class CharacteristicValueMapperTests {
 
-    @Autowired
-    private CharacteristicValueMapper mapper;
+    private CharacteristicValueMapper mapper = Mappers.getMapper(
+            CharacteristicValueMapper.class);
 
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {

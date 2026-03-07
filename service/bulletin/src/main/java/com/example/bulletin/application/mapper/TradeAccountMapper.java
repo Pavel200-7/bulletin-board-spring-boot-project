@@ -5,8 +5,9 @@ import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.vo.TradeAccountData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TradeAccountMapper {
 
     @Mapping(target = "ownerId", source = "ownerInfo.owner.id")

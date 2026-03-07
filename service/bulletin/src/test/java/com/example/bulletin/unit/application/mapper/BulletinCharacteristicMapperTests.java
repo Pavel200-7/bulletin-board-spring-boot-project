@@ -10,9 +10,10 @@ import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.vo.BulletinCharacteristicData;
 import com.example.bulletin.domain.vo.CharacteristicData;
 import com.example.bulletin.domain.vo.CharacteristicValueData;
+import com.example.bulletin.unit.application.mapper.helper.MapperBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
@@ -20,18 +21,20 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class BulletinCharacteristicMapperTests {
 
-    @Autowired
     private BulletinCharacteristicMapper mapper;
+    private CharacteristicMapper characteristicMapper = Mappers.getMapper(
+            CharacteristicMapper.class);
+    private CharacteristicValueMapper characteristicValueMapper = Mappers.getMapper(
+            CharacteristicValueMapper.class);
+    private MapperBuilder mapperBuilder = new MapperBuilder();
 
-    @Autowired
-    private CharacteristicMapper characteristicMapper;
-
-    @Autowired
-    private CharacteristicValueMapper characteristicValueMapper;
+    @BeforeEach
+    public void setup() {
+        mapper = mapperBuilder.createBulletinCharacteristicMapper();
+    }
 
     @Test
     public void shouldConvertCorrectlyFromEntityToData() {

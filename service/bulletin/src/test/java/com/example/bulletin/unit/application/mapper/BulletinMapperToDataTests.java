@@ -10,10 +10,10 @@ import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import com.example.bulletin.domain.vo.*;
+import com.example.bulletin.unit.application.mapper.helper.MapperBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mapstruct.factory.Mappers;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -23,26 +23,27 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
 @ActiveProfiles("test")
 public class BulletinMapperToDataTests {
 
-    @Autowired
     private BulletinMapper bulletinMapper;
-
-    @Autowired
-    private CategoryMapper categoryMapper;
-
-    @Autowired
     private BulletinCharacteristicMapper bulletinCharacteristicMapper;
 
-    @Autowired
-    private BulletinImageMapper bulletinImageMapper;
+
+    private CategoryMapper categoryMapper = Mappers.getMapper(
+            CategoryMapper.class);
+
+    private BulletinImageMapper bulletinImageMapper = Mappers.getMapper(
+            BulletinImageMapper.class);
 
     private Bulletin bulletin;
+    private MapperBuilder mapperBuilder = new MapperBuilder();
+
 
     @BeforeEach
     void setUp() {
+        bulletinMapper = mapperBuilder.createBulletinMapper();
+        bulletinCharacteristicMapper = mapperBuilder.createBulletinCharacteristicMapper();
         bulletin = createBulletin();
     }
 

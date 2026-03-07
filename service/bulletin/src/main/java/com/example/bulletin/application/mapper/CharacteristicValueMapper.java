@@ -5,8 +5,9 @@ import com.example.bulletin.domain.entity.CharacteristicValue;
 import com.example.bulletin.domain.vo.CharacteristicValueData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CharacteristicValueMapper {
 
     @Mapping(target = "characteristicId", source = "characteristic.id")

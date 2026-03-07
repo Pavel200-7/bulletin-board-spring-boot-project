@@ -3,14 +3,17 @@ package com.example.bulletin.application.mapper;
 import com.example.bulletin.application.data.response.BulletinCharacteristicResponse;
 import com.example.bulletin.domain.entity.BulletinCharacteristic;
 import com.example.bulletin.domain.vo.BulletinCharacteristicData;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+        uses = {
         CharacteristicMapper.class,
         CharacteristicValueMapper.class
 })
 public interface BulletinCharacteristicMapper {
+
 
     @Mapping(target = "bulletinId", source = "bulletin.id")
     public BulletinCharacteristicData toData(BulletinCharacteristic entity);

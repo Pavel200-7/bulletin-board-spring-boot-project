@@ -3,10 +3,13 @@ package com.example.bulletin.application.mapper;
 import com.example.bulletin.application.data.response.BulletinResponse;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.vo.BulletinData;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
 
-@Mapper(componentModel = "spring",
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
         uses = {
                 CategoryMapper.class,
                 BulletinCharacteristicMapper.class,
