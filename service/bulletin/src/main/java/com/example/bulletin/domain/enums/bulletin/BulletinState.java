@@ -8,8 +8,8 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public enum BulletinState {
-    ACTIVE,
-    INACTIVE,
+//    ACTIVE,
+//    INACTIVE,
 
     CREATED,
     MODIFIABLE,

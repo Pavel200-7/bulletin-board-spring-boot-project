@@ -53,7 +53,7 @@ public class BulletinResponseTests {
                 .build();
 
         BulletinResponse data2 = createResponseBuilder()
-                .state(BulletinState.ACTIVE)
+                .state(BulletinState.COMPLETED)
                 .build();
 
         // Act
