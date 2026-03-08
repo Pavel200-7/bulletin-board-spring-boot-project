@@ -34,14 +34,14 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
     @Override
     public void sendEvent(UUID bulletinId, BulletinEvent event) throws BindException {
         StateMachine<BulletinState, BulletinEvent> machine = restore(bulletinId);
-        boolean accepted = machine.sendEvent(event);
+        machine.sendEvent(event);
 
         String currentState = getBulletin(machine).getState().name();
-        log.info(currentState == BulletinState.MODIFIABLE.name() ? "Хел е бейби" : "ничего, сперва она тебя, потом ты ее");
         log.info("Итоговое состояние bulletin: {}", currentState);
 
         BindingResult errors = getValidationErrors(machine);
-        if (!accepted && errors.hasErrors()) {
+        log.info(errors.hasErrors() ? "Ошибки валидации." : "");
+        if (errors.hasErrors()) {
             throw new BindException(errors);
         }
     }
