@@ -48,7 +48,7 @@ public class BulletinDataTests {
                 .build();
 
         BulletinData data2 = createDataBuilder()
-                .state(BulletinState.ACTIVE)
+                .state(BulletinState.COMPLETED)
                 .build();
 
         // Act

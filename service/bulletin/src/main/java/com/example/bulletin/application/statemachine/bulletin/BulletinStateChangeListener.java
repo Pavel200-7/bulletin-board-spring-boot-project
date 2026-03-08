@@ -7,6 +7,7 @@ import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.state.State;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BulletinStateChangeListener extends StateMachineInterceptorAdapter<BulletinState, BulletinEvent> {
@@ -26,13 +28,18 @@ public class BulletinStateChangeListener extends StateMachineInterceptorAdapter<
     public void postStateChange(State<BulletinState, BulletinEvent> state, Message<BulletinEvent> message, Transition<BulletinState, BulletinEvent> transition,
                                 StateMachine<BulletinState, BulletinEvent> stateMachine, StateMachine<BulletinState, BulletinEvent> rootStateMachine) {
         if (message == null) { return; }
-        UUID bulletinId = UUID.class.cast(
-                message.getHeaders().get(BulletinSMHeaderContract.BULLETIN_ID_HEADER));
-        Bulletin bulletin = repository.findById(bulletinId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found"));
-
+        log.info("Вызван postStateChange при состоянии: {}", state.getId().name());
+        Bulletin bulletin = getBulletinFromMachine(stateMachine);
         bulletin.setState(state.getId());
         repository.save(bulletin);
+    }
+
+    private Bulletin getBulletinFromMachine(StateMachine<BulletinState, BulletinEvent> stateMachine) {
+        if (stateMachine == null || stateMachine.getExtendedState() == null) {
+            return null;
+        }
+        return stateMachine.getExtendedState()
+                .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
     }
 
 }

@@ -8,6 +8,7 @@ import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.statemachine.StateMachineContext;
@@ -21,6 +22,7 @@ import org.springframework.validation.Errors;
 
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BulletinStateMachineServiceImpl implements BulletinStateMachineService {
@@ -33,6 +35,10 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
     public void sendEvent(UUID bulletinId, BulletinEvent event) throws BindException {
         StateMachine<BulletinState, BulletinEvent> machine = restore(bulletinId);
         boolean accepted = machine.sendEvent(event);
+
+        String currentState = getBulletin(machine).getState().name();
+        log.info(currentState == BulletinState.MODIFIABLE.name() ? "Хел е бейби" : "ничего, сперва она тебя, потом ты ее");
+        log.info("Итоговое состояние bulletin: {}", currentState);
 
         BindingResult errors = getValidationErrors(machine);
         if (!accepted && errors.hasErrors()) {
@@ -48,6 +54,8 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
         StateMachine<BulletinState, BulletinEvent> machine =
                 factory.getStateMachine(bulletinId.toString());
 
+        machine.stop();
+
         machine.getStateMachineAccessor().doWithAllRegions(access -> {
             access.addStateMachineInterceptor(stateChangeListener);
 
@@ -61,6 +69,16 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
                     );
             access.resetStateMachine(context);
         });
+
+        machine.start();
+
+        log.info("После start() - запущена, состояние: {}", machine.getState());
+
+        machine.getExtendedState().getVariables()
+                .put(BulletinSMHeaderContract.BULLETIN_HEADER, bulletin);
+        machine.getExtendedState().getVariables()
+                .put(BulletinSMHeaderContract.BULLETIN_ID_HEADER, bulletin.getId());
+
 
         return machine;
     }
@@ -79,6 +97,11 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
         return (BindingResult) machine.getExtendedState()
                 .getVariables()
                 .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+    }
+
+    private Bulletin getBulletin(StateMachine<BulletinState, BulletinEvent> machine) {
+        return machine.getExtendedState()
+                .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
     }
 
 }
