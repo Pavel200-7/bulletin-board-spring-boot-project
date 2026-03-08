@@ -1,15 +1,10 @@
 package com.example.bulletin.application.service.bulletin;
 
 import com.example.bulletin.application.data.response.BulletinResponse;
+import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.BulletinMapper;
-import com.example.bulletin.application.service.bulletin.data.request.ApproveBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.request.CloseBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.request.CreateBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.request.PublishBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.response.ApproveBulletinResponse;
-import com.example.bulletin.application.service.bulletin.data.response.CloseBulletinResponse;
-import com.example.bulletin.application.service.bulletin.data.response.CreateBulletinResponse;
-import com.example.bulletin.application.service.bulletin.data.response.PublishBulletinResponse;
+import com.example.bulletin.application.service.bulletin.data.request.*;
+import com.example.bulletin.application.service.bulletin.data.response.*;
 import com.example.bulletin.application.statemachine.bulletin.service.BulletinStateMachineService;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
@@ -49,6 +44,13 @@ public class BulletinServiceImpl implements BulletinService {
         Optional<Bulletin> modifiableBulletin = bulletinRepository.findById(bulletin.getId());
         BulletinResponse bulletinResponse = mapper.toResponse(modifiableBulletin.get());
         return new CreateBulletinResponse(bulletinResponse);
+    }
+
+    @Override
+    public UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) {
+        Bulletin bulletin = bulletinRepository.findById(request.getBulletinRequest().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bulletin is not found."));
+        return null;
     }
 
     @Override
