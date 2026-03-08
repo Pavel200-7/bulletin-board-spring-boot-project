@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuardsImpl;
 import com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto.BulletinApproveValidationDto;
 import com.example.bulletin.domain.entity.*;
@@ -62,7 +62,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
     public void shouldReturnTrueWhenValidationPasses() {
         // Arrange
         setupValidBulletin();
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(bulletin);
         doAnswer(answer -> null)
                 .when(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
@@ -75,7 +75,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         verify(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertFalse(errors.hasErrors());
     }
@@ -83,7 +83,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
     @Test
     public void shouldReturnFalseWhenBulletinIsNull() {
         // Arrange
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(null);
 
         // Act
@@ -94,7 +94,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         verify(validator, never()).validate(any(), any(Errors.class));
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getErrorCount());
@@ -108,7 +108,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
     public void shouldReturnFalseWhenValidationFails() {
         // Arrange
         setupValidBulletin();
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(bulletin);
 
         doAnswer(invocation -> {
@@ -127,7 +127,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         verify(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(3, errors.getErrorCount());
@@ -138,7 +138,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
     public void shouldPreserveErrorOrder() {
         // Arrange
         setupValidBulletin();
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(bulletin);
 
         List<String> expectedErrors = List.of(
@@ -161,7 +161,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertEquals(2, errors.getErrorCount());
 
@@ -175,11 +175,11 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
     public void shouldOverridePreviousValidationResult() {
         // Arrange
         setupValidBulletin();
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(bulletin);
 
         Errors previousErrors = mock(Errors.class);
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
+        variables.put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT, previousErrors);
 
         doAnswer(invocation -> null)
                 .when(validator).validate(any(BulletinApproveValidationDto.class), any(Errors.class));
@@ -191,7 +191,7 @@ public class BulletinGuardsCheckIfCanBeApprovedGuardTests {
         assertTrue(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertFalse(errors.hasErrors());
         assertNotEquals(previousErrors, errors);

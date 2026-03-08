@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard.helper.validationcontext;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.helper.BulletinValidationContext;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
@@ -39,7 +39,7 @@ public class BulletinValidationContextCreationTests {
     @BeforeEach
     void setup() {
         variables = new HashMap<>();
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
+        variables.put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT,
                 new BeanPropertyBindingResult(Bulletin.class, "bulletin"));
 
         when(context.getExtendedState())
@@ -64,7 +64,7 @@ public class BulletinValidationContextCreationTests {
 
         // Act
         Errors errors = (Errors) context.getExtendedState().getVariables()
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
 
         // Assert
         assertFalse(errors.hasErrors());

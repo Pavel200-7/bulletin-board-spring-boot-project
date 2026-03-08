@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuardsImpl;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
@@ -62,7 +62,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         assertTrue(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertFalse(errors.hasErrors());
 
@@ -81,7 +81,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getErrorCount());
@@ -97,7 +97,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
     public void shouldClearPreviousErrorsOnSuccess() {
         // Arrange
         Errors previousErrors = mock(Errors.class);
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
+        variables.put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT, previousErrors);
 
         when(securityService.isAdmin()).thenReturn(true);
 
@@ -108,7 +108,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         assertTrue(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertFalse(errors.hasErrors());
         assertNotEquals(previousErrors, errors);
@@ -118,7 +118,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
     public void shouldOverwriteErrorsOnFailure() {
         // Arrange
         Errors previousErrors = mock(Errors.class);
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
+        variables.put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT, previousErrors);
 
         when(securityService.isAdmin()).thenReturn(false);
 
@@ -129,7 +129,7 @@ public class BulletinGuardCheckIfUserIsAdminGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getErrorCount());

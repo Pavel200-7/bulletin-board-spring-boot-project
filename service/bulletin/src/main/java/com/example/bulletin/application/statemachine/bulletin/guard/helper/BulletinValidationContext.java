@@ -1,6 +1,6 @@
 package com.example.bulletin.application.statemachine.bulletin.guard.helper;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
@@ -66,14 +66,14 @@ public class BulletinValidationContext {
 
     public boolean accept() {
         context.getExtendedState().getVariables()
-                .put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
+                .put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT,
                         new BeanPropertyBindingResult(Bulletin.class, "bulletin"));
         return true;
     }
 
     private void saveErrors() {
         context.getExtendedState().getVariables()
-                .put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, errors);
+                .put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT, errors);
     }
 
 }

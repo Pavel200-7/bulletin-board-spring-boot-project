@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard.helper.validationcontext;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.helper.BulletinValidationContext;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
@@ -55,7 +55,7 @@ class BulletinValidationContextRejectTests {
         assertFalse(result);
 
         Errors savedErrors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(savedErrors);
         assertTrue(savedErrors.hasErrors());
         assertEquals(1, savedErrors.getErrorCount());
@@ -77,7 +77,7 @@ class BulletinValidationContextRejectTests {
         assertFalse(result);
 
         Errors savedErrors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(savedErrors);
         assertFalse(savedErrors.hasErrors());
     }

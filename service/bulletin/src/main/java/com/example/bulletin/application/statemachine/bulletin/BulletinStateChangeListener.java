@@ -1,7 +1,6 @@
 package com.example.bulletin.application.statemachine.bulletin;
 
-import com.example.bulletin.application.exception.ResourceNotFoundException;
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
@@ -14,8 +13,6 @@ import org.springframework.statemachine.state.State;
 import org.springframework.statemachine.support.StateMachineInterceptorAdapter;
 import org.springframework.statemachine.transition.Transition;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -39,7 +36,7 @@ public class BulletinStateChangeListener extends StateMachineInterceptorAdapter<
             return null;
         }
         return stateMachine.getExtendedState()
-                .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
+                .get(BulletinExtendedState.BULLETIN, Bulletin.class);
     }
 
 }

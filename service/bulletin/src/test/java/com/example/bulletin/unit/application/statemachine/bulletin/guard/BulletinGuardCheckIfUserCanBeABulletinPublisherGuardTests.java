@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuardsImpl;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.Location;
@@ -98,7 +98,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertTrue(errors.hasErrors());
         assertEquals(getObjectErrorMes(errors), "User with this id is not found.");
     }
@@ -115,7 +115,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertTrue(errors.hasErrors());
         assertEquals(getObjectErrorMes(errors), "User with this id is blocked.");
     }
@@ -132,7 +132,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertTrue(errors.hasErrors());
         assertEquals(getObjectErrorMes(errors), "User with this id does not have trade account.");
 
@@ -152,7 +152,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertTrue(errors.hasErrors());
         assertEquals(getObjectErrorMes(errors), "Trade account of this user is not approved.");
     }

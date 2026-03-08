@@ -1,5 +1,6 @@
 package com.example.bulletin.application.statemachine.bulletin;
 
+import com.example.bulletin.application.statemachine.bulletin.action.BulletinActions;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuards;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
@@ -19,6 +20,7 @@ import org.springframework.statemachine.config.builders.StateMachineTransitionCo
 public class BulletinStateMachineConfig extends EnumStateMachineConfigurerAdapter<BulletinState, BulletinEvent> {
 
     private final BulletinGuards guards;
+    private final BulletinActions actions;
 
     @Override
     public void configure(StateMachineStateConfigurer<BulletinState, BulletinEvent> states)
@@ -46,7 +48,12 @@ public class BulletinStateMachineConfig extends EnumStateMachineConfigurerAdapte
                     .source(BulletinState.MODIFIABLE).target(BulletinState.APPROVED)
                     .guard(guards.checkIfUserIsOwnerGuard())
                     .guard(guards.checkIfCanBeApprovedGuard())
-                    .event(BulletinEvent.APPROVE_2)
+                    .event(BulletinEvent.APPROVE)
+                .and()
+                .withInternal()
+                    .source(BulletinState.MODIFIABLE)
+                    .action(actions.updateAction())
+                    .event(BulletinEvent.UPDATE)
                 .and()
                 .withExternal()
                     .source(BulletinState.APPROVED).target(BulletinState.MODIFIABLE)

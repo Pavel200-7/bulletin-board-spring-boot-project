@@ -1,14 +1,8 @@
 package com.example.bulletin.host.controller;
 
 import com.example.bulletin.application.service.bulletin.BulletinService;
-import com.example.bulletin.application.service.bulletin.data.request.ApproveBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.request.CloseBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.request.CreateBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.request.PublishBulletinRequest;
-import com.example.bulletin.application.service.bulletin.data.response.ApproveBulletinResponse;
-import com.example.bulletin.application.service.bulletin.data.response.CloseBulletinResponse;
-import com.example.bulletin.application.service.bulletin.data.response.CreateBulletinResponse;
-import com.example.bulletin.application.service.bulletin.data.response.PublishBulletinResponse;
+import com.example.bulletin.application.service.bulletin.data.request.*;
+import com.example.bulletin.application.service.bulletin.data.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +20,12 @@ public class BulletinController {
     public ResponseEntity<CreateBulletinResponse> createBulletin()
             throws BindException {
         return ResponseEntity.ok(service.createBulletin(new CreateBulletinRequest()));
+    }
+
+    @PutMapping
+    public ResponseEntity<UpdateBulletinResponse> createBulletin(@Valid @RequestBody UpdateBulletinRequest request)
+            throws BindException {
+        return ResponseEntity.ok(service.updateBulletin(request));
     }
 
     @PutMapping("/approve")
