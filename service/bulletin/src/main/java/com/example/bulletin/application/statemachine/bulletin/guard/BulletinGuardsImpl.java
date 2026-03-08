@@ -1,6 +1,6 @@
 package com.example.bulletin.application.statemachine.bulletin.guard;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.helper.BulletinValidationContext;
 import com.example.bulletin.application.statemachine.bulletin.guard.helper.validationdto.BulletinApproveValidationDto;
 import com.example.bulletin.domain.entity.Bulletin;
@@ -13,7 +13,6 @@ import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -40,7 +39,7 @@ public class BulletinGuardsImpl implements BulletinGuards {
 
             BulletinValidationContext validationContext = new BulletinValidationContext(context);
             Bulletin bulletin = context.getExtendedState()
-                    .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
+                    .get(BulletinExtendedState.BULLETIN, Bulletin.class);
 
             if (bulletin == null) {
                 log.info("Bulletin not found.");
@@ -104,7 +103,7 @@ public class BulletinGuardsImpl implements BulletinGuards {
 
             BulletinValidationContext validationContext = new BulletinValidationContext(context);
             Bulletin bulletin = context.getExtendedState()
-                    .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
+                    .get(BulletinExtendedState.BULLETIN, Bulletin.class);
 
             if (bulletin == null) {
                 validationContext.addObjectError("Bulletin not found");

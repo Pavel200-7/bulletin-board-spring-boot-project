@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuardsImpl;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
@@ -64,7 +64,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         when(bulletin.getOwnerInfo()).thenReturn(ownerInfo);
         when(context.getExtendedState()).thenReturn(extendedState);
         when(extendedState.getVariables()).thenReturn(variables);
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(bulletin);
     }
 
@@ -81,7 +81,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         assertTrue(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertFalse(errors.hasErrors());
     }
@@ -89,7 +89,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
     @Test
     public void shouldForbidWhenBulletinIsNull() {
         // Arrange
-        when(extendedState.get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class))
+        when(extendedState.get(BulletinExtendedState.BULLETIN, Bulletin.class))
                 .thenReturn(null);
 
         // Act
@@ -99,7 +99,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getErrorCount());
@@ -125,7 +125,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getErrorCount());
@@ -147,7 +147,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertTrue(errors.hasErrors());
         assertEquals(1, errors.getErrorCount());
@@ -161,7 +161,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
     public void shouldClearPreviousErrorsOnSuccess() {
         // Arrange
         Errors previousErrors = mock(Errors.class);
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, previousErrors);
+        variables.put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT, previousErrors);
 
         when(securityService.getCurrentUserIdAsUUID()).thenReturn(userId);
         when(bulletin.getOwnerInfo().isOwnedByUserId(userId)).thenReturn(true);
@@ -173,7 +173,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         assertTrue(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertFalse(errors.hasErrors());
     }
@@ -190,7 +190,7 @@ public class BulletinGuardCheckIfUserIsOwnerGuardTests {
         assertFalse(result);
 
         Errors errors = (Errors) variables
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
         assertNotNull(errors);
         assertEquals(1, errors.getErrorCount());
     }

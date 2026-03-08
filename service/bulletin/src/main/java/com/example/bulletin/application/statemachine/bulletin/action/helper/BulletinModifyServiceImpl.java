@@ -1,9 +1,8 @@
-package com.example.bulletin.application.service.bulletin.helper;
+package com.example.bulletin.application.statemachine.bulletin.action.helper;
 
 import com.example.bulletin.application.data.request.BulletinCharacteristicRequest;
 import com.example.bulletin.application.data.request.BulletinRequest;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
-import com.example.bulletin.application.service.bulletin.data.request.UpdateBulletinRequest;
 import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import com.example.bulletin.infrastructure.repository.CharacteristicRepository;
@@ -17,13 +16,13 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class BulletinModifyServiceImpl {
+public class BulletinModifyServiceImpl implements BulletinModifyService {
 
     private final CategoryRepository categoryRepository;
     private final CharacteristicRepository characteristicRepository;
     private final CharacteristicValueRepository characteristicValueRepository;
 
-    public void updateBulletin(Bulletin bulletin, BulletinRequest request) throws BindException {
+    public void updateBulletin(Bulletin bulletin, BulletinRequest request) {
         updateSimpleFields(bulletin, request);
         updateCategory(bulletin, request);
         updateCharacteristics(bulletin, request.getCharacteristics());
@@ -36,16 +35,16 @@ public class BulletinModifyServiceImpl {
     }
 
     private void updateCategory(Bulletin bulletin, BulletinRequest request) {
-        Optional<UUID> newCategoryId = Optional.ofNullable(request.getCategory().getId());
+        Optional<UUID> newCategoryId = Optional.ofNullable(request.getCategoryId());
         if (newCategoryId.isEmpty()) {
             return;
         }
-        if (bulletin.getCategory().getId().equals(newCategoryId.get())) {
+        if (bulletin.getCategory() != null && bulletin.getCategory().getId().equals(newCategoryId.get())) {
             return;
         }
 
         Category newCategory = categoryRepository.findById(newCategoryId.get())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + newCategoryId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category is not found. id: " + newCategoryId.get()));
         bulletin.setCategory(newCategory);
     }
 
@@ -105,17 +104,17 @@ public class BulletinModifyServiceImpl {
         }
 
         CharacteristicValue newValue = characteristicValueRepository.findById(newValueId)
-                .orElseThrow(() -> new ResourceNotFoundException("Characteristic value not found: " + newValueId));
+                .orElseThrow(() -> new ResourceNotFoundException("Characteristic value not found. id:" + newValueId));
         bulletinCharacteristic.setValue(newValue);
     }
 
     private void addNewCharacteristic(Bulletin bulletin, UUID characteristicId, UUID valueId) {
         Characteristic characteristic = characteristicRepository.findById(characteristicId)
-                .orElseThrow(() -> new ResourceNotFoundException("Characteristic not found: " + characteristicId));
+                .orElseThrow(() -> new ResourceNotFoundException("Characteristic not found. id:" + characteristicId));
         BulletinCharacteristic newCharacteristic = bulletin.addCharacteristic(characteristic);
 
         CharacteristicValue value = characteristicValueRepository.findById(valueId)
-                .orElseThrow(() -> new ResourceNotFoundException("Characteristic value not found: " + valueId));
+                .orElseThrow(() -> new ResourceNotFoundException("Characteristic value not found. id: " + valueId));
         newCharacteristic.setValue(value);
     }
 }

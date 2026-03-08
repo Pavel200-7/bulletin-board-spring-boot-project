@@ -2,15 +2,16 @@ package com.example.bulletin.application.statemachine.bulletin.service;
 
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.statemachine.bulletin.BulletinStateChangeListener;
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinMessageState;
 import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.statemachine.StateMachine;
+import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateMachineContext;
 import org.springframework.statemachine.config.StateMachineFactory;
 import org.springframework.statemachine.support.DefaultStateMachineContext;
@@ -32,9 +33,14 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
     private final BulletinStateChangeListener stateChangeListener;
 
     @Override
-    public void sendEvent(UUID bulletinId, BulletinEvent event) throws BindException {
+    public void sendEvent(Message<BulletinEvent> message)
+            throws BindException {
+
+        UUID bulletinId = message.getHeaders()
+                .get(BulletinMessageState.BULLETIN_ID, UUID.class);
         StateMachine<BulletinState, BulletinEvent> machine = restore(bulletinId);
-        machine.sendEvent(event);
+
+        machine.sendEvent(message);
 
         String currentState = getBulletin(machine).getState().name();
         log.info("Итоговое состояние bulletin: {}", currentState);
@@ -48,7 +54,7 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
 
     @Override
     public StateMachine<BulletinState, BulletinEvent> restore(UUID bulletinId) {
-        Bulletin bulletin = bulletinRepository.findById(bulletinId)
+        Bulletin bulletin = bulletinRepository.findByIdEager(bulletinId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found"));
 
         StateMachine<BulletinState, BulletinEvent> machine =
@@ -63,7 +69,7 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
                     new DefaultStateMachineContext<>(
                             bulletin.getState(),
                             null,
-                            createExtendedState(bulletin),
+                            null,
                             null,
                             null
                     );
@@ -73,35 +79,31 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
         machine.start();
 
         log.info("После start() - запущена, состояние: {}", machine.getState());
-
-        machine.getExtendedState().getVariables()
-                .put(BulletinSMHeaderContract.BULLETIN_HEADER, bulletin);
-        machine.getExtendedState().getVariables()
-                .put(BulletinSMHeaderContract.BULLETIN_ID_HEADER, bulletin.getId());
-
-
+        setExtendedState(machine, bulletin);
         return machine;
     }
 
-    private Map<String, Object> createExtendedState(Bulletin bulletin) {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put(BulletinSMHeaderContract.BULLETIN_ID_HEADER, bulletin.getId());
-        variables.put(BulletinSMHeaderContract.BULLETIN_HEADER, bulletin);
+    private void setExtendedState(StateMachine<BulletinState, BulletinEvent> machine,
+                                                 Bulletin bulletin) {
+        machine.getExtendedState().getVariables()
+                .put(BulletinExtendedState.BULLETIN, bulletin);
+        machine.getExtendedState().getVariables()
+                .put(BulletinExtendedState.BULLETIN_ID, bulletin.getId());
 
         Errors emptyErrorsHoled = new BeanPropertyBindingResult(Bulletin.class, "bulletin");
-        variables.put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER, emptyErrorsHoled);
-        return variables;
+        machine.getExtendedState().getVariables()
+                .put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT, emptyErrorsHoled);
     }
 
     private BindingResult getValidationErrors(StateMachine<BulletinState, BulletinEvent> machine) {
         return (BindingResult) machine.getExtendedState()
                 .getVariables()
-                .get(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER);
+                .get(BulletinExtendedState.BULLETIN_VALIDATION_RESULT);
     }
 
     private Bulletin getBulletin(StateMachine<BulletinState, BulletinEvent> machine) {
         return machine.getExtendedState()
-                .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
+                .get(BulletinExtendedState.BULLETIN, Bulletin.class);
     }
 
 }

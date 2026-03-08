@@ -1,6 +1,6 @@
 package com.example.bulletin.unit.application.statemachine.bulletin.guard.helper.validationcontext;
 
-import com.example.bulletin.application.statemachine.bulletin.contract.BulletinSMHeaderContract;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.helper.BulletinValidationContext;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
@@ -37,7 +37,7 @@ class BulletinValidationContextAddFieldErrorTests {
     @BeforeEach
     void setup() {
         variables = new HashMap<>();
-        extendedState.getVariables().put(BulletinSMHeaderContract.BULLETIN_VALIDATION_RESULT_HEADER,
+        extendedState.getVariables().put(BulletinExtendedState.BULLETIN_VALIDATION_RESULT,
                 new ArrayList<String>());
 
         when(context.getExtendedState())
