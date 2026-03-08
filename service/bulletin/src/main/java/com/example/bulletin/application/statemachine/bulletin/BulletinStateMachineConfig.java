@@ -46,7 +46,7 @@ public class BulletinStateMachineConfig extends EnumStateMachineConfigurerAdapte
                     .source(BulletinState.MODIFIABLE).target(BulletinState.APPROVED)
                     .guard(guards.checkIfUserIsOwnerGuard())
                     .guard(guards.checkIfCanBeApprovedGuard())
-                    .event(BulletinEvent.APPROVE)
+                    .event(BulletinEvent.APPROVE_2)
                 .and()
                 .withExternal()
                     .source(BulletinState.APPROVED).target(BulletinState.MODIFIABLE)

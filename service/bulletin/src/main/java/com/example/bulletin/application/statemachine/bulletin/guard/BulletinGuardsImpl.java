@@ -12,6 +12,7 @@ import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
 import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.guard.Guard;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import org.springframework.validation.Validator;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BulletinGuardsImpl implements BulletinGuards {
@@ -34,11 +36,14 @@ public class BulletinGuardsImpl implements BulletinGuards {
     @Override
     public Guard<BulletinState, BulletinEvent> checkIfCanBeApprovedGuard() {
         return context -> {
+            log.info("Начался guard checkIfCanBeApprovedGuard.");
+
             BulletinValidationContext validationContext = new BulletinValidationContext(context);
             Bulletin bulletin = context.getExtendedState()
                     .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
 
             if (bulletin == null) {
+                log.info("Bulletin not found.");
                 validationContext.addObjectError("Bulletin not found");
                 return validationContext.reject();
             }
@@ -48,10 +53,12 @@ public class BulletinGuardsImpl implements BulletinGuards {
             validator.validate(validationDto, validationErrors);
 
             if (validationErrors.hasErrors()) {
+                log.info("Bulletin is invalid.");
                 validationContext.addErrors(validationErrors);
                 return validationContext.reject();
             }
 
+            log.info("Прошел guard checkIfCanBeApprovedGuard.");
             return validationContext.accept();
         };
     }
@@ -59,6 +66,8 @@ public class BulletinGuardsImpl implements BulletinGuards {
     @Override
     public Guard<BulletinState, BulletinEvent> checkIfUserCanBeABulletinPublisherGuard() {
         return context -> {
+            log.info("Начался guard checkIfUserCanBeABulletinPublisherGuard.");
+
             BulletinValidationContext validationContext = new BulletinValidationContext(context);
             UUID userId = securityService.getCurrentUserIdAsUUID();
             Optional<User> user = userRepository.findById(userId);
@@ -83,6 +92,7 @@ public class BulletinGuardsImpl implements BulletinGuards {
                 return validationContext.reject();
             }
 
+            log.info("Прошел guard checkIfUserCanBeABulletinPublisherGuard.");
             return validationContext.accept();
         };
     }
@@ -90,6 +100,8 @@ public class BulletinGuardsImpl implements BulletinGuards {
     @Override
     public Guard<BulletinState, BulletinEvent> checkIfUserIsOwnerGuard() {
         return context -> {
+            log.info("Начался guard checkIfUserIsOwnerGuard.");
+
             BulletinValidationContext validationContext = new BulletinValidationContext(context);
             Bulletin bulletin = context.getExtendedState()
                     .get(BulletinSMHeaderContract.BULLETIN_HEADER, Bulletin.class);
@@ -105,6 +117,7 @@ public class BulletinGuardsImpl implements BulletinGuards {
                 return validationContext.reject();
             }
 
+            log.info("Прошел guard checkIfUserIsOwnerGuard.");
             return validationContext.accept();
         };
     }
