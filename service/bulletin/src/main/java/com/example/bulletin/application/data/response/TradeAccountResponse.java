@@ -1,6 +1,7 @@
 package com.example.bulletin.application.data.response;
 
 import lombok.Builder;
+import lombok.Setter;
 import lombok.Value;
 
 import java.util.Objects;

@@ -55,4 +55,9 @@ public class TradeAccountController {
         return ResponseEntity.ok(service.SetExactLocation(request));
     }
 
+    @PutMapping("/approve")
+    public ResponseEntity<ApproveTradeAccountResponse> approve() {
+        return ResponseEntity.ok(service.approveTradeAccount(new ApproveTradeAccountRequest()));
+    }
+
 }

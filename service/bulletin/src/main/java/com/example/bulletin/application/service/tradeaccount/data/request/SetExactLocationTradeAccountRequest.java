@@ -19,9 +19,6 @@ import java.util.UUID;
 public class SetExactLocationTradeAccountRequest {
 
     @NotNull
-    private UUID id;
-
-    @NotNull
     @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
     @DecimalMax(value = "90.0", message = "Latitude must be between -90 and 90")
     private Double latitude;

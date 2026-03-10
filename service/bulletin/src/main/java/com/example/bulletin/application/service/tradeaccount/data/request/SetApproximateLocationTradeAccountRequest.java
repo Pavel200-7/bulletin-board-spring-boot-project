@@ -17,8 +17,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SetApproximateLocationTradeAccountRequest {
-    @NotNull
-    private UUID id;
 
     @NotNull
     @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")

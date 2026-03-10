@@ -41,21 +41,6 @@ public class RenameTradeAccountRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankId(UUID id) {
-        // Arrange
-        RenameTradeAccountRequest request = createValidRequestBuilder()
-                .id(id)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
-    @NullSource
     @ValueSource(strings = {"", "  "})
     public void shouldForbidBlankName(String name) {
         // Arrange
@@ -117,7 +102,6 @@ public class RenameTradeAccountRequestTests {
 
     public RenameTradeAccountRequest.RenameTradeAccountRequestBuilder createValidRequestBuilder() {
         return RenameTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .name("new name");
     }
 

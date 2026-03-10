@@ -16,8 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangeDescriptionTradeAccountRequest {
-    @NotNull
-    private UUID id;
     @NotBlank
     @Length(min = 0, max = 1000)
     private String description;
