@@ -10,6 +10,7 @@ import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
 import com.example.bulletin.infrastructure.repository.UserRepository;
+import com.example.bulletin.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +47,9 @@ public class CreateTradeAccountTests {
     @Mock
     private TradeAccountMapper mapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private TradeAccountServiceImpl service;
 
@@ -57,6 +61,9 @@ public class CreateTradeAccountTests {
 
     @BeforeEach
     public void setup() {
+        when(securityService.getCurrentUserIdAsUUID())
+                .thenReturn(UUID.randomUUID());
+
         when(tradeAccountRepository.save(any(TradeAccount.class)))
                 .thenAnswer(i -> i.getArgument(0));
 

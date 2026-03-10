@@ -10,6 +10,7 @@ import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
+import com.example.bulletin.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,9 @@ public class RenameTradeAccountTests {
     @Mock
     private TradeAccountMapper mapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private TradeAccountServiceImpl service;
 
@@ -55,7 +59,10 @@ public class RenameTradeAccountTests {
     public void setup() {
         tradeAccount = createTradeAccount();
 
-        when(tradeAccountRepository.findById(any(UUID.class)))
+        when(securityService.getCurrentUserIdAsUUID())
+                .thenReturn(UUID.randomUUID());
+
+        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
                 .thenReturn(Optional.of(tradeAccount));
 
         when(tradeAccountRepository.save(any(TradeAccount.class)))
@@ -72,7 +79,7 @@ public class RenameTradeAccountTests {
     public void shouldThrowWhenTradeAccountNotFound() {
         // Arrange
         RenameTradeAccountRequest request = createRequest();
-        when(tradeAccountRepository.findById(any(UUID.class)))
+        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
@@ -126,7 +133,6 @@ public class RenameTradeAccountTests {
 
     private RenameTradeAccountRequest createRequest() {
         return RenameTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .name("New Account Name")
                 .build();
     }

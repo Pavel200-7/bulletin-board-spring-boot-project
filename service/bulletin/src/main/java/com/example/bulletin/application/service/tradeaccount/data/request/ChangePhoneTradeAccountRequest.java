@@ -15,8 +15,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangePhoneTradeAccountRequest {
-    @NotNull
-    private UUID id;
     @NotBlank
     @Pattern(
             regexp = "^\\+?[0-9]{10,15}$",

@@ -42,21 +42,6 @@ public class SetExactLocationTradeAccountRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidNullId(UUID id) {
-        // Arrange
-        SetExactLocationTradeAccountRequest request = createValidRequestBuilder()
-                .id(id)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
-    @NullSource
     public void shouldForbidNullLatitude(Double latitude) {
         // Arrange
         SetExactLocationTradeAccountRequest request = createValidRequestBuilder()
@@ -209,7 +194,6 @@ public class SetExactLocationTradeAccountRequestTests {
 
     public SetExactLocationTradeAccountRequest.SetExactLocationTradeAccountRequestBuilder createValidRequestBuilder() {
         return SetExactLocationTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .latitude(55.7558)
                 .longitude(37.6173)
                 .townName("Moscow")

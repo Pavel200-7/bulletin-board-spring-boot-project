@@ -11,10 +11,13 @@ import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
 import com.example.bulletin.infrastructure.repository.UserRepository;
+import com.example.bulletin.infrastructure.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -23,6 +26,7 @@ public class TradeAccountServiceImpl implements TradeAccountService {
 
     private final TradeAccountRepository tradeAccountRepository;
     private final UserRepository userRepository;
+    private final SecurityService securityService;
     private final TradeAccountMapper mapper;
 
     @Override
@@ -43,7 +47,7 @@ public class TradeAccountServiceImpl implements TradeAccountService {
 
         OwnerInfo ownerInfo = new OwnerInfo(owner);
         TradeAccount tradeAccount = TradeAccount.createTradeAccount(ownerInfo);
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new CreateTradeAccountResponse(response);
@@ -52,11 +56,12 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     @Override
     @Transactional
     public RenameTradeAccountResponse renameTradeAccount(RenameTradeAccountRequest request) {
-        TradeAccount tradeAccount = tradeAccountRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + request.getId()));
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
 
         tradeAccount.setName(request.getName());
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new RenameTradeAccountResponse(response);
@@ -65,11 +70,12 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     @Override
     @Transactional
     public ChangePhoneTradeAccountResponse changePhone(ChangePhoneTradeAccountRequest request) {
-        TradeAccount tradeAccount = tradeAccountRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + request.getId()));
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
 
         tradeAccount.setPhone(request.getPhone());
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new ChangePhoneTradeAccountResponse(response);
@@ -78,11 +84,12 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     @Override
     @Transactional
     public ChangeContactsTradeAccountResponse changeContacts(ChangeContactsTradeAccountRequest request) {
-        TradeAccount tradeAccount = tradeAccountRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + request.getId()));
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
 
         tradeAccount.setContacts(request.getContacts());
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new ChangeContactsTradeAccountResponse(response);
@@ -91,11 +98,12 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     @Override
     @Transactional
     public ChangeDescriptionTradeAccountResponse changeDescription(ChangeDescriptionTradeAccountRequest request) {
-        TradeAccount tradeAccount = tradeAccountRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + request.getId()));
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
 
         tradeAccount.setDescription(request.getDescription());
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new ChangeDescriptionTradeAccountResponse(response);
@@ -104,8 +112,9 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     @Override
     @Transactional
     public SetApproximateLocationTradeAccountResponse setApproximateLocation(SetApproximateLocationTradeAccountRequest request) {
-        TradeAccount tradeAccount = tradeAccountRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + request.getId()));
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
 
         Location location = new Location(
                 request.getLatitude(),
@@ -115,7 +124,7 @@ public class TradeAccountServiceImpl implements TradeAccountService {
         );
 
         tradeAccount.setApproximateLocation(location);
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new SetApproximateLocationTradeAccountResponse(response);
@@ -124,8 +133,9 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     @Override
     @Transactional
     public SetExactLocationTradeAccountResponse SetExactLocation(SetExactLocationTradeAccountRequest request) {
-        TradeAccount tradeAccount = tradeAccountRepository.findById(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + request.getId()));
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
 
         Location location = new Location(
                 request.getLatitude(),
@@ -135,10 +145,23 @@ public class TradeAccountServiceImpl implements TradeAccountService {
         );
 
         tradeAccount.setExactLocation(location);
-        tradeAccount = tradeAccountRepository.save(tradeAccount);
+        tradeAccountRepository.save(tradeAccount);
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new SetExactLocationTradeAccountResponse(response);
+    }
+
+    @Override
+    public ApproveTradeAccountResponse approveTradeAccount(ApproveTradeAccountRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
+
+        tradeAccount.approve();
+        tradeAccountRepository.save(tradeAccount);
+
+        TradeAccountResponse response = mapper.toResponse(tradeAccount);
+        return new ApproveTradeAccountResponse(response);
     }
 
 }

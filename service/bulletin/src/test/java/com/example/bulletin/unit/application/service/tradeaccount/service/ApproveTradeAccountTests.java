@@ -1,22 +1,27 @@
 package com.example.bulletin.unit.application.service.tradeaccount.service;
 
+import com.example.bulletin.application.data.response.TradeAccountResponse;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.application.service.tradeaccount.TradeAccountServiceImpl;
-import com.example.bulletin.application.service.tradeaccount.data.request.SetExactLocationTradeAccountRequest;
-import com.example.bulletin.application.service.tradeaccount.data.response.SetExactLocationTradeAccountResponse;
-import com.example.bulletin.application.data.response.TradeAccountResponse;
+import com.example.bulletin.application.service.tradeaccount.data.request.ApproveTradeAccountRequest;
+import com.example.bulletin.application.service.tradeaccount.data.request.ChangeContactsTradeAccountRequest;
+import com.example.bulletin.application.service.tradeaccount.data.response.ApproveTradeAccountResponse;
+import com.example.bulletin.application.service.tradeaccount.data.response.ChangeContactsTradeAccountResponse;
 import com.example.bulletin.domain.entity.TradeAccount;
+import com.example.bulletin.domain.entity.base.Location;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.infrastructure.repository.TradeAccountRepository;
-import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -25,8 +30,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,7 +39,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class SetExactLocationTests {
+public class ApproveTradeAccountTests {
 
     private TradeAccountMapper mapperHelper = Mappers.getMapper(
             TradeAccountMapper.class);
@@ -53,6 +58,7 @@ public class SetExactLocationTests {
 
     @Captor
     private ArgumentCaptor<TradeAccount> tradeAccountCaptor;
+
     private TradeAccount tradeAccount;
 
     @BeforeEach
@@ -78,70 +84,43 @@ public class SetExactLocationTests {
     @Test
     public void shouldThrowWhenTradeAccountNotFound() {
         // Arrange
-        SetExactLocationTradeAccountRequest request = createRequest();
+        ApproveTradeAccountRequest request = createRequest();
         when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> service.SetExactLocation(request));
+        assertThrows(ResourceNotFoundException.class, () -> service.approveTradeAccount(request));
     }
 
     @Test
-    public void shouldSetExactLocationAndSave() {
+    public void shouldApproveAndSave() {
         // Arrange
-        SetExactLocationTradeAccountRequest request = createRequest();
+        ApproveTradeAccountRequest request = createRequest();
 
         // Act
-        service.SetExactLocation(request);
+        service.approveTradeAccount(request);
 
         // Assert
         verify(tradeAccountRepository).save(tradeAccountCaptor.capture());
         TradeAccount actual = tradeAccountCaptor.getValue();
-
-        assertThat(actual.getLocation().getLatitude()).isEqualTo(request.getLatitude());
-        assertThat(actual.getLocation().getLongitude()).isEqualTo(request.getLongitude());
-        assertThat(actual.getLocation().getTownName()).isEqualTo(request.getTownName());
-        assertThat(actual.getLocation().getLocationName()).isEqualTo(request.getLocationName());
-        assertThat(actual.isCoordinatesExact()).isTrue();
+        assertTrue(actual.isApproved());
     }
 
     @Test
     public void shouldMapBeforeReturn() {
         // Arrange
-        SetExactLocationTradeAccountRequest request = createRequest();
-        TradeAccountResponse expected = mapperHelper.toResponse(tradeAccount);
-        expected = TradeAccountResponse.builder()
-                .ownerId(expected.getOwnerId())
-                .name(expected.getName())
-                .phone(expected.getPhone())
-                .contacts(expected.getContacts())
-                .description(expected.getDescription())
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .townName(request.getTownName())
-                .locationName(request.getLocationName())
-                .coordinatesExact(true)
-                .approved(false)
-                .imageId(expected.getImageId())
-                .build();
+        ApproveTradeAccountRequest request = createRequest();
 
         // Act
-        SetExactLocationTradeAccountResponse response = service.SetExactLocation(request);
+        ApproveTradeAccountResponse response = service.approveTradeAccount(request);
         TradeAccountResponse actual = response.getTradeAccountResponse();
 
         // Assert
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .ignoringFields("id")
-                .isEqualTo(expected);
+        assertTrue(actual.isApproved());
     }
 
-    private SetExactLocationTradeAccountRequest createRequest() {
-        return SetExactLocationTradeAccountRequest.builder()
-                .latitude(55.7558)
-                .longitude(37.6173)
-                .townName("Moscow")
-                .locationName("Red Square, 1")
+    private ApproveTradeAccountRequest createRequest() {
+        return ApproveTradeAccountRequest.builder()
                 .build();
     }
 
@@ -151,6 +130,8 @@ public class SetExactLocationTests {
         TradeAccount tradeAccount = TradeAccount.createTradeAccount(ownerInfo);
         tradeAccount.setName("Test Account");
         tradeAccount.setPhone("+79991234567");
+        tradeAccount.setContacts("Old contacts");
+        tradeAccount.setExactLocation(new Location(23.32, 233223.33, "test", "test"));
         return tradeAccount;
     }
 

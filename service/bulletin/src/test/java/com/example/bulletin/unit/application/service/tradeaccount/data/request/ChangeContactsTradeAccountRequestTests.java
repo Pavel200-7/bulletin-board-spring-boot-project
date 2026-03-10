@@ -41,21 +41,6 @@ public class ChangeContactsTradeAccountRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankId(UUID id) {
-        // Arrange
-        ChangeContactsTradeAccountRequest request = createValidRequestBuilder()
-                .id(id)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
-    @NullSource
     @ValueSource(strings = {"", "  "})
     public void shouldForbidBlankContacts(String contacts) {
         // Arrange
@@ -92,7 +77,6 @@ public class ChangeContactsTradeAccountRequestTests {
 
     public ChangeContactsTradeAccountRequest.ChangeContactsTradeAccountRequestBuilder createValidRequestBuilder() {
         return ChangeContactsTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .contacts("""
                         phone: +1 111 111 11 11
                         telegram: some@some.ru

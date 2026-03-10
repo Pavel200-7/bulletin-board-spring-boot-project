@@ -41,21 +41,6 @@ public class ChangeDescriptionTradeAccountRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidBlankId(UUID id) {
-        // Arrange
-        ChangeDescriptionTradeAccountRequest request = createValidRequestBuilder()
-                .id(id)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
-    @NullSource
     @ValueSource(strings = {"", "  "})
     public void shouldForbidBlankDescription(String description) {
         // Arrange
@@ -99,7 +84,6 @@ public class ChangeDescriptionTradeAccountRequestTests {
 
     public ChangeDescriptionTradeAccountRequest.ChangeDescriptionTradeAccountRequestBuilder createValidRequestBuilder() {
         return ChangeDescriptionTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .description("sell toilet bowls");
     }
 

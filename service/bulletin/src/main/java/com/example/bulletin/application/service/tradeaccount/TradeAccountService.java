@@ -12,4 +12,5 @@ public interface TradeAccountService {
     ChangeDescriptionTradeAccountResponse changeDescription(ChangeDescriptionTradeAccountRequest request);
     SetApproximateLocationTradeAccountResponse setApproximateLocation(SetApproximateLocationTradeAccountRequest request);
     SetExactLocationTradeAccountResponse SetExactLocation(SetExactLocationTradeAccountRequest request);
+    ApproveTradeAccountResponse approveTradeAccount(ApproveTradeAccountRequest request);
 }

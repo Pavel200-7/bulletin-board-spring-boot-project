@@ -42,21 +42,6 @@ public class SetApproximateLocationSetExactLocationRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidNullId(UUID id) {
-        // Arrange
-        SetApproximateLocationTradeAccountRequest request = createValidRequestBuilder()
-                .id(id)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
-    @NullSource
     public void shouldForbidNullLatitude(Double latitude) {
         // Arrange
         SetApproximateLocationTradeAccountRequest request = createValidRequestBuilder()
@@ -178,7 +163,6 @@ public class SetApproximateLocationSetExactLocationRequestTests {
 
     public SetApproximateLocationTradeAccountRequest.SetApproximateLocationTradeAccountRequestBuilder createValidRequestBuilder() {
         return SetApproximateLocationTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .latitude(55.7558)
                 .longitude(37.6173)
                 .townName("Moscow");

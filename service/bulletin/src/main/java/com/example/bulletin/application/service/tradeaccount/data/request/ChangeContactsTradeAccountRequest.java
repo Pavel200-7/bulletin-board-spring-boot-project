@@ -15,8 +15,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangeContactsTradeAccountRequest {
-    @NotNull
-    private UUID id;
     @NotBlank
     @Length(min = 0, max = 300)
     private String contacts;

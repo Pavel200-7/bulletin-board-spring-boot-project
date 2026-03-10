@@ -41,21 +41,6 @@ public class ChangePhoneTradeAccountRequestTests {
 
     @ParameterizedTest
     @NullSource
-    public void shouldForbidNullId(UUID id) {
-        // Arrange
-        ChangePhoneTradeAccountRequest request = createValidRequestBuilder()
-                .id(id)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
-    @NullSource
     @ValueSource(strings = {"", "  "})
     public void shouldForbidBlankPhone(String phone) {
         // Arrange
@@ -145,7 +130,6 @@ public class ChangePhoneTradeAccountRequestTests {
 
     public ChangePhoneTradeAccountRequest.ChangePhoneTradeAccountRequestBuilder createValidRequestBuilder() {
         return ChangePhoneTradeAccountRequest.builder()
-                .id(UUID.randomUUID())
                 .phone("+79991234567");
     }
 }

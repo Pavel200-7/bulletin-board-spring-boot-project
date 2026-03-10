@@ -14,8 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RenameTradeAccountRequest {
-    @NotNull
-    private UUID id;
     @NotBlank
     @Pattern(regexp = "^[ a-zA-Zа-яА-ЯёЁ0-9]+$",
             message = "Name must contain only letters (Russian or English) and digits")
