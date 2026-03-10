@@ -18,4 +18,9 @@ public class TestController {
     public String isAdmin() {
         return securityService.isAdmin() ? "admin" : "no";
     }
+
+    @GetMapping("/id")
+    public String getId() {
+        return securityService.getCurrentUserId();
+    }
 }
