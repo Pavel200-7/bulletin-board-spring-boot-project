@@ -5,6 +5,7 @@ import com.example.bulletin.application.service.bulletin.data.response.*;
 
 public interface BulletinService {
     GetBulletinResponse getBulletin(GetBulletinRequest request);
+    GetBulletinPaginationResponse getBulletinPagination(GetBulletinPaginationRequest request);
     GetModifiableBulletinResponse getModifiableBulletin(GetModifiableBulletinRequest request);
     CreateBulletinResponse createBulletin(CreateBulletinRequest request) throws Exception;
     UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws Exception;

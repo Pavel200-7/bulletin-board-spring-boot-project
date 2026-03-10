@@ -26,6 +26,12 @@ public class BulletinController {
         return ResponseEntity.ok(service.getBulletin(request));
     }
 
+    @PostMapping("/page")
+    private ResponseEntity<GetBulletinPaginationResponse> getBulletinPage(
+            @Valid @RequestBody GetBulletinPaginationRequest request) {
+        return ResponseEntity.ok(service.getBulletinPagination(request));
+    }
+
     @GetMapping("/modifiable/{id}")
     private ResponseEntity<GetModifiableBulletinResponse> getModifiableBulletin(@PathVariable UUID id) {
         GetModifiableBulletinRequest request = new GetModifiableBulletinRequest(id);
