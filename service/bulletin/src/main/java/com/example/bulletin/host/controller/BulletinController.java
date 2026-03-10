@@ -39,10 +39,29 @@ public class BulletinController {
             throws Exception {
         return ResponseEntity.ok(service.publishBulletin(request));
     }
+
     @PutMapping("/close")
     public ResponseEntity<CloseBulletinResponse> closeBulletin(@Valid @RequestBody CloseBulletinRequest request)
             throws Exception {
         return ResponseEntity.ok(service.closeBulletin(request));
+    }
+
+    @PutMapping("/add-image")
+    public ResponseEntity<AddBulletinImageResponse> addImage(@Valid @RequestBody AddBulletinImageRequest request)
+            throws Exception {
+        return ResponseEntity.ok(service.addImage(request));
+    }
+
+    @PutMapping("/remove-image")
+    public ResponseEntity<RemoveBulletinImageResponse> removeImage(@Valid @RequestBody RemoveBulletinImageRequest request)
+            throws Exception {
+        return ResponseEntity.ok(service.removeImage(request));
+    }
+
+    @PutMapping("/main-image")
+    public ResponseEntity<SetMainBulletinImageResponse> setMainImage(@Valid @RequestBody SetMainBulletinImageRequest request)
+            throws Exception {
+        return ResponseEntity.ok(service.setMainImage(request));
     }
 
 }

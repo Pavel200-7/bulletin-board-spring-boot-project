@@ -5,7 +5,9 @@ public enum BulletinEvent {
     REJECT,
 
     UPDATE,
+    ADD_IMAGE,
+    REMOVE_IMAGE,
+    SET_MAIN_IMAGE,
 
-    EXPIRE,
     BLOCK;
 }

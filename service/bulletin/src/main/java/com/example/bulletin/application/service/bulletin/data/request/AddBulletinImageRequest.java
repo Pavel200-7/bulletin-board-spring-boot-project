@@ -1,5 +1,6 @@
 package com.example.bulletin.application.service.bulletin.data.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddBulletinImageRequest {
+    @NotNull
     private UUID bulletinId;
-    private UUID newImageId;
+    @NotNull
+    private UUID providerImageId;
 }

@@ -7,6 +7,9 @@ import org.springframework.validation.BindException;
 public interface BulletinService {
     CreateBulletinResponse createBulletin(CreateBulletinRequest request) throws Exception;
     UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws Exception;
+    AddBulletinImageResponse addImage(AddBulletinImageRequest request) throws Exception;
+    RemoveBulletinImageResponse removeImage(RemoveBulletinImageRequest request) throws Exception;
+    SetMainBulletinImageResponse setMainImage(SetMainBulletinImageRequest request) throws Exception;
     ApproveBulletinResponse approveBulletin(ApproveBulletinRequest request) throws Exception;
     PublishBulletinResponse publishBulletin(PublishBulletinRequest request) throws Exception;
     CloseBulletinResponse closeBulletin(CloseBulletinRequest request) throws Exception;

@@ -15,6 +15,7 @@ import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class BulletinServiceImpl implements BulletinService {
     private final BulletinMapper mapper;
 
     @Override
+    @Transactional
     public CreateBulletinResponse createBulletin(CreateBulletinRequest request)
             throws Exception {
         OwnerInfo ownerInfo = getOwnerInfo();
@@ -55,6 +57,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
+    @Transactional
     public UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws Exception {
         BulletinRequest bulletinRequest = request.getBulletinRequest();
         Message<BulletinEvent> message = MessageBuilder
@@ -70,6 +73,52 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
+    @Transactional
+    public AddBulletinImageResponse addImage(AddBulletinImageRequest request) throws Exception {
+        Message<BulletinEvent> message = MessageBuilder
+                .withPayload(BulletinEvent.ADD_IMAGE)
+                .setHeader(BulletinMessageState.BULLETIN_ID, request.getBulletinId())
+                .setHeader(BulletinMessageState.BULLETIN_PROVIDER_IMAGE_ID, request.getProviderImageId())
+                .build();
+        stateMachineService.sendEvent(message);
+
+        Optional<Bulletin> modifiableBulletin = bulletinRepository.findById(request.getBulletinId());
+        BulletinResponse bulletinResponse = mapper.toResponse(modifiableBulletin.get());
+        return new AddBulletinImageResponse(bulletinResponse);
+    }
+
+    @Override
+    @Transactional
+    public RemoveBulletinImageResponse removeImage(RemoveBulletinImageRequest request) throws Exception {
+        Message<BulletinEvent> message = MessageBuilder
+                .withPayload(BulletinEvent.REMOVE_IMAGE)
+                .setHeader(BulletinMessageState.BULLETIN_ID, request.getBulletinId())
+                .setHeader(BulletinMessageState.BULLETIN_IMAGE_ID, request.getImageId())
+                .build();
+        stateMachineService.sendEvent(message);
+
+        Optional<Bulletin> modifiableBulletin = bulletinRepository.findById(request.getBulletinId());
+        BulletinResponse bulletinResponse = mapper.toResponse(modifiableBulletin.get());
+        return new RemoveBulletinImageResponse(bulletinResponse);
+    }
+
+    @Override
+    @Transactional
+    public SetMainBulletinImageResponse setMainImage(SetMainBulletinImageRequest request) throws Exception {
+        Message<BulletinEvent> message = MessageBuilder
+                .withPayload(BulletinEvent.SET_MAIN_IMAGE)
+                .setHeader(BulletinMessageState.BULLETIN_ID, request.getBulletinId())
+                .setHeader(BulletinMessageState.BULLETIN_IMAGE_ID, request.getImageId())
+                .build();
+        stateMachineService.sendEvent(message);
+
+        Optional<Bulletin> modifiableBulletin = bulletinRepository.findById(request.getBulletinId());
+        BulletinResponse bulletinResponse = mapper.toResponse(modifiableBulletin.get());
+        return new SetMainBulletinImageResponse(bulletinResponse);
+    }
+
+    @Override
+    @Transactional
     public ApproveBulletinResponse approveBulletin(ApproveBulletinRequest request) throws Exception {
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.APPROVE)
@@ -83,6 +132,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
+    @Transactional
     public PublishBulletinResponse publishBulletin(PublishBulletinRequest request) throws Exception {
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.APPROVE)
@@ -96,6 +146,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
+    @Transactional
     public CloseBulletinResponse closeBulletin(CloseBulletinRequest request) throws Exception {
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.APPROVE)
