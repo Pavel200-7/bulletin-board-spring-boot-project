@@ -18,30 +18,30 @@ public class BulletinController {
 
     @PostMapping
     public ResponseEntity<CreateBulletinResponse> createBulletin()
-            throws BindException {
+            throws Exception {
         return ResponseEntity.ok(service.createBulletin(new CreateBulletinRequest()));
     }
 
     @PutMapping
-    public ResponseEntity<UpdateBulletinResponse> createBulletin(@Valid @RequestBody UpdateBulletinRequest request)
-            throws BindException {
+    public ResponseEntity<UpdateBulletinResponse> updateBulletin(@Valid @RequestBody UpdateBulletinRequest request)
+            throws Exception {
         return ResponseEntity.ok(service.updateBulletin(request));
     }
 
     @PutMapping("/approve")
     public ResponseEntity<ApproveBulletinResponse> approveBulletin(@Valid @RequestBody ApproveBulletinRequest request)
-            throws BindException {
+            throws Exception {
         return ResponseEntity.ok(service.approveBulletin(request));
     }
 
     @PutMapping("/publish")
     public ResponseEntity<PublishBulletinResponse> publishBulletin(@Valid @RequestBody PublishBulletinRequest request)
-            throws BindException {
+            throws Exception {
         return ResponseEntity.ok(service.publishBulletin(request));
     }
     @PutMapping("/close")
     public ResponseEntity<CloseBulletinResponse> closeBulletin(@Valid @RequestBody CloseBulletinRequest request)
-            throws BindException {
+            throws Exception {
         return ResponseEntity.ok(service.closeBulletin(request));
     }
 

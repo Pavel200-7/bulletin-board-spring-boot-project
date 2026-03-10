@@ -1,20 +1,22 @@
 package com.example.bulletin.application.data.request;
 
-import com.example.bulletin.application.data.response.CharacteristicResponse;
-import com.example.bulletin.application.data.response.CharacteristicValueResponse;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.Value;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Value
 @Builder
+@ToString
 @AllArgsConstructor
 public class BulletinCharacteristicRequest {
-    private UUID id;
-    private UUID CharacteristicId;
-    private UUID CharacteristicValueId;
+
+    @NotNull(message = "Characteristic ID must not be null")
+    private UUID characteristicId;
+
+    @NotNull(message = "Characteristic value ID must not be null")
+    private UUID characteristicValueId;
 }

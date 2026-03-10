@@ -34,21 +34,23 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
 
     @Override
     public void sendEvent(Message<BulletinEvent> message)
-            throws BindException {
-
+            throws Exception {
         UUID bulletinId = message.getHeaders()
                 .get(BulletinMessageState.BULLETIN_ID, UUID.class);
         StateMachine<BulletinState, BulletinEvent> machine = restore(bulletinId);
-
         machine.sendEvent(message);
 
-        String currentState = getBulletin(machine).getState().name();
-        log.info("Итоговое состояние bulletin: {}", currentState);
+        log.info("Итоговое состояние bulletin: {}", getBulletin(machine).getState().name());
 
-        BindingResult errors = getValidationErrors(machine);
-        log.info(errors.hasErrors() ? "Ошибки валидации." : "");
-        if (errors.hasErrors()) {
-            throw new BindException(errors);
+        Optional<Exception> exception = getException(machine);
+        if (exception.isPresent()) {
+            throw exception.get();
+        }
+
+        BindingResult validationErrors = getValidationErrors(machine);
+        if (validationErrors.hasErrors()) {
+            log.info("Ошибки валидации.");
+            throw new BindException(validationErrors);
         }
     }
 
@@ -104,6 +106,12 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
     private Bulletin getBulletin(StateMachine<BulletinState, BulletinEvent> machine) {
         return machine.getExtendedState()
                 .get(BulletinExtendedState.BULLETIN, Bulletin.class);
+    }
+
+    private Optional<Exception> getException(StateMachine<BulletinState, BulletinEvent> machine) {
+        return Optional.ofNullable((Exception) machine.getExtendedState()
+                .getVariables()
+                .get(BulletinExtendedState.EXCEPTION));
     }
 
 }

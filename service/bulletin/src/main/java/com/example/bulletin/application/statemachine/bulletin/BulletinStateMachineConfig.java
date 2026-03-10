@@ -1,12 +1,15 @@
 package com.example.bulletin.application.statemachine.bulletin;
 
 import com.example.bulletin.application.statemachine.bulletin.action.BulletinActions;
+import com.example.bulletin.application.statemachine.bulletin.contract.BulletinExtendedState;
 import com.example.bulletin.application.statemachine.bulletin.guard.BulletinGuards;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.action.Action;
 import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineConfigurationConfigurer;
@@ -32,8 +35,6 @@ public class BulletinStateMachineConfig extends EnumStateMachineConfigurerAdapte
                     .state(BulletinState.APPROVED)
                     .state(BulletinState.PUBLISHED)
                     .end(BulletinState.COMPLETED);
-//                    .states(EnumSet.allOf(BulletinState.class));
-
     }
 
     @Override
@@ -52,7 +53,7 @@ public class BulletinStateMachineConfig extends EnumStateMachineConfigurerAdapte
                 .and()
                 .withInternal()
                     .source(BulletinState.MODIFIABLE)
-                    .action(actions.updateAction())
+                    .action(actions.updateAction(), errorAction())
                     .event(BulletinEvent.UPDATE)
                 .and()
                 .withExternal()
@@ -91,6 +92,23 @@ public class BulletinStateMachineConfig extends EnumStateMachineConfigurerAdapte
         config
                 .withConfiguration()
                 .autoStartup(false);
+    }
+
+    @Bean
+    public Action<BulletinState, BulletinEvent> errorAction() {
+        return context -> {
+            log.info("В sm было вызвано исключение.");
+
+            Exception exception = context.getException();
+            exception.getMessage();
+
+            log.error("Поймано исключение: {}", exception.getMessage());
+            log.error("Тип исключения: {}", exception.getClass().getSimpleName());
+            log.error("Stacktrace:", exception);
+
+            context.getExtendedState().getVariables()
+                    .put(BulletinExtendedState.EXCEPTION, exception);
+        };
     }
 
 }

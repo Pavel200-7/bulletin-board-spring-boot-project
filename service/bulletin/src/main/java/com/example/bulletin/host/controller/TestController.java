@@ -14,7 +14,7 @@ public class TestController {
 
     private final SecurityService securityService;
 
-    @GetMapping
+    @GetMapping("/is-admin")
     public String isAdmin() {
         return securityService.isAdmin() ? "admin" : "no";
     }
