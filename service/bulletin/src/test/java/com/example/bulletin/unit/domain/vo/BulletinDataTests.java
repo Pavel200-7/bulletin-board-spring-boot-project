@@ -178,6 +178,7 @@ public class BulletinDataTests {
                 .id(UUID.randomUUID())
                 .bulletinId(BULLETIN_ID)
                 .imageId(imageId)
+                .main(true)
                 .build();
     }
 

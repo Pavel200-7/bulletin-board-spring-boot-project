@@ -183,6 +183,7 @@ public class BulletinResponseTests {
                 .id(UUID.randomUUID())
                 .bulletinId(BULLETIN_ID)
                 .imageId(imageId)
+                .main(true)
                 .build();
     }
 

@@ -21,12 +21,14 @@ public class BulletinImageDataTests {
                 .id(UUID.randomUUID())
                 .bulletinId(bulletinId)
                 .imageId(imageId)
+                .main(true)
                 .build();
 
         BulletinImageData data2 = BulletinImageData.builder()
                 .id(UUID.randomUUID())
                 .bulletinId(bulletinId)
                 .imageId(imageId)
+                .main(true)
                 .build();
 
         // Act

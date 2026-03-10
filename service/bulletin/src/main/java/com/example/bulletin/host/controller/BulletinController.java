@@ -3,11 +3,15 @@ package com.example.bulletin.host.controller;
 import com.example.bulletin.application.service.bulletin.BulletinService;
 import com.example.bulletin.application.service.bulletin.data.request.*;
 import com.example.bulletin.application.service.bulletin.data.response.*;
+import com.example.bulletin.application.service.category.data.request.GetCategoryRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,6 +19,18 @@ import org.springframework.web.bind.annotation.*;
 public class BulletinController {
 
     private final BulletinService service;
+
+    @GetMapping("/{id}")
+    private ResponseEntity<GetBulletinResponse> getBulletin(@PathVariable UUID id) {
+        GetBulletinRequest request = new GetBulletinRequest(id);
+        return ResponseEntity.ok(service.getBulletin(request));
+    }
+
+    @GetMapping("/modifiable/{id}")
+    private ResponseEntity<GetModifiableBulletinResponse> getModifiableBulletin(@PathVariable UUID id) {
+        GetModifiableBulletinRequest request = new GetModifiableBulletinRequest(id);
+        return ResponseEntity.ok(service.getModifiableBulletin(request));
+    }
 
     @PostMapping
     public ResponseEntity<CreateBulletinResponse> createBulletin()
