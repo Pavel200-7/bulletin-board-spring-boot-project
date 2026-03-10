@@ -37,7 +37,7 @@ public class BulletinServiceImpl implements BulletinService {
 
     @Override
     public CreateBulletinResponse createBulletin(CreateBulletinRequest request)
-            throws BindException {
+            throws Exception {
         OwnerInfo ownerInfo = getOwnerInfo();
         Bulletin bulletin = Bulletin.createDraft(ownerInfo);
         bulletinRepository.save(bulletin);
@@ -55,7 +55,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
-    public UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws BindException {
+    public UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws Exception {
         BulletinRequest bulletinRequest = request.getBulletinRequest();
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.UPDATE)
@@ -70,7 +70,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
-    public ApproveBulletinResponse approveBulletin(ApproveBulletinRequest request) throws BindException {
+    public ApproveBulletinResponse approveBulletin(ApproveBulletinRequest request) throws Exception {
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.APPROVE)
                 .setHeader(BulletinMessageState.BULLETIN_ID, request.getBulletinId())
@@ -83,7 +83,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
-    public PublishBulletinResponse publishBulletin(PublishBulletinRequest request) throws BindException {
+    public PublishBulletinResponse publishBulletin(PublishBulletinRequest request) throws Exception {
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.APPROVE)
                 .setHeader(BulletinMessageState.BULLETIN_ID, request.getBulletinId())
@@ -96,7 +96,7 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
-    public CloseBulletinResponse closeBulletin(CloseBulletinRequest request) throws BindException {
+    public CloseBulletinResponse closeBulletin(CloseBulletinRequest request) throws Exception {
         Message<BulletinEvent> message = MessageBuilder
                 .withPayload(BulletinEvent.APPROVE)
                 .setHeader(BulletinMessageState.BULLETIN_ID, request.getBulletinId())

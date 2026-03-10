@@ -8,12 +8,13 @@ import com.example.bulletin.infrastructure.repository.CategoryRepository;
 import com.example.bulletin.infrastructure.repository.CharacteristicRepository;
 import com.example.bulletin.infrastructure.repository.CharacteristicValueRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BulletinModifyServiceImpl implements BulletinModifyService {
@@ -23,6 +24,8 @@ public class BulletinModifyServiceImpl implements BulletinModifyService {
     private final CharacteristicValueRepository characteristicValueRepository;
 
     public void updateBulletin(Bulletin bulletin, BulletinRequest request) {
+        log.info("Начало updateBulletin.");
+        log.info("Переданный request: {}", request.toString());
         updateSimpleFields(bulletin, request);
         updateCategory(bulletin, request);
         updateCharacteristics(bulletin, request.getCharacteristics());
@@ -96,10 +99,8 @@ public class BulletinModifyServiceImpl implements BulletinModifyService {
     private void updateExistingCharacteristic(BulletinCharacteristic bulletinCharacteristic,
                                               UUID newValueId) {
         Optional<UUID> oldValueId = Optional.ofNullable(bulletinCharacteristic.getValue().getId());
-        if (oldValueId.isPresent()) {
-            return;
-        }
-        if (oldValueId.get().equals(newValueId)) {
+        if (oldValueId.isPresent()
+                && oldValueId.get().equals(newValueId)) {
             return;
         }
 
@@ -109,6 +110,8 @@ public class BulletinModifyServiceImpl implements BulletinModifyService {
     }
 
     private void addNewCharacteristic(Bulletin bulletin, UUID characteristicId, UUID valueId) {
+        log.info("Начало addNewCharacteristic.");
+        log.info("Переданное characteristicId: {}, valueId: {}.", characteristicId, valueId);
         Characteristic characteristic = characteristicRepository.findById(characteristicId)
                 .orElseThrow(() -> new ResourceNotFoundException("Characteristic not found. id:" + characteristicId));
         BulletinCharacteristic newCharacteristic = bulletin.addCharacteristic(characteristic);

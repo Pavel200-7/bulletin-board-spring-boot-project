@@ -31,15 +31,9 @@ public class BulletinActionsImpl implements BulletinActions {
             BulletinRequest bulletinRequest = context.getMessage()
                     .getHeaders()
                     .get(BulletinMessageState.BULLETIN_UPDATE_REQUEST, BulletinRequest.class);
-
-            try {
-                modifyService.updateBulletin(bulletin, bulletinRequest);
-            } catch (Exception e) {
-                log.info(e.getMessage());
-                log.info(e.toString());
-                validationContext.addObjectError(e.getMessage());
-                validationContext.reject();
-            }
+            modifyService.updateBulletin(bulletin, bulletinRequest);
+            log.info("Завершено updateAction");
         };
     }
+
 }

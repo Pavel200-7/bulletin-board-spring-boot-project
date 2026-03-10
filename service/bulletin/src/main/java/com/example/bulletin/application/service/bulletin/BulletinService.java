@@ -5,9 +5,9 @@ import com.example.bulletin.application.service.bulletin.data.response.*;
 import org.springframework.validation.BindException;
 
 public interface BulletinService {
-    CreateBulletinResponse createBulletin(CreateBulletinRequest request) throws BindException;
-    UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws BindException;
-    ApproveBulletinResponse approveBulletin(ApproveBulletinRequest request) throws BindException;
-    PublishBulletinResponse publishBulletin(PublishBulletinRequest request) throws BindException;
-    CloseBulletinResponse closeBulletin(CloseBulletinRequest request) throws BindException;
+    CreateBulletinResponse createBulletin(CreateBulletinRequest request) throws Exception;
+    UpdateBulletinResponse updateBulletin(UpdateBulletinRequest request) throws Exception;
+    ApproveBulletinResponse approveBulletin(ApproveBulletinRequest request) throws Exception;
+    PublishBulletinResponse publishBulletin(PublishBulletinRequest request) throws Exception;
+    CloseBulletinResponse closeBulletin(CloseBulletinRequest request) throws Exception;
 }

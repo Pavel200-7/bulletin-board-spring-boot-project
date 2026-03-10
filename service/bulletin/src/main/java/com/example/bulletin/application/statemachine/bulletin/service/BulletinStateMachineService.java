@@ -9,6 +9,6 @@ import org.springframework.validation.BindException;
 import java.util.UUID;
 
 public interface BulletinStateMachineService {
-    void sendEvent(Message<BulletinEvent> message) throws BindException;
+    void sendEvent(Message<BulletinEvent> message) throws Exception;
     StateMachine<BulletinState, BulletinEvent> restore(UUID bulletinId);
 }
