@@ -26,6 +26,9 @@ public class User {
     @Column(name = "blocked")
     private boolean blocked;
 
+    @OneToOne(mappedBy = "ownerInfo.owner", cascade = CascadeType.ALL)
+    private TradeAccount tradeAccount;
+
     @PrePersist
     public void onInit() {
         this.blocked = false;

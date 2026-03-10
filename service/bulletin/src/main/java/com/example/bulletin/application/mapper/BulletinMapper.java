@@ -1,12 +1,17 @@
 package com.example.bulletin.application.mapper;
 
 import com.example.bulletin.application.data.response.BulletinResponse;
+import com.example.bulletin.application.service.bulletin.data.response.data.BulletinPaginationData;
 import com.example.bulletin.domain.entity.Bulletin;
+import com.example.bulletin.domain.entity.BulletinImage;
 import com.example.bulletin.domain.vo.BulletinData;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+
+import java.util.List;
+import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
@@ -27,4 +32,15 @@ public interface BulletinMapper {
     @Mapping(target = "characteristics", source = "characteristics")
     @Mapping(target = "images", source = "images")
     BulletinResponse toResponse(Bulletin entity);
+
+    @Mapping(target = "image", source = "images")
+    BulletinPaginationData toPaginationData(Bulletin bulletin);
+
+    default UUID mapImages(List<BulletinImage> images) {
+        return images.stream()
+                .filter(BulletinImage::isMain)
+                .findFirst()
+                .map(BulletinImage::getImageId)
+                .orElse(null);
+    }
 }

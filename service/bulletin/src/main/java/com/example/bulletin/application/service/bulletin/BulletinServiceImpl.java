@@ -5,7 +5,11 @@ import com.example.bulletin.application.data.response.BulletinResponse;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.BulletinMapper;
 import com.example.bulletin.application.service.bulletin.data.request.*;
+import com.example.bulletin.application.service.bulletin.data.request.data.BulletinSearchCriteria;
+import com.example.bulletin.application.service.bulletin.data.request.data.PageData;
 import com.example.bulletin.application.service.bulletin.data.response.*;
+import com.example.bulletin.application.service.bulletin.data.response.data.BulletinPaginationData;
+import com.example.bulletin.application.service.bulletin.helper.specification.BulletinSpecificationBuilder;
 import com.example.bulletin.application.statemachine.bulletin.contract.BulletinMessageState;
 import com.example.bulletin.application.statemachine.bulletin.service.BulletinStateMachineService;
 import com.example.bulletin.domain.entity.Bulletin;
@@ -15,15 +19,22 @@ import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BulletinServiceImpl implements BulletinService {
@@ -32,9 +43,11 @@ public class BulletinServiceImpl implements BulletinService {
     private final UserRepository userRepository;
     private final SecurityService securityService;
     private final BulletinStateMachineService stateMachineService;
+    private final BulletinSpecificationBuilder specificationBuilder;
     private final BulletinMapper mapper;
 
     @Override
+    @Transactional(readOnly = true)
     public GetBulletinResponse getBulletin(GetBulletinRequest request) {
         Bulletin bulletin = bulletinRepository.findByIdEager(request.getBulletinId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found."));
@@ -47,6 +60,25 @@ public class BulletinServiceImpl implements BulletinService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public GetBulletinPaginationResponse getBulletinPagination(GetBulletinPaginationRequest request) {
+        log.info(request.toString());
+
+        BulletinSearchCriteria criteria = request.getCriteria();
+        Specification<Bulletin> spec = specificationBuilder.fromCriteria(criteria);
+
+        PageData pageData = request.getPageData();
+        Sort sortOrder = Sort.by(criteria.getDirection(), criteria.getOrderBy().getFieldName());
+
+        Pageable pageable = PageRequest.of(pageData.getPage(), pageData.getSize(), sortOrder);
+        Page<Bulletin> bulletins = bulletinRepository.findAll(spec, pageable);
+
+        Page<BulletinPaginationData> paginationData = bulletins.map(mapper::toPaginationData);
+        return new GetBulletinPaginationResponse(paginationData);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public GetModifiableBulletinResponse getModifiableBulletin(GetModifiableBulletinRequest request) {
         Bulletin bulletin = bulletinRepository.findByIdEager(request.getBulletinId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found."));

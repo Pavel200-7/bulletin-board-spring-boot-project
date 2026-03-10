@@ -5,6 +5,7 @@ import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.application.service.tradeaccount.data.request.*;
 import com.example.bulletin.application.service.tradeaccount.data.response.*;
 import com.example.bulletin.application.data.response.TradeAccountResponse;
+import com.example.bulletin.application.service.bulletin.helper.specification.BulletinSpecificationBuilder;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.Location;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
