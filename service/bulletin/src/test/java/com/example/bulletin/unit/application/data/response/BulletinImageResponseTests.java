@@ -21,12 +21,14 @@ public class BulletinImageResponseTests {
                 .id(UUID.randomUUID())
                 .bulletinId(bulletinId)
                 .imageId(imageId)
+                .main(true)
                 .build();
 
         BulletinImageResponse data2 = BulletinImageResponse.builder()
                 .id(UUID.randomUUID())
                 .bulletinId(bulletinId)
                 .imageId(imageId)
+                .main(true)
                 .build();
 
         // Act

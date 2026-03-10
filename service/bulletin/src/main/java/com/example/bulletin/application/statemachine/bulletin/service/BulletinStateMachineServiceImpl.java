@@ -57,7 +57,7 @@ public class BulletinStateMachineServiceImpl implements BulletinStateMachineServ
     @Override
     public StateMachine<BulletinState, BulletinEvent> restore(UUID bulletinId) {
         Bulletin bulletin = bulletinRepository.findByIdEager(bulletinId)
-                .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found."));
 
         StateMachine<BulletinState, BulletinEvent> machine =
                 factory.getStateMachine(bulletinId.toString());

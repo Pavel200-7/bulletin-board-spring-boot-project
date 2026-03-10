@@ -17,9 +17,7 @@ import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindException;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
@@ -35,6 +33,33 @@ public class BulletinServiceImpl implements BulletinService {
     private final SecurityService securityService;
     private final BulletinStateMachineService stateMachineService;
     private final BulletinMapper mapper;
+
+    @Override
+    public GetBulletinResponse getBulletin(GetBulletinRequest request) {
+        Bulletin bulletin = bulletinRepository.findByIdEager(request.getBulletinId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found."));
+        if (!bulletin.isActive()) {
+            throw new ResourceNotFoundException("Bulletin not found.");
+        }
+
+        BulletinResponse bulletinResponse = mapper.toResponse(bulletin);
+        return new GetBulletinResponse(bulletinResponse);
+    }
+
+    @Override
+    public GetModifiableBulletinResponse getModifiableBulletin(GetModifiableBulletinRequest request) {
+        Bulletin bulletin = bulletinRepository.findByIdEager(request.getBulletinId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bulletin not found."));
+
+        OwnerInfo ownerInfo = getOwnerInfo();
+        if (!bulletin.getOwnerInfo()
+                .isOwnedByUser(ownerInfo.getOwner())) {
+            throw new ResourceNotFoundException("Bulletin not found.");
+        }
+
+        BulletinResponse bulletinResponse = mapper.toResponse(bulletin);
+        return new GetModifiableBulletinResponse(bulletinResponse);
+    }
 
     @Override
     @Transactional

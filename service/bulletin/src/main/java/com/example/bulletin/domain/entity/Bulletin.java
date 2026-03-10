@@ -191,4 +191,9 @@ public class Bulletin extends BaseEntity {
                 .findFirst();
     }
 
+    public boolean isActive() {
+        return this.state
+                .equals(BulletinState.PUBLISHED);
+    }
+
 }
