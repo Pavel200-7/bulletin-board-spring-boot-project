@@ -1,10 +1,14 @@
 package com.example.notification.domain.entity.base.user;
 
+import com.example.notification.domain.entity.Subscription;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity

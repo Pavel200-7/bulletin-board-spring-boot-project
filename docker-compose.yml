@@ -34,6 +34,47 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+
+  notification:
+    build: ./service/notification
+    container_name: notification
+    ports:
+      - 8086:8080
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/notification_db
+      - DB_USERNAME=dbuser
+      - DB_PASSWORD=password
+      
+      # RabbitMQ
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=rmuser
+      - RABBITMQ_PASSWORD=rmpassword
+      
+      # Keycloak
+      - KEYCLOAK_ISSUER_URI=http://localhost:8080/realms/oAuth
+      - DOCKER_KEYCLOAK_ISSUER_URI=http://keycloak:8080/realms/oAuth
+      - KEYCLOAK_CLIENT_ID=myclient
+      - KEYCLOAK_CLIENT_SECRET=sYXnZMAiSY4ouudztjv73iHyPr5H0dQC
+
+      # Mail
+      - MAIL_HOST=smtp.yandex.ru
+      - MAIL_PORT=465
+      - MAIL_PROTOCOL=smtps
+      - MAIL_USERNAME=Pavel200-7@yandex.ru
+      - MAIL_PASSWORD=prvepeophfnvnjlm
+      
+      # Server
+      - SERVER_PORT=8080 
+    networks:
+      app-net:
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
   
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.2

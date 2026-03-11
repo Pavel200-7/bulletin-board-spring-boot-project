@@ -64,67 +64,6 @@ public class SecurityConfig {
             throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        // ========== ПУБЛИЧНЫЕ ЭНДПОИНТЫ (READ ONLY) ==========
-                        // BulletinController
-                        .requestMatchers(HttpMethod.POST, "/api/v1/bulletin/page").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/bulletin/**").permitAll()
-
-                        // CategoryController
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category/root").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category/family/**").permitAll()
-
-                        // CharacteristicController
-                        .requestMatchers(HttpMethod.GET, "/api/v1/characteristic/**").permitAll()
-
-                        // CharacteristicValueController
-                        .requestMatchers(HttpMethod.GET, "/api/v1/characteristic-value/**").permitAll()
-
-                        // CategoryCharacteristicController
-                        .requestMatchers(HttpMethod.GET, "/api/v1/category/*/characteristic").permitAll()
-
-                        // CharacteristicCharacteristicValueController
-                        .requestMatchers(HttpMethod.GET, "/api/v1/characteristic/*/characteristic-value").permitAll()
-
-                        // TradeAccountController - GET запросы публичные
-                        .requestMatchers(HttpMethod.GET, "/api/v1/trade-account/**").permitAll()
-
-                        // ========== АУТЕНТИФИЦИРОВАННЫЕ ПОЛЬЗОВАТЕЛИ (любая роль) ==========
-                        // BulletinController - операции с объявлениями
-                        .requestMatchers(HttpMethod.POST, "/api/v1/bulletin").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/add-image").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/remove-image").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/main-image").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/close").authenticated()
-
-                        // TradeAccountController - все PUT запросы требуют аутентификации
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/name").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/phone").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/contacts").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/description").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/approximate-location").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/exact-location").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/approve").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/approve").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/publish").authenticated()
-
-                        // ========== АДМИНИСТРАТОРЫ (только ADMIN) ==========
-                        // Управление справочниками
-                        .requestMatchers(HttpMethod.POST, "/api/v1/category/root").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/category/child").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/v1/category/leafy-child").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/category/name").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/category/**").hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/api/v1/category/*/characteristic").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/characteristic/name").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/category/*/characteristic/**").hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.POST, "/api/v1/characteristic/*/characteristic-value").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/characteristic-value/name").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/characteristic/*/characteristic-value/**").hasRole("ADMIN")
-
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
