@@ -21,19 +21,19 @@ public class BulletinController {
     private final BulletinService service;
 
     @GetMapping("/{id}")
-    private ResponseEntity<GetBulletinResponse> getBulletin(@PathVariable UUID id) {
+    public ResponseEntity<GetBulletinResponse> getBulletin(@PathVariable UUID id) {
         GetBulletinRequest request = new GetBulletinRequest(id);
         return ResponseEntity.ok(service.getBulletin(request));
     }
 
     @PostMapping("/page")
-    private ResponseEntity<GetBulletinPaginationResponse> getBulletinPage(
+    public ResponseEntity<GetBulletinPaginationResponse> getBulletinPage(
             @Valid @RequestBody GetBulletinPaginationRequest request) {
         return ResponseEntity.ok(service.getBulletinPagination(request));
     }
 
     @GetMapping("/modifiable/{id}")
-    private ResponseEntity<GetModifiableBulletinResponse> getModifiableBulletin(@PathVariable UUID id) {
+    public ResponseEntity<GetModifiableBulletinResponse> getModifiableBulletin(@PathVariable UUID id) {
         GetModifiableBulletinRequest request = new GetModifiableBulletinRequest(id);
         return ResponseEntity.ok(service.getModifiableBulletin(request));
     }

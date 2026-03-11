@@ -5,6 +5,7 @@ import com.example.bulletin.application.data.response.BulletinImageResponse;
 import com.example.bulletin.application.data.response.BulletinResponse;
 import com.example.bulletin.application.data.response.CategoryResponse;
 import com.example.bulletin.application.mapper.*;
+import com.example.bulletin.application.service.bulletin.data.response.data.BulletinPaginationData;
 import com.example.bulletin.domain.entity.*;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
-public class BulletinMapperToDataTests {
+public class BulletinMapperTests {
 
     private BulletinMapper bulletinMapper;
     private BulletinCharacteristicMapper bulletinCharacteristicMapper;
@@ -41,14 +42,14 @@ public class BulletinMapperToDataTests {
 
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         bulletinMapper = mapperBuilder.createBulletinMapper();
         bulletinCharacteristicMapper = mapperBuilder.createBulletinCharacteristicMapper();
         bulletin = createBulletin();
     }
 
     @Test
-    void shouldConvertCorrectlyFromEntityToData() {
+    public void shouldConvertCorrectlyFromEntityToData() {
         // Arrange
         BulletinData expected = createExpectedBulletinDataBuilder().build();
 
@@ -76,7 +77,7 @@ public class BulletinMapperToDataTests {
     }
 
     @Test
-    void shouldHandleEmptyImagesWhenConvertToData() {
+    public void shouldHandleEmptyImagesWhenConvertToData() {
         // Arrange
         bulletin.getImages().clear();
         BulletinData expected = createExpectedBulletinDataBuilder()
@@ -91,7 +92,7 @@ public class BulletinMapperToDataTests {
     }
 
     @Test
-    void shouldConvertCorrectlyFromEntityToResponse() {
+    public void shouldConvertCorrectlyFromEntityToResponse() {
         // Arrange
         BulletinResponse expected = createExpectedBulletinResponseBuilder().build();
 
@@ -105,7 +106,7 @@ public class BulletinMapperToDataTests {
     }
 
     @Test
-    void shouldHandleEmptyCharacteristicsWhenConvertToResponse() {
+    public void shouldHandleEmptyCharacteristicsWhenConvertToResponse() {
         // Arrange
         bulletin.getCharacteristics().clear();
         BulletinResponse expected = createExpectedBulletinResponseBuilder()
@@ -120,7 +121,7 @@ public class BulletinMapperToDataTests {
     }
 
     @Test
-    void shouldHandleEmptyImageshenConvertToResponse() {
+    public void shouldHandleEmptyImageshenConvertToResponse() {
         // Arrange
         bulletin.getImages().clear();
         BulletinResponse expected = createExpectedBulletinResponseBuilder()
@@ -133,6 +134,22 @@ public class BulletinMapperToDataTests {
         // Assert
         assertTrue(expected.equalsData(actual));
     }
+
+    @Test
+    public void shouldConvertToPaginationData() {
+        // Arrange
+        BulletinPaginationData expected = createExpectedBulletinPaginationDataBuilder().build();
+
+        // Act
+        BulletinPaginationData actual = bulletinMapper.toPaginationData(bulletin);
+
+        // Assert
+        assertThat(actual)
+        .usingRecursiveComparison()
+        .isEqualTo(expected);
+
+    }
+
 
     private Bulletin createBulletin() {
         User user = User.createUser(UUID.randomUUID(), "owner@example.com");
@@ -200,6 +217,18 @@ public class BulletinMapperToDataTests {
                 .images(imagesResponse);
     }
 
+    private BulletinPaginationData.BulletinPaginationDataBuilder createExpectedBulletinPaginationDataBuilder() {
+        return BulletinPaginationData.builder()
+                .id(bulletin.getId())
+                .title(bulletin.getTitle())
+                .price(bulletin.getPrice())
+                .image(bulletin.getImages()
+                        .stream()
+                        .filter(i -> i.isMain())
+                        .findFirst()
+                        .get().getImageId());
+    }
+
     private Category createCategory() {
         Category root = Category.createRoot("Root Category");
         Category child = root.createLeafyChild("Child Category");
@@ -217,7 +246,8 @@ public class BulletinMapperToDataTests {
     }
 
     private BulletinImage createBulletinImage(Bulletin bulletin) {
-        return BulletinImage.createBulletinImage(bulletin, UUID.randomUUID());
+        BulletinImage image = BulletinImage.createBulletinImage(bulletin, UUID.randomUUID());
+        return image.setMain();
     }
 
 }

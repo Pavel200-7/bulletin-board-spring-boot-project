@@ -7,6 +7,12 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:iamdeadlytired795795}
   jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
