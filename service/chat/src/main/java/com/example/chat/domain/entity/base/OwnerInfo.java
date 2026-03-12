@@ -1,6 +1,6 @@
 package com.example.chat.domain.entity.base;
 
-import com.example.notification.domain.entity.base.user.User;
+import com.example.chat.domain.entity.base.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 
