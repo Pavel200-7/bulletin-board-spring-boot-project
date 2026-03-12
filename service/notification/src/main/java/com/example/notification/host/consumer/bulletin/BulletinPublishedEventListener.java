@@ -22,7 +22,6 @@ public class BulletinPublishedEventListener {
 
     private final NotificationService service;
 
-
     @RabbitListener(queues = QueueContract.NOTIFICATION_BULLETIN_PUBLISHED_QUEUE)
     public void handleBulletinPublishedEvent(BulletinPublishedEvent event) {
         log.info("Получено событие BulletinPublishedEvent: {}", event);

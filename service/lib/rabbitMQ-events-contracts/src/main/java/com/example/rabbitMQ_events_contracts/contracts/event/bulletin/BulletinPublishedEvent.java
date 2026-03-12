@@ -29,7 +29,7 @@ public class BulletinPublishedEvent extends BaseEvent {
     @JsonProperty("publisher_name")
     private String publisherName;
 
-    @JsonProperty("publisher_id")
+    @JsonProperty("bulletin_id")
     private UUID bulletinId;
 
     @JsonProperty("bulletin_name")
@@ -43,5 +43,15 @@ public class BulletinPublishedEvent extends BaseEvent {
 
     @JsonProperty("price")
     private Double price;
+
+    @JsonProperty("price")
+    public Double getPrice() {
+        return price;
+    }
+
+    @JsonProperty("price")
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
 }

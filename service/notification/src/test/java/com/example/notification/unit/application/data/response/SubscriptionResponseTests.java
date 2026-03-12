@@ -17,8 +17,6 @@ public class SubscriptionResponseTests {
     @Test
     void shouldReturnTrueWhenAllDataFieldsMatch() {
         // Arrange
-
-
         SubscriptionResponse data1 = createResponseBuilder()
                 .build();
 

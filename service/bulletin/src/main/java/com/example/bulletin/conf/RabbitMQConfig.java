@@ -19,9 +19,15 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public TopicExchange bulletinExchange() {
+        return new TopicExchange(ExchangeContract.BULLETIN_EXCHANGE);
+    }
+
+    @Bean
     public Queue userRegisteredQueue() {
         return QueueBuilder.durable(QueueContract.BULLETIN_USER_REGISTERED_QUEUE)
                 .withArgument("x-dead-letter-exchange", QueueContract.BULLETIN_USER_REGISTERED_QUEUE.concat(".dlx"))
+                .withArgument("x-max-delivery-attempts", 3)
                 .build();
     }
 
@@ -29,6 +35,7 @@ public class RabbitMQConfig {
     public Queue userBlockedQueue() {
         return QueueBuilder.durable(QueueContract.BULLETIN_USER_BLOCKED_QUEUE)
                 .withArgument("x-dead-letter-exchange", QueueContract.BULLETIN_USER_BLOCKED_QUEUE.concat(".dlx"))
+                .withArgument("x-max-delivery-attempts", 3)
                 .build();
     }
 
@@ -36,6 +43,7 @@ public class RabbitMQConfig {
     public Queue userUnblockedQueue() {
         return QueueBuilder.durable(QueueContract.BULLETIN_USER_UNBLOCKED_QUEUE)
                 .withArgument("x-dead-letter-exchange", QueueContract.BULLETIN_USER_UNBLOCKED_QUEUE.concat(".dlx"))
+                .withArgument("x-max-delivery-attempts", 3)
                 .build();
     }
 

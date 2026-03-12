@@ -22,7 +22,7 @@ public class BulletinCompletedEvent extends BaseEvent {
         return EventType.BULLETIN_COMPLETED;
     }
 
-    @JsonProperty("publisher_id")
+    @JsonProperty("bulletin_id")
     private UUID bulletinId;
 
 }

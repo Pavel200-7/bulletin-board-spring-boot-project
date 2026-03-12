@@ -16,9 +16,12 @@ import com.example.bulletin.domain.entity.Bulletin;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
 import com.example.bulletin.domain.entity.base.user.User;
 import com.example.bulletin.domain.enums.bulletin.BulletinEvent;
+import com.example.bulletin.infrastructure.publisher.RabbitMQEventPublisher;
+import com.example.bulletin.infrastructure.publisher.RabbitMQEventPublisherImpl;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
 import com.example.bulletin.infrastructure.repository.UserRepository;
 import com.example.bulletin.infrastructure.security.SecurityService;
+import com.example.rabbitMQ_events_contracts.contracts.event.bulletin.BulletinPublishedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +48,7 @@ public class BulletinServiceImpl implements BulletinService {
     private final SecurityService securityService;
     private final BulletinStateMachineService stateMachineService;
     private final BulletinSpecificationBuilder specificationBuilder;
+    private final RabbitMQEventPublisher publisher;
     private final BulletinMapper mapper;
 
     @Override
@@ -197,10 +202,30 @@ public class BulletinServiceImpl implements BulletinService {
                 .build();
         stateMachineService.sendEvent(message);
 
-        Optional<Bulletin> modifiableBulletin = bulletinRepository.findById(request.getBulletinId());
-        BulletinResponse bulletinResponse = mapper.toResponse(modifiableBulletin.get());
+        Optional<Bulletin> bulletin = bulletinRepository.findById(request.getBulletinId());
+
+        BulletinPublishedEvent event = createBulletinPublishedEvent(bulletin.get());
+        publisher.send(event);
+
+        BulletinResponse bulletinResponse = mapper.toResponse(bulletin.get());
         return new PublishBulletinResponse(bulletinResponse);
     }
+
+    private BulletinPublishedEvent createBulletinPublishedEvent(Bulletin bulletin) {
+        User owner = getOwnerInfo().getOwner();
+        return BulletinPublishedEvent.builder()
+                .publisherId(owner.getId())
+                .publisherName(owner.getEmail())
+                .bulletinId(bulletin.getId())
+                .bulletinName(bulletin.getTitle())
+                .categoryId(bulletin.getCategory().getId())
+                .price(bulletin.getPrice())
+                .characteristicValueIds(bulletin.getCharacteristics().stream()
+                        .map(bc -> bc.getValue().getId())
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
 
     @Override
     @Transactional

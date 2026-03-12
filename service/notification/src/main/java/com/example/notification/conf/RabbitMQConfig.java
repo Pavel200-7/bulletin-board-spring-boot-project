@@ -26,6 +26,7 @@ public class RabbitMQConfig {
     public Queue userRegisteredQueue() {
         return QueueBuilder.durable(QueueContract.NOTIFICATION_USER_REGISTERED_QUEUE)
                 .withArgument("x-dead-letter-exchange", QueueContract.NOTIFICATION_USER_REGISTERED_QUEUE.concat(".dlx"))
+                .withArgument("x-max-delivery-attempts", 3)
                 .build();
     }
 
@@ -33,6 +34,7 @@ public class RabbitMQConfig {
     public Queue bulletinPublishedQueue() {
         return QueueBuilder.durable(QueueContract.NOTIFICATION_BULLETIN_PUBLISHED_QUEUE)
                 .withArgument("x-dead-letter-exchange", QueueContract.NOTIFICATION_BULLETIN_PUBLISHED_QUEUE.concat(".dlx"))
+                .withArgument("x-max-delivery-attempts", 3)
                 .build();
     }
 

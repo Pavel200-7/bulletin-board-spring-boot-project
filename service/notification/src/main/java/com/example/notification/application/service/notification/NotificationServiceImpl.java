@@ -14,7 +14,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -35,11 +35,14 @@ public class NotificationServiceImpl implements NotificationService {
                 NotificationType.BULLETIN_PUBLISHED,
                 request.getPublisherId());
 
+        AtomicInteger sentCounter = new AtomicInteger();
         iterable.iterator().forEachRemaining(subscription -> {
             String email = subscription.getOwner().getEmail();
             MimeMessage message = createMimeMessage(template, email, subject);
             emailSender.send(message);
+            sentCounter.getAndIncrement();
         });
+        log.info("Было отправлено {} сообщений.", sentCounter.get());
     }
 
     private MimeMessage createMimeMessage(String body, String email, String subject) {
@@ -54,6 +57,6 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
-
     }
+
 }

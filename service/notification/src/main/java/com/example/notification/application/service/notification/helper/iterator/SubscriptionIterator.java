@@ -5,6 +5,7 @@ import com.example.notification.domain.enums.NotificationType;
 import com.example.notification.infrastructure.repository.SubscriptionRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 public class SubscriptionIterator implements Iterator<Subscription> {
 
@@ -50,9 +52,11 @@ public class SubscriptionIterator implements Iterator<Subscription> {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<Subscription> page = repository
                 .findPageByTypeAndPublisher(notificationType, publisherId, pageable);
+        log.info("Было найдено {} подписчиков в этой итерации.", page.stream().count());
 
         currentPage = page.getContent().iterator();
         hasNextPages = page.hasNext();
         pageNumber++;
     }
+
 }
