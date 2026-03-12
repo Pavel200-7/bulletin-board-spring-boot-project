@@ -1,4 +1,4 @@
-package com.example.notification.application.service.subscripion.data.request;
+package com.example.chat.application.service.user.data.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DeleteSubscriptionRequest {
+public class CreateUserRequest {
     private UUID id;
+    private String email;
 }

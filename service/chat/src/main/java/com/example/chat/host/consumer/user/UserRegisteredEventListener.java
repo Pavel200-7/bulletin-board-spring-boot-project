@@ -1,8 +1,8 @@
-package com.example.notification.host.consumer.user;
+package com.example.chat.host.consumer.user;
 
-import com.example.notification.application.service.user.UserService;
-import com.example.notification.application.service.user.data.request.CreateUserRequest;
-import com.example.notification.application.service.user.data.response.CreateUserResponse;
+import com.example.chat.application.service.user.UserService;
+import com.example.chat.application.service.user.data.request.CreateUserRequest;
+import com.example.chat.application.service.user.data.response.CreateUserResponse;
 import com.example.rabbitMQ_events_contracts.contracts.QueueContract;
 import com.example.rabbitMQ_events_contracts.contracts.event.UserRegisteredEvent;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class UserRegisteredEventListener {
 
     private final UserService service;
 
-    @RabbitListener(queues = QueueContract.NOTIFICATION_USER_REGISTERED_QUEUE)
+//    @RabbitListener(queues = QueueContract.NOTIFICATION_USER_REGISTERED_QUEUE)
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
         log.info("Получено событие UserRegisteredEvent: {}", event);
         CreateUserRequest request = CreateUserRequest.builder()

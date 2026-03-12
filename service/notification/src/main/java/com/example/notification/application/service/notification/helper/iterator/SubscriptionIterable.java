@@ -4,7 +4,6 @@ import com.example.notification.domain.entity.Subscription;
 import com.example.notification.domain.enums.NotificationType;
 import com.example.notification.infrastructure.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.UUID;

@@ -2,7 +2,6 @@ package com.example.notification.domain.entity;
 
 import com.example.notification.domain.entity.base.BaseEntity;
 import com.example.notification.domain.entity.base.OwnerInfo;
-import com.example.notification.domain.entity.base.user.User;
 import com.example.notification.domain.enums.PublisherType;
 import com.example.notification.domain.enums.NotificationType;
 import jakarta.persistence.*;

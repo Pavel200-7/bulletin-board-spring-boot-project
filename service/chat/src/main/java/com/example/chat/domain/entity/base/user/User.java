@@ -1,4 +1,4 @@
-package com.example.notification.domain.entity.base.user;
+package com.example.chat.domain.entity.base.user;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
