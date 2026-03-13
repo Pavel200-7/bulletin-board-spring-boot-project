@@ -1,7 +1,7 @@
 package com.example.chat.infrastructure.security;
 
-import com.example.notification.infrastructure.security.enums.Claims;
-import com.example.notification.infrastructure.security.enums.Roles;
+import com.example.chat.infrastructure.security.enums.Claims;
+import com.example.chat.infrastructure.security.enums.Roles;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

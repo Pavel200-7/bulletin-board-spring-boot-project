@@ -1,13 +1,15 @@
 package com.example.chat.unit.application.mapper;
 
-import com.example.notification.application.data.response.UserResponse;
-import com.example.notification.application.mapper.UserMapper;
-import com.example.notification.domain.entity.base.user.User;
+import com.example.chat.application.data.response.UserResponse;
+import com.example.chat.application.mapper.UserMapper;
+import com.example.chat.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
 public class UserMapperTests {

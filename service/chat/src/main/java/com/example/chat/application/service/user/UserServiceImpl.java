@@ -1,13 +1,12 @@
 package com.example.chat.application.service.user;
 
-import com.example.notification.application.data.response.UserResponse;
-import com.example.notification.application.exception.DuplicateResourceException;
-import com.example.notification.application.exception.ResourceNotFoundException;
-import com.example.notification.application.mapper.UserMapper;
-import com.example.notification.application.service.user.data.request.*;
-import com.example.notification.application.service.user.data.response.*;
-import com.example.notification.domain.entity.base.user.User;
-import com.example.notification.infrastructure.repository.UserRepository;
+import com.example.chat.application.data.response.UserResponse;
+import com.example.chat.application.exception.DuplicateResourceException;
+import com.example.chat.application.mapper.UserMapper;
+import com.example.chat.application.service.user.data.request.*;
+import com.example.chat.application.service.user.data.response.*;
+import com.example.chat.domain.entity.base.user.User;
+import com.example.chat.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

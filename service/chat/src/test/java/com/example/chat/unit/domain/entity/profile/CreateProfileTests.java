@@ -1,31 +1,32 @@
-package com.example.bulletin.unit.domain.entity.tradeaccount;
+package com.example.chat.unit.domain.entity.profile;
 
-import com.example.bulletin.domain.entity.TradeAccount;
-import com.example.bulletin.domain.entity.base.OwnerInfo;
-import com.example.bulletin.domain.entity.base.user.User;
+import com.example.chat.domain.entity.Profile;
+import com.example.chat.domain.entity.base.OwnerInfo;
+import com.example.chat.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ActiveProfiles("test")
-public class TradeAccountCreateTests {
+public class CreateProfileTests {
 
     @Test
     public void shouldCreateTradeAccount() {
         // Arrange
         OwnerInfo ownerInfo = createOwnerInfo();
+        String publicName = "someName";
 
         // Act
-        TradeAccount tradeAccount = TradeAccount.createTradeAccount(ownerInfo);
+        Profile profile = Profile.createProfile(ownerInfo, publicName);
 
         // Assert
         assertEquals(ownerInfo.getOwner(),
-                tradeAccount.getOwner());
-        assertFalse(tradeAccount.isApproved());
+                profile.getOwner());
+        assertEquals(publicName,
+                profile.getPublicName());
 
     }
 

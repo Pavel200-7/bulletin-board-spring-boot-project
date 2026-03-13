@@ -1,6 +1,6 @@
 package com.example.chat.infrastructure.repository;
 
-import com.example.notification.domain.entity.base.user.User;
+import com.example.chat.domain.entity.base.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

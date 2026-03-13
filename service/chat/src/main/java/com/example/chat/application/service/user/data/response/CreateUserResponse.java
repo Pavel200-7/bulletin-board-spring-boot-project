@@ -1,6 +1,6 @@
 package com.example.chat.application.service.user.data.response;
 
-import com.example.notification.application.data.response.UserResponse;
+import com.example.chat.application.data.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

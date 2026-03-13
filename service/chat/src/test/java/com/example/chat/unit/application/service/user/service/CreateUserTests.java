@@ -1,13 +1,13 @@
 package com.example.chat.unit.application.service.user.service;
 
-import com.example.notification.application.data.response.UserResponse;
-import com.example.notification.application.exception.DuplicateResourceException;
-import com.example.notification.application.mapper.UserMapper;
-import com.example.notification.application.service.user.UserServiceImpl;
-import com.example.notification.application.service.user.data.request.CreateUserRequest;
-import com.example.notification.application.service.user.data.response.CreateUserResponse;
-import com.example.notification.domain.entity.base.user.User;
-import com.example.notification.infrastructure.repository.UserRepository;
+import com.example.chat.application.data.response.UserResponse;
+import com.example.chat.application.exception.DuplicateResourceException;
+import com.example.chat.application.mapper.UserMapper;
+import com.example.chat.application.service.user.UserServiceImpl;
+import com.example.chat.application.service.user.data.request.CreateUserRequest;
+import com.example.chat.application.service.user.data.response.CreateUserResponse;
+import com.example.chat.domain.entity.base.user.User;
+import com.example.chat.infrastructure.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.test.context.ActiveProfiles;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;

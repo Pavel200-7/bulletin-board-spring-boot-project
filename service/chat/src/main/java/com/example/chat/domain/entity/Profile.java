@@ -46,4 +46,14 @@ public class Profile extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Contact> contacts;
 
+    protected Profile() {};
+
+    private Profile(OwnerInfo ownerInfo, String publicName) {
+        this.id = UUID.randomUUID();
+        this.ownerInfo = ownerInfo;
+        this.publicName = publicName;
+    }
+
+    public static Profile createProfile(OwnerInfo ownerInfo, String publicName) { return new Profile(ownerInfo, publicName); }
+
 }

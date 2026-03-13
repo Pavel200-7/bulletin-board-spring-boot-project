@@ -1,6 +1,6 @@
 package com.example.chat.unit.application.data.response;
 
-import com.example.notification.application.data.response.UserResponse;
+import com.example.chat.application.data.response.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 

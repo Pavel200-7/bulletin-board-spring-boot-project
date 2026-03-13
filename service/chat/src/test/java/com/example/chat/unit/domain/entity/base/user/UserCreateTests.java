@@ -1,11 +1,14 @@
 package com.example.chat.unit.domain.entity.base.user;
 
 
-import com.example.notification.domain.entity.base.user.User;
+import com.example.chat.domain.entity.base.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ActiveProfiles("test")
 public class UserCreateTests {
