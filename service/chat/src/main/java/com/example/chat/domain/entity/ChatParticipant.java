@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import tools.jackson.core.ObjectReadContext;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -36,9 +34,49 @@ public class ChatParticipant extends BaseEntity {
     private ChatRoom chatRoom;
 
     @Column(name = "last_read_message_id")
+    @Setter(AccessLevel.NONE)
     private UUID lastReadMessageId;
 
     @Column(name = "hidden")
+    @Setter(AccessLevel.NONE)
     private boolean hidden;
+
+    protected ChatParticipant() {}
+
+    private ChatParticipant(Profile profile, ChatRoom chatRoom, boolean isOwner) {
+        this.id = UUID.randomUUID();
+        this.profile = profile;
+        this.chatRoom = chatRoom;
+        this.owner = isOwner;
+        this.hidden = false;
+    }
+
+    static ChatParticipant createParticipant(Profile profile, ChatRoom chatRoom, boolean isOwner) {
+        return new ChatParticipant(profile, chatRoom, isOwner);
+    }
+
+    public ChatParticipant markMessageAsRead(UUID messageId) {
+        this.lastReadMessageId = messageId;
+        return this;
+    }
+
+    public ChatParticipant hide() {
+        this.hidden = true;
+        return this;
+    }
+
+    public ChatParticipant unhide() {
+        this.hidden = false;
+        return this;
+    }
+
+//    void delete() {
+//        ChatRoom room = this.chatRoom;
+//        if (room != null) {
+//            room.removeParticipant(this);
+//            this.chatRoom = null;
+//        }
+//        this.profile = null;
+//    }
 
 }

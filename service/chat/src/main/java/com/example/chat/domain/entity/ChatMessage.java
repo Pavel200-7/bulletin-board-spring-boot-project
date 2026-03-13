@@ -38,4 +38,37 @@ public class ChatMessage extends BaseEntity {
     @Column(name = "content")
     private String content;
 
+    protected ChatMessage() {}
+
+    private ChatMessage(Profile sender, ChatRoom chatRoom, ChatMessageType type, String content) {
+        this.id = UUID.randomUUID();
+        this.sender = sender;
+        this.chatRoom = chatRoom;
+        this.type = type;
+        this.content = content;
+    }
+
+    static ChatMessage createTextMessage(Profile sender, ChatRoom chatRoom, String text) {
+        return new ChatMessage(sender, chatRoom, ChatMessageType.TEXT, text);
+    }
+
+    static ChatMessage createImageMessage(Profile sender, ChatRoom chatRoom, UUID imageId) {
+        return new ChatMessage(sender, chatRoom, ChatMessageType.IMAGE, imageId.toString());
+    }
+
+    public boolean isText() {
+        return type == ChatMessageType.TEXT;
+    }
+
+    public boolean isImage() {
+        return type == ChatMessageType.IMAGE;
+    }
+
+    public UUID getImageId() {
+        if (!isImage()) {
+            throw new IllegalStateException("This message is not an image");
+        }
+        return UUID.fromString(content);
+    }
+
 }

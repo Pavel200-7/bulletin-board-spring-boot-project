@@ -32,4 +32,31 @@ public class Contact extends BaseEntity {
     @Column(name = "contact_name")
     private String contactName;
 
+    protected Contact() {}
+
+    private Contact(Profile ownerProfile, Profile contactProfile, String contactName) {
+        this.id = UUID.randomUUID();
+        this.ownerProfile = ownerProfile;
+        this.contactProfile = contactProfile;
+        this.contactName = contactName;
+    }
+
+    public static Contact createContact(Profile ownerProfile, Profile contactProfile) {
+        return new Contact(ownerProfile, contactProfile, contactProfile.getPublicName());
+    }
+
+    public Contact changeContactName(String newContactName) {
+        this.contactName = newContactName;
+        return this;
+    }
+
+    void delete() {
+        Profile owner = this.ownerProfile;
+        if (owner != null) {
+            owner.removeContact(this);
+            this.ownerProfile = null;
+        }
+        this.contactProfile = null;
+    }
+
 }
