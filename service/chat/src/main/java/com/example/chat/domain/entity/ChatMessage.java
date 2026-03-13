@@ -35,6 +35,9 @@ public class ChatMessage extends BaseEntity {
     @Setter(AccessLevel.NONE)
     private ChatMessageType type;
 
+    @Column(name = "updated")
+    private boolean updated;
+
     @Column(name = "content")
     private String content;
 
@@ -49,11 +52,19 @@ public class ChatMessage extends BaseEntity {
     }
 
     static ChatMessage createTextMessage(Profile sender, ChatRoom chatRoom, String text) {
+        validateTextContent(text);
         return new ChatMessage(sender, chatRoom, ChatMessageType.TEXT, text);
     }
 
     static ChatMessage createImageMessage(Profile sender, ChatRoom chatRoom, UUID imageId) {
+        validateImageId(imageId);
         return new ChatMessage(sender, chatRoom, ChatMessageType.IMAGE, imageId.toString());
+    }
+
+    private static void validateImageId(UUID imageId) {
+        if (imageId == null) {
+            throw new IllegalStateException("Image ID cannot be null");
+        }
     }
 
     public boolean isText() {
@@ -70,5 +81,30 @@ public class ChatMessage extends BaseEntity {
         }
         return UUID.fromString(content);
     }
+
+    public ChatMessage update(String newContent) {
+        validateUpdate(newContent);
+        validateTextContent(newContent);
+        this.content = newContent;
+        this.updated = true;
+        return this;
+    }
+
+    private void validateUpdate(String newContent) {
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new IllegalStateException("Message content cannot be empty");
+        }
+    }
+
+    private static void validateTextContent(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            throw new IllegalStateException("Message text cannot be empty");
+        }
+    }
+
+
+
+
+
 
 }

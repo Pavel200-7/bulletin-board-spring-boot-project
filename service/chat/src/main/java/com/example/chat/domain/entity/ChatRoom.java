@@ -124,8 +124,6 @@ public class ChatRoom extends BaseEntity {
 
     public ChatMessage addTextMessage(Profile sender, String text) {
         validateMessageSender(sender);
-        validateTextContent(text);
-
         ChatMessage message = ChatMessage.createTextMessage(sender, this, text);
         this.messages.add(message);
 
@@ -134,8 +132,6 @@ public class ChatRoom extends BaseEntity {
 
     public ChatMessage addImageMessage(Profile sender, UUID imageId) {
         validateMessageSender(sender);
-        validateImageId(imageId);
-
         ChatMessage message = ChatMessage.createImageMessage(sender, this, imageId);
         this.messages.add(message);
 
@@ -145,18 +141,6 @@ public class ChatRoom extends BaseEntity {
     private void validateMessageSender(Profile sender) {
         if (!hasParticipant(sender)) {
             throw new IllegalStateException("Only participants can send messages to this chat");
-        }
-    }
-
-    private void validateTextContent(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            throw new IllegalStateException("Message text cannot be empty");
-        }
-    }
-
-    private void validateImageId(UUID imageId) {
-        if (imageId == null) {
-            throw new IllegalStateException("Image ID cannot be null");
         }
     }
 
