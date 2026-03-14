@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
-public class ProfileSpecificationBuilderImpl {
+public class ProfileSpecificationBuilderImpl implements ProfileSpecificationBuilder {
 
     public Specification<Profile> fromCriteria(ProfileSearchCriteria criteria) {
         if (criteria == null) {

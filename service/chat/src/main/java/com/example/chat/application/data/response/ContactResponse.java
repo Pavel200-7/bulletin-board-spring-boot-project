@@ -9,7 +9,7 @@ import java.util.UUID;
 @Builder
 public class ContactResponse {
     private UUID id;
-    private UUID ownerId;
+    private UUID ownerProfileId;
     private UUID contactProfileId;
     private String contactName;
     private UUID chatId;
