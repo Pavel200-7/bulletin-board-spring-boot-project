@@ -1,10 +1,10 @@
 package com.example.chat.unit.application.service.profile.service;
 
-
 import com.example.chat.application.exception.ResourceNotFoundException;
 import com.example.chat.application.mapper.ProfileMapper;
 import com.example.chat.application.service.profile.ProfileServiceImpl;
-import com.example.chat.application.service.profile.data.request.GetProfileRequest;
+import com.example.chat.application.service.profile.data.request.GetProfileByUserIdRequest;
+import com.example.chat.application.service.profile.validator.ProfileAccessValidator;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -31,73 +31,84 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class GetProfileTests {
+public class GetProfileByUserIdTests {
 
     @Mock
     private ProfileRepository profileRepository;
 
     @Mock
+    private SecurityService securityService;
+
+    @Mock
     private ProfileMapper profileMapper;
+
+    @Mock
+    private ProfileAccessValidator accessValidator;
 
     @InjectMocks
     private ProfileServiceImpl profileService;
 
-    private ProfileMapper mapperHelper = Mappers.getMapper(
-            ProfileMapper.class);
+    private ProfileMapper mapperHelper = Mappers.getMapper(ProfileMapper.class);
 
-    private UUID userId;
+    private UUID targetUserId;
+    private UUID currentUserId;
     private Profile profile;
 
     @BeforeEach
     void setUp() {
-        userId = UUID.randomUUID();
-        profile = createProfile(userId);
+        targetUserId = UUID.randomUUID();
+        currentUserId = UUID.randomUUID();
+
+        profile = createProfile(targetUserId);
+
+        when(securityService.getCurrentUserIdAsUUID()).thenReturn(currentUserId);
 
         when(profileMapper.toResponse(any(Profile.class)))
                 .thenAnswer(invocation -> {
                     Profile profile = invocation.getArgument(0);
                     return mapperHelper.toResponse(profile);
                 });
+
+        when(profileRepository.findByOwnerInfoOwnerId(targetUserId))
+                .thenReturn(Optional.of(profile));
     }
 
     @Test
-    void shouldGetProfileByIdSuccessfully() {
+    void shouldGetProfileSuccessfully() {
         // Arrange
-        GetProfileRequest request = createRequest();
-
-        when(profileRepository.findById(any(UUID.class)))
-                .thenReturn(Optional.of(profile));
+        GetProfileByUserIdRequest request = GetProfileByUserIdRequest.builder()
+                .id(targetUserId)
+                .build();
 
         // Act
-        var response = profileService.getProfile(request);
+        var response = profileService.getProfileByUserId(request);
 
         // Assert
         assertNotNull(response);
         assertNotNull(response.getProfileResponse());
-        assertEquals(userId, response.getProfileResponse().getOwnerId());
+        assertEquals(profile.getId(), response.getProfileResponse().getId());
+        assertEquals(targetUserId, response.getProfileResponse().getOwnerId());
         assertEquals(profile.getPublicName(), response.getProfileResponse().getPublicName());
+        assertEquals(profile.getDescription(), response.getProfileResponse().getDescription());
+        assertEquals(profile.getImageId(), response.getProfileResponse().getImageId());
 
-        verify(profileRepository).findById(any(UUID.class));
+        verify(profileRepository).findByOwnerInfoOwnerId(targetUserId);
         verify(profileMapper).toResponse(profile);
     }
 
     @Test
     void shouldThrowWhenProfileNotFound() {
         // Arrange
-        GetProfileRequest request = createRequest();
+        GetProfileByUserIdRequest request = GetProfileByUserIdRequest.builder()
+                .id(targetUserId)
+                .build();
 
-        when(profileRepository.findById(any(UUID.class)))
+        when(profileRepository.findByOwnerInfoOwnerId(targetUserId))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class,
-                () -> profileService.getProfile(request));
-    }
-
-    private GetProfileRequest createRequest() {
-        return GetProfileRequest.builder()
-                .id(UUID.randomUUID())
-                .build();
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> profileService.getProfileByUserId(request));
     }
 
     private Profile createProfile(UUID userId) {
@@ -106,4 +117,5 @@ public class GetProfileTests {
         String profileName = "User " + userId.toString().substring(0, 8);
         return Profile.createProfile(ownerInfo, profileName);
     }
+
 }

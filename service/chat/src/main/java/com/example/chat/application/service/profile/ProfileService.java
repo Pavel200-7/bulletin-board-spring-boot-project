@@ -5,6 +5,7 @@ import com.example.chat.application.service.profile.data.response.*;
 
 public interface ProfileService {
     GetProfileResponse getProfile(GetProfileRequest request);
+    GetProfileByUserIdResponse getProfileByUserId(GetProfileByUserIdRequest request);
     GetProfilePaginationResponse getProfilePagination(GetProfilePaginationRequest request);
     CreateProfileResponse createProfile(CreateProfileRequest request);
     ChangePublicNameResponse changeName(ChangePublicNameRequest request);

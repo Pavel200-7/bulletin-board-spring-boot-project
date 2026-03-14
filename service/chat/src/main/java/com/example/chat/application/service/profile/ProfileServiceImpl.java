@@ -43,15 +43,27 @@ public class ProfileServiceImpl implements ProfileService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public GetProfileResponse getProfile(GetProfileRequest request) {
-        Profile profile = profileRepository.findByOwnerInfoOwnerId(request.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user with id: " + request.getId()));
+        Profile profile = profileRepository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id: " + request.getId()));
         log.info("Найден profile с id: {}", profile.getId());
         ProfileResponse profileResponse = profileMapper.toResponse(profile);
         return new GetProfileResponse(profileResponse);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public GetProfileByUserIdResponse getProfileByUserId(GetProfileByUserIdRequest request) {
+        Profile profile = profileRepository.findByOwnerInfoOwnerId(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user with id: " + request.getId()));
+        log.info("Найден profile с id user: {}", profile.getId());
+        ProfileResponse profileResponse = profileMapper.toResponse(profile);
+        return new GetProfileByUserIdResponse(profileResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public GetProfilePaginationResponse getProfilePagination(GetProfilePaginationRequest request) {
         ProfileSearchCriteria criteria = request.getCriteria();
         Specification<Profile> spec = specificationBuilder.fromCriteria(criteria);

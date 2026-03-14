@@ -11,6 +11,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetProfileRequest {
-    private UUID id;
+public class GetProfileByUserIdRequest {
+    private UUID id; // Используется именно id от User
 }
