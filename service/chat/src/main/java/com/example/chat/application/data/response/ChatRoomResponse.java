@@ -9,9 +9,9 @@ import java.util.UUID;
 
 @Value
 @Builder
-public class ChatResponse {
+public class ChatRoomResponse {
     private UUID id;
     private String name;
-    private List<ContactResponse> contactResponses;
     private UUID imageId;
+    private List<ChatParticipantResponse> participantResponses;
 }

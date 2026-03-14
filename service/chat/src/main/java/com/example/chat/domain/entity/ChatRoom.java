@@ -30,7 +30,12 @@ public class ChatRoom extends BaseEntity {
     private ChatRoomType type;
 
     @Column(name = "name")
+    @Setter(AccessLevel.NONE)
     private String name;
+
+    @Column(name = "image_id")
+    @Setter(AccessLevel.NONE)
+    private UUID imageId;
 
     @OneToMany(mappedBy = "chatRoom",
             fetch = FetchType.LAZY,
@@ -48,16 +53,17 @@ public class ChatRoom extends BaseEntity {
 
     protected ChatRoom() {}
 
-    private ChatRoom(ChatRoomType type, String name) {
+    private ChatRoom(ChatRoomType type, String name, UUID imageId) {
         this.id = UUID.randomUUID();
         this.type = type;
         this.name = name;
+        this.imageId = imageId;
     }
 
     static ChatRoom createTwoPartyChat(Profile creator, Profile otherParticipant) {
         validateTwoPartyChatCreation(creator, otherParticipant);
 
-        ChatRoom chatRoom = new ChatRoom(ChatRoomType.TWO_PARTY, null);
+        ChatRoom chatRoom = new ChatRoom(ChatRoomType.TWO_PARTY, null, null);
 
         chatRoom.addParticipant(creator, true);
         chatRoom.addParticipant(otherParticipant, false);
@@ -109,6 +115,14 @@ public class ChatRoom extends BaseEntity {
         return this;
     }
 
+    public ChatRoom setImage(UUID imageId) {
+        if (this.type == ChatRoomType.TWO_PARTY) {
+            throw new IllegalStateException("Cannot rename two-party chat");
+        }
+        this.imageId = imageId;
+        return this;
+    }
+
     void removeParticipant(ChatParticipant participant) {
         if (this.type == ChatRoomType.TWO_PARTY) {
             throw new IllegalStateException("Cannot remove participant from two-party chat");
@@ -142,6 +156,12 @@ public class ChatRoom extends BaseEntity {
         if (!hasParticipant(sender)) {
             throw new IllegalStateException("Only participants can send messages to this chat");
         }
+    }
+
+    public boolean isParticipantByUserId(UUID UserId) {
+        return this.participants.stream()
+                .map(ChatParticipant::getProfile)
+                .anyMatch(profile -> profile.getOwnerInfo().getOwnerId().equals(UserId));
     }
 
 }

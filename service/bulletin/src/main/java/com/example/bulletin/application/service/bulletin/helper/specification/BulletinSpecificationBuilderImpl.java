@@ -21,13 +21,17 @@ public class BulletinSpecificationBuilderImpl implements BulletinSpecificationBu
     public Specification<Bulletin> fromCriteria(BulletinSearchCriteria criteria) {
         List<Specification<Bulletin>> specs = new ArrayList<>();
 
-        specs.add(this.isPublished());
+        specs.add(isPublished());
         specs.add(titleContains(criteria.getTitle()));
         specs.add(priceBetween(criteria.getMinPrice(), criteria.getMaxPrice()));
         specs.add(hasCategory(criteria.getCategoryId()));
         specs.add(hasCharacteristicValues(criteria.getCharacteristicValueIds()));
         specs.add(hasOwner(criteria.getOwnerId()));
 
+        return buildFromList(specs);
+    }
+
+    private Specification<Bulletin> buildFromList(List<Specification<Bulletin>> specs) {
         return specs.stream()
                 .reduce(Specification::and)
                 .orElse(Specification.where(((root, query, criteriaBuilder) -> criteriaBuilder.conjunction())));

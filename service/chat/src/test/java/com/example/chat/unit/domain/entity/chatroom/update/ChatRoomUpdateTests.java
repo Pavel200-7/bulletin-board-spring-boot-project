@@ -26,6 +26,18 @@ public class ChatRoomUpdateTests {
 
     }
 
+    @Test
+    public void shouldThrowWhenSettingImageToTwoPartyChat() {
+        // Arrange
+        ChatRoom chatRoom = createChatRoom();
+        UUID imageId = UUID.randomUUID();
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () ->
+                chatRoom.setImage(imageId));
+
+    }
+
     private ChatRoom createChatRoom() {
         Profile creator = createProfile("creator@example.com", "Creator");
         Profile other = createProfile("other@example.com", "Other");
