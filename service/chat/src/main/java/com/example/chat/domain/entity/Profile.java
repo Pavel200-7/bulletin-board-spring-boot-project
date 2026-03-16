@@ -93,11 +93,11 @@ public class Profile extends BaseEntity {
 
     private void validateContactAddition(Profile contactProfile) {
         if (this.getId().equals(contactProfile.getId())) {
-            throw new IllegalStateException("Cannot add self as contact.");
+            throw new IllegalStateException("Cannot add self as contact");
         }
 
         if (hasExistingContact(contactProfile)) {
-            throw new IllegalStateException("Contact already exists.");
+            throw new IllegalStateException("Contact already exists");
         }
     }
 
@@ -108,21 +108,21 @@ public class Profile extends BaseEntity {
 
     public Profile removeContact(UUID contactId) {
         Contact contact = findContact(contactId)
-                .orElseThrow(() -> new IllegalStateException("Contact not found."));
+                .orElseThrow(() -> new IllegalStateException("Contact not found"));
         contact.delete();
         return this;
     }
 
     void removeContact(Contact contact) {
         if (contact.getOwnerProfile() != this) {
-            throw new IllegalStateException("This contact does not belong to this profile.");
+            throw new IllegalStateException("This contact does not belong to this profile");
         }
         this.contacts.remove(contact);
     }
 
     public Contact updateContactName(UUID contactId, String newContactName) {
         Contact contact = findContact(contactId)
-                .orElseThrow(() -> new ResourceNotFoundException("Contact not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Contact not found"));
         contact.changeContactName(newContactName);
         return contact;
     }
@@ -147,7 +147,7 @@ public class Profile extends BaseEntity {
 
     void addChatParticipant(ChatParticipant participant) {
         if (hasExistingChatParticipant(participant)) {
-            throw new IllegalStateException("Chat participant already exists.");
+            throw new IllegalStateException("Chat participant already exists");
         }
         this.chatParticipants.add(participant);
     }
@@ -159,7 +159,7 @@ public class Profile extends BaseEntity {
 
     void removeChatParticipant(UUID id) {
         ChatParticipant participant = findChatParticipant(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Chat participant not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Chat participant not found"));
         this.chatParticipants.remove(participant);
     }
 

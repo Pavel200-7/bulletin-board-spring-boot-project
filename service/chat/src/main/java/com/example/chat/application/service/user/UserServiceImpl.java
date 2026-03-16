@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public CreateUserResponse createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("User with this email is already exist.");
+            throw new DuplicateResourceException("User with this email is already exist");
         }
 
         UUID userId = request.getId() != null ? request.getId() : UUID.randomUUID();

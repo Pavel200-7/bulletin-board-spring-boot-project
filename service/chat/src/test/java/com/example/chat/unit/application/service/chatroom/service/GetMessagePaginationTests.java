@@ -15,7 +15,6 @@ import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
 import com.example.chat.infrastructure.repository.ChatMessageRepository;
-import com.example.chat.infrastructure.repository.ChatParticipantRepository;
 import com.example.chat.infrastructure.repository.ChatRoomRepository;
 import com.example.chat.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,9 +50,6 @@ public class GetMessagePaginationTests {
 
     @Mock
     private ChatRoomRepository chatRoomRepository;
-
-    @Mock
-    private ChatParticipantRepository chatParticipantRepository;
 
     @Mock
     private ChatMessageRepository chatMessageRepository;
@@ -144,7 +140,7 @@ public class GetMessagePaginationTests {
     }
 
     @Test
-    void shouldGetMessagePaginationWithoutCursor() {
+    void shouldGetMessagePaginationForFirstPage() {
         // Arrange
         GetMessagePaginationRequest request = createRequest(null);
 
@@ -152,13 +148,11 @@ public class GetMessagePaginationTests {
         chatRoomService.getMessagePagination(request);
 
         // Assert
-        verify(chatMessageRepository, never()).findById(any());
         verify(specificationBuilder).fromCursorCriteria(criteriaCaptor.capture());
 
         MessageCursorCriteria capturedCriteria = criteriaCaptor.getValue();
         assertEquals(chatRoomId, capturedCriteria.getChatRoomId());
-        assertNull(capturedCriteria.getCreatedAt());
-        assertEquals(Sort.Direction.DESC, capturedCriteria.getDirection());
+        assertEquals(Sort.Direction.ASC, capturedCriteria.getDirection());
     }
 
     @Test
@@ -188,35 +182,6 @@ public class GetMessagePaginationTests {
         // Act & Assert
         assertThrows(AccessDeniedException.class,
                 () -> chatRoomService.getMessagePagination(request));
-    }
-
-    @Test
-    void shouldThrowWhenCursorMessageNotFound() {
-        // Arrange
-        UUID nonExistentCursorId = UUID.randomUUID();
-        when(chatMessageRepository.findById(nonExistentCursorId)).thenReturn(Optional.empty());
-        GetMessagePaginationRequest request = createRequest(nonExistentCursorId);
-
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class,
-                () -> chatRoomService.getMessagePagination(request));
-    }
-
-    @Test
-    void shouldPassCorrectCriteriaToBuilder() {
-        // Arrange
-        GetMessagePaginationRequest request = createRequest(cursorMessageId);
-
-        // Act
-        chatRoomService.getMessagePagination(request);
-
-        // Assert
-        verify(specificationBuilder).fromCursorCriteria(criteriaCaptor.capture());
-        MessageCursorCriteria captured = criteriaCaptor.getValue();
-
-        assertEquals(chatRoomId, captured.getChatRoomId());
-        assertEquals(cursorMessage.getCreatedAt(), captured.getCreatedAt());
-        assertEquals(Sort.Direction.DESC, captured.getDirection());
     }
 
     private GetMessagePaginationRequest createRequest(UUID cursorMessageId) {

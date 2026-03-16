@@ -70,13 +70,4 @@ public class ChatParticipant extends BaseEntity {
         return this;
     }
 
-//    void delete() {
-//        ChatRoom room = this.chatRoom;
-//        if (room != null) {
-//            room.removeParticipant(this);
-//            this.chatRoom = null;
-//        }
-//        this.profile = null;
-//    }
-
 }

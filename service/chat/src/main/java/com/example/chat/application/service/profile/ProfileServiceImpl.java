@@ -104,7 +104,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ChangePublicNameResponse changeName(ChangePublicNameRequest request) {
+    public ChangePublicNameResponse changePublicName(ChangePublicNameRequest request) {
         UUID currentUserId = securityService.getCurrentUserIdAsUUID();
         Profile profile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException(

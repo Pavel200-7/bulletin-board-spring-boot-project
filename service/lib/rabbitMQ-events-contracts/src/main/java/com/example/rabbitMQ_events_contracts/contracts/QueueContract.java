@@ -10,5 +10,8 @@ public class QueueContract {
     public static final String NOTIFICATION_USER_REGISTERED_QUEUE = "notification.user_registered_queue";
     public static final String NOTIFICATION_BULLETIN_PUBLISHED_QUEUE = "notification.bulletin_published_queue";
 
+    public static final String CHAT_USER_REGISTERED_QUEUE = "chat.user_registered_queue";
+
+
     private QueueContract() {}
 }

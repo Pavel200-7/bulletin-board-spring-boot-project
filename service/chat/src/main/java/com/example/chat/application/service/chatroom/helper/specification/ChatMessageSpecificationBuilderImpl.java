@@ -19,7 +19,10 @@ public class ChatMessageSpecificationBuilderImpl implements ChatMessageSpecifica
         List<Specification<ChatMessage>> specs = new ArrayList<>();
 
         specs.add(belongsToChatRoom(criteria.getChatRoomId()));
-        specs.add(applyCursor(criteria.getCreatedAt(), criteria.getDirection()));
+        if (criteria.getCreatedAt().isPresent()) {
+            specs.add(applyCursor(criteria.getCreatedAt().get(), criteria.getDirection()));
+        }
+        specs.add(orderByDirection(criteria.getDirection()));
 
         return buildFromList(specs);
     }
@@ -46,6 +49,17 @@ public class ChatMessageSpecificationBuilderImpl implements ChatMessageSpecifica
             } else {
                 return cb.lessThan(root.get("createdAt"), cursorTime);
             }
+        };
+    }
+
+    private Specification<ChatMessage> orderByDirection(Direction direction) {
+        return (root, query, cb) -> {
+            if (direction == Direction.ASC) {
+                query.orderBy(cb.asc(root.get("createdAt")));
+            } else {
+                query.orderBy(cb.desc(root.get("createdAt")));
+            }
+            return cb.conjunction(); // always true
         };
     }
 

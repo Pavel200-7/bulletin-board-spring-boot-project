@@ -25,7 +25,7 @@ public class ChatMessage extends BaseEntity {
     @Setter(AccessLevel.NONE)
     private Profile sender;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "chat_room_id")
     @Setter(AccessLevel.NONE)
     private ChatRoom chatRoom;
@@ -36,7 +36,12 @@ public class ChatMessage extends BaseEntity {
     private ChatMessageType type;
 
     @Column(name = "updated")
+    @Setter(AccessLevel.NONE)
     private boolean updated;
+
+    @Column(name = "read")
+    @Setter(AccessLevel.NONE)
+    private boolean read;
 
     @Column(name = "content")
     private String content;
@@ -91,6 +96,10 @@ public class ChatMessage extends BaseEntity {
     }
 
     private void validateUpdate(String newContent) {
+        if (!this.isText()) {
+            throw new IllegalStateException("You can update only text message");
+        }
+
         if (newContent == null || newContent.trim().isEmpty()) {
             throw new IllegalStateException("Message content cannot be empty");
         }
@@ -100,6 +109,26 @@ public class ChatMessage extends BaseEntity {
         if (text == null || text.trim().isEmpty()) {
             throw new IllegalStateException("Message text cannot be empty");
         }
+    }
+
+    public boolean isOwner(Profile profile) {
+        return this.sender.getId().equals(profile.getId());
+    }
+
+    public void setRead(Profile readingProfile) {
+        if (this.isOwner(readingProfile)) {
+            throw new IllegalStateException("Owner can not set message read");
+        }
+        this.read = true;
+    }
+
+    public boolean isOlderThan(ChatMessage other) {
+        return this.getCreatedAt()
+                .isBefore(other.getCreatedAt());
+    }
+
+    public boolean isYoungerThan(ChatMessage other) {
+        return !isOlderThan(other);
     }
 
 }

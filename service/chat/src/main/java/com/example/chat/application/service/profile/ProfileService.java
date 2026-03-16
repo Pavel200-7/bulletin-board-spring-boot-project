@@ -8,6 +8,6 @@ public interface ProfileService {
     GetProfileByUserIdResponse getProfileByUserId(GetProfileByUserIdRequest request);
     GetProfilePaginationResponse getProfilePagination(GetProfilePaginationRequest request);
     CreateProfileResponse createProfile(CreateProfileRequest request);
-    ChangePublicNameResponse changeName(ChangePublicNameRequest request);
+    ChangePublicNameResponse changePublicName(ChangePublicNameRequest request);
     ChangeDescriptionResponse changeDescription(ChangeDescriptionRequest request);
 }

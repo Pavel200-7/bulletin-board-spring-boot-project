@@ -1,6 +1,5 @@
 package com.example.chat.unit.application.service.profile.service;
 
-import com.example.chat.application.data.response.ProfileResponse;
 import com.example.chat.application.exception.AccessDeniedException;
 import com.example.chat.application.exception.ResourceNotFoundException;
 import com.example.chat.application.mapper.ProfileMapper;
@@ -90,7 +89,7 @@ public class ChangePublicNameTests {
                 .build();
 
         // Act
-        var response = profileService.changeName(request);
+        var response = profileService.changePublicName(request);
 
         // Assert
         assertNotNull(response);
@@ -114,7 +113,7 @@ public class ChangePublicNameTests {
                 .build();
 
         // Act
-        profileService.changeName(request);
+        profileService.changePublicName(request);
 
         // Assert
         verify(profileRepository).save(profileCaptor.capture());
@@ -135,7 +134,7 @@ public class ChangePublicNameTests {
 
         // Act & Assert
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-                () -> profileService.changeName(request));
+                () -> profileService.changePublicName(request));
     }
 
     @Test
@@ -150,7 +149,7 @@ public class ChangePublicNameTests {
 
         // Act & Assert
         AccessDeniedException exception = assertThrows(AccessDeniedException.class,
-                () -> profileService.changeName(request));
+                () -> profileService.changePublicName(request));
     }
 
     @Test
@@ -166,7 +165,7 @@ public class ChangePublicNameTests {
 
         // Act
         assertThrows(AccessDeniedException.class,
-                () -> profileService.changeName(request));
+                () -> profileService.changePublicName(request));
 
         // Assert
         assertEquals(oldPublicName, profile.getPublicName());
@@ -180,7 +179,7 @@ public class ChangePublicNameTests {
                 .build();
 
         // Act
-        profileService.changeName(request);
+        profileService.changePublicName(request);
 
         // Assert
         verify(profileRepository).save(profileCaptor.capture());

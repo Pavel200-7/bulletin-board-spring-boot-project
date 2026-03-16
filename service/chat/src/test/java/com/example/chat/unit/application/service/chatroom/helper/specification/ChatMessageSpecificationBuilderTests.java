@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,11 +20,9 @@ public class ChatMessageSpecificationBuilderTests {
     private ChatMessageSpecificationBuilderImpl builder = new ChatMessageSpecificationBuilderImpl();
 
     @Test
-    void shouldBuildSpecificationWithChatRoomIdOnly() {
+    void shouldBuildSpecificationForFirstPage() {
         // Arrange
-        MessageCursorCriteria criteria = MessageCursorCriteria.builder()
-                .chatRoomId(UUID.randomUUID())
-                .build();
+        MessageCursorCriteria criteria = MessageCursorCriteria.firstPage(UUID.randomUUID());
 
         // Act
         Specification<ChatMessage> spec = builder.fromCursorCriteria(criteria);
@@ -37,7 +36,7 @@ public class ChatMessageSpecificationBuilderTests {
         // Arrange
         MessageCursorCriteria criteria = MessageCursorCriteria.builder()
                 .chatRoomId(UUID.randomUUID())
-                .createdAt(LocalDateTime.now())
+                .createdAt(Optional.of(LocalDateTime.now()))
                 .direction(Sort.Direction.ASC)
                 .build();
 
@@ -53,7 +52,7 @@ public class ChatMessageSpecificationBuilderTests {
         // Arrange
         MessageCursorCriteria criteria = MessageCursorCriteria.builder()
                 .chatRoomId(UUID.randomUUID())
-                .createdAt(LocalDateTime.now())
+                .createdAt(Optional.of(LocalDateTime.now()))
                 .direction(Sort.Direction.DESC)
                 .build();
 
