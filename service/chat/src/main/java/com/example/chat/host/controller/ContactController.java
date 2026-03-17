@@ -34,7 +34,7 @@ public class ContactController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/{contactId}/name")
+    @PutMapping("/{contactId}/name")
     public ResponseEntity<ChangeContactNameResponse> changeContactName(
             @PathVariable UUID contactId,
             @Valid @RequestBody ChangeContactNameRequest request) {

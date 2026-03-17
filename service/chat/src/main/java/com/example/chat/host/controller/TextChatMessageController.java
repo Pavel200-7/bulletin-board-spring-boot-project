@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/chats/{chatId}/messages/text")
+@RequestMapping("/api/v1/chat/{chatId}/messages/text")
 @RequiredArgsConstructor
 public class TextChatMessageController {
 
@@ -31,7 +31,7 @@ public class TextChatMessageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/{messageId}")
+    @PutMapping("/{messageId}")
     public ResponseEntity<UpdateTextChatMessageResponse> updateTextMessage(
             @PathVariable UUID chatId,
             @PathVariable UUID messageId,

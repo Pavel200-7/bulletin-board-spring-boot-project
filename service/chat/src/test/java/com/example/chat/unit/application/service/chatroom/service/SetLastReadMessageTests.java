@@ -172,8 +172,8 @@ public class SetLastReadMessageTests {
 
         when(participant.getLastReadMessageId()).thenReturn(lastReadId);
         when(chatMessageRepository.findById(lastReadId)).thenReturn(Optional.of(lastReadMessage));
-        when(lastReadMessage.isYoungerThan(targetMessage)).thenReturn(false);
-        when(targetMessage.isYoungerThan(lastReadMessage)).thenReturn(true);
+        when(targetMessage.isOlderThan(lastReadMessage)).thenReturn(true);
+
 
         // Act & Assert
         assertThrows(IllegalStateException.class,
@@ -188,8 +188,7 @@ public class SetLastReadMessageTests {
 
         when(participant.getLastReadMessageId()).thenReturn(lastReadId);
         when(chatMessageRepository.findById(lastReadId)).thenReturn(Optional.of(lastReadMessage));
-        when(lastReadMessage.isYoungerThan(targetMessage)).thenReturn(true);
-        when(targetMessage.isYoungerThan(lastReadMessage)).thenReturn(false);
+        when(targetMessage.isOlderThan(lastReadMessage)).thenReturn(false);
 
         // Act
         var response = chatRoomService.setLastReadMessage(request);

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/chats/{chatId}/messages/image")
+@RequestMapping("/api/v1/chat/{chatId}/messages/image")
 @RequiredArgsConstructor
 public class ImageChatMessageController {
 

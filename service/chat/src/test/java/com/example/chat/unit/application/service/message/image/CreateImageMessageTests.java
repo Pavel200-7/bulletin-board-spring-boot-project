@@ -89,7 +89,7 @@ public class CreateImageMessageTests {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
         when(chatRoom.isParticipantByUserId(currentUserId)).thenReturn(true);
         when(chatRoom.addImageMessage(sender, imageId)).thenReturn(createdMessage);
-        when(messageRepository.save(createdMessage)).thenReturn(createdMessage);
+        when(chatRoomRepository.save(chatRoom)).thenReturn(chatRoom);
         when(messageMapper.toResponse(createdMessage)).thenReturn(mockResponse);
     }
 
@@ -105,7 +105,7 @@ public class CreateImageMessageTests {
         verify(profileRepository).findByOwnerInfoOwnerId(currentUserId);
         verify(chatRoomRepository).findById(chatRoomId);
         verify(chatRoom).addImageMessage(sender, imageId);
-        verify(messageRepository).save(createdMessage);
+        verify(chatRoomRepository).save(chatRoom);
         verify(messageMapper).toResponse(createdMessage);
     }
 

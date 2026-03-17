@@ -56,7 +56,7 @@ public class ImageChatMessageServiceImpl
 
         ChatMessage message = chatRoom.addImageMessage(sender, request.getImageId());
 
-        messageRepository.save(message);
+        chatRoomRepository.save(chatRoom);
         log.info("Сообщение с типом 'Изображение' создано с id: {}", message.getId());
 
         ChatMessageResponse messageResponse = messageMapper.toResponse(message);

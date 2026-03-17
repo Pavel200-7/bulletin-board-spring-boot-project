@@ -57,7 +57,7 @@ public class TextChatMessageServiceImpl
 
         ChatMessage message = chatRoom.addTextMessage(sender, request.getText());
 
-        messageRepository.save(message);
+        chatRoomRepository.save(chatRoom);
         log.info("Сообщение с типом 'Текст' создано с id: {}", message.getId());
 
         ChatMessageResponse messageResponse = messageMapper.toResponse(message);

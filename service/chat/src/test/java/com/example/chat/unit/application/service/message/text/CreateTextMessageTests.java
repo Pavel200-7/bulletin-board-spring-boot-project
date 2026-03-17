@@ -38,9 +38,6 @@ import static org.mockito.Mockito.*;
 public class CreateTextMessageTests {
 
     @Mock
-    private ChatMessageRepository messageRepository;
-
-    @Mock
     private ProfileRepository profileRepository;
 
     @Mock
@@ -89,7 +86,7 @@ public class CreateTextMessageTests {
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
         when(chatRoom.isParticipantByUserId(currentUserId)).thenReturn(true);
         when(chatRoom.addTextMessage(sender, text)).thenReturn(createdMessage);
-        when(messageRepository.save(createdMessage)).thenReturn(createdMessage);
+        when(chatRoomRepository.save(chatRoom)).thenReturn(chatRoom);
         when(messageMapper.toResponse(createdMessage)).thenReturn(mockResponse);
     }
 
@@ -105,7 +102,7 @@ public class CreateTextMessageTests {
         verify(profileRepository).findByOwnerInfoOwnerId(currentUserId);
         verify(chatRoomRepository).findById(chatRoomId);
         verify(chatRoom).addTextMessage(sender, text);
-        verify(messageRepository).save(createdMessage);
+        verify(chatRoomRepository).save(chatRoom);
         verify(messageMapper).toResponse(createdMessage);
     }
 

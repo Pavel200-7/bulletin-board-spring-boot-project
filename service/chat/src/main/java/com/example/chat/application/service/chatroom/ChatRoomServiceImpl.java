@@ -157,7 +157,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
 
         return chatMessageRepository.findById(lastReadMessageId)
-                .map(lastReadMessage -> !lastReadMessage.isYoungerThan(targetMessage))
+                .map(lastReadMessage -> targetMessage.isOlderThan(lastReadMessage))
                 .orElse(false);
     }
 

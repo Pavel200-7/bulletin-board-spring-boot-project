@@ -12,7 +12,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "chat_participant")
+@Table(name = "chat_message")
 public class ChatMessage extends BaseEntity {
 
     @Id

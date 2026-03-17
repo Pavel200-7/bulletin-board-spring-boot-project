@@ -45,7 +45,7 @@ public class ChatRoomController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{chatId}/messages/{messageId}/last-read")
+    @PutMapping("/{chatId}/messages/{messageId}/last-read")
     public ResponseEntity<SetLastReadMessageResponse> setLastReadMessage(
             @PathVariable UUID chatId,
             @PathVariable UUID messageId) {
