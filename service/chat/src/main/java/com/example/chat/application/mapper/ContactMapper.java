@@ -23,18 +23,21 @@ public interface ContactMapper {
     default UUID findChatId(Contact contact) {
         Profile owner = contact.getOwnerProfile();
         Profile contactProfile = contact.getContactProfile();
+        try {
+            return owner.getChatParticipants().stream()
+                    .map(ChatParticipant::getChatRoom)
+                    .filter(chatRoom -> chatRoom.getType() == ChatRoomType.TWO_PARTY)
+                    .filter(chatRoom ->
+                            containsProfile(chatRoom, owner) &&
+                                    containsProfile(chatRoom, contactProfile)
+                    )
+                    .map(ChatRoom::getId)
+                    .findFirst()
+                    .orElse(null);
 
-        // Ищем чат, где оба профиля являются участниками
-        return owner.getChatParticipants().stream()
-                .map(ChatParticipant::getChatRoom)
-                .filter(chatRoom -> chatRoom.getType() == ChatRoomType.TWO_PARTY)
-                .filter(chatRoom ->
-                        containsProfile(chatRoom, owner) &&
-                                containsProfile(chatRoom, contactProfile)
-                )
-                .map(ChatRoom::getId)
-                .findFirst()
-                .orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private boolean containsProfile(ChatRoom chatRoom, Profile profile) {

@@ -1,6 +1,7 @@
 package com.example.chat.application.service.contact;
 
 
+import com.example.chat.application.data.response.ChatRoomResponse;
 import com.example.chat.application.data.response.ContactResponse;
 import com.example.chat.application.exception.AccessDeniedException;
 import com.example.chat.application.exception.DuplicateResourceException;
@@ -13,8 +14,10 @@ import com.example.chat.application.service.contact.data.response.ChangeContactN
 import com.example.chat.application.service.contact.data.response.CreateContactResponse;
 import com.example.chat.application.service.contact.data.response.GetContactsResponse;
 import com.example.chat.application.service.profile.validator.ProfileAccessValidator;
+import com.example.chat.domain.entity.ChatRoom;
 import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
+import com.example.chat.infrastructure.repository.ChatRoomRepository;
 import com.example.chat.infrastructure.repository.ContactRepository;
 import com.example.chat.infrastructure.repository.ProfileRepository;
 import com.example.chat.infrastructure.security.SecurityService;
@@ -33,6 +36,7 @@ public class ContactServiceImpl implements ContactService {
 
     private final ContactRepository contactRepository;
     private final ProfileRepository profileRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final SecurityService securityService;
     private final ContactMapper contactMapper;
 
@@ -66,11 +70,18 @@ public class ContactServiceImpl implements ContactService {
                 .orElseThrow(() -> new ResourceNotFoundException("Contact profile not found with id: " + request.getProfileId()));
 
         Contact contact = ownerProfile.addContact(contactProfile);
-        contactRepository.save(contact);
-        log.info("Создан новый контакт с id: {}, чат так же создан.", contact.getId());
+        ChatRoom newChatRoom = getChatRoomCreatedForNewContact(ownerProfile);
+        chatRoomRepository.save(newChatRoom);
+        profileRepository.save(ownerProfile);
 
+        log.info("Создан новый контакт с id: {}, чат так же создан.", contact.getId());
+        
         ContactResponse contactResponse = contactMapper.toResponse(contact);
         return new CreateContactResponse(contactResponse);
+    }
+
+    private ChatRoom getChatRoomCreatedForNewContact(Profile profile) {
+        return profile.getChatParticipants().getFirst().getChatRoom();
     }
 
     @Override

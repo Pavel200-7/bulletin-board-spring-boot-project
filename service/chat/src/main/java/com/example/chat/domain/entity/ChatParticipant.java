@@ -52,7 +52,9 @@ public class ChatParticipant extends BaseEntity {
     }
 
     static ChatParticipant createParticipant(Profile profile, ChatRoom chatRoom, boolean isOwner) {
-        return new ChatParticipant(profile, chatRoom, isOwner);
+        ChatParticipant participant = new ChatParticipant(profile, chatRoom, isOwner);
+        profile.addChatParticipant(participant);
+        return participant;
     }
 
     public ChatParticipant markMessageAsRead(UUID messageId) {

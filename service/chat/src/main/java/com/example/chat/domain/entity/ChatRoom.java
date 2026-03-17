@@ -84,10 +84,7 @@ public class ChatRoom extends BaseEntity {
     ChatParticipant addParticipant(Profile profile, boolean isOwner) {
         validateParticipantAddition(profile);
         ChatParticipant participant = ChatParticipant.createParticipant(profile, this, isOwner);
-
         this.participants.add(participant);
-        profile.addChatParticipant(participant);
-
         return participant;
     }
 

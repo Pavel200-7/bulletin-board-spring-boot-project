@@ -19,12 +19,14 @@ public class Contact extends BaseEntity {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_profile_id")
     @Setter(AccessLevel.NONE)
     private Profile ownerProfile;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     @JoinColumn(name = "contact_profile_id")
     @Setter(AccessLevel.NONE)
     private Profile contactProfile;

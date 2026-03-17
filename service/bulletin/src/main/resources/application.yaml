@@ -27,14 +27,9 @@ spring:
     password: ${RABBITMQ_PASSWORD:rmpassword}
     virtual-host: ${RABBITMQ_VHOST:/}
     connection-timeout: 5000
-    template:
-      retry:
-        enabled: true
-        max-attempts: 3
-        initial-interval: 2000
-        multiplier: 2.0
-        max-interval: 10000
-      default-requeue-rejected: false
+    listener:
+      simple:
+        default-requeue-rejected: false
   amqp:
     deserialization:
       trust:

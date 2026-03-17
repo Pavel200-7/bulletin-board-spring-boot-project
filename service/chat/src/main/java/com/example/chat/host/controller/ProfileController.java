@@ -44,14 +44,14 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/public-name")
+    @PutMapping("/public-name")
     public ResponseEntity<ChangePublicNameResponse> changePublicName(
             @Valid @RequestBody ChangePublicNameRequest request) {
         ChangePublicNameResponse response = profileService.changePublicName(request);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/description")
+    @PutMapping("/description")
     public ResponseEntity<ChangeDescriptionResponse> changeDescription(
             @Valid @RequestBody ChangeDescriptionRequest request) {
         ChangeDescriptionResponse response = profileService.changeDescription(request);

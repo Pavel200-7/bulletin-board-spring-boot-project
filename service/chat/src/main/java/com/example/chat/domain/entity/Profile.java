@@ -53,7 +53,8 @@ public class Profile extends BaseEntity {
     private List<Contact> contacts = new ArrayList<>();
 
     @OneToMany(mappedBy = "profile",
-            fetch = FetchType.LAZY)
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private List<ChatParticipant> chatParticipants = new ArrayList<>();
 
     protected Profile() {};

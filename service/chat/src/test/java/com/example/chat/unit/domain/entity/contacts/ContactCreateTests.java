@@ -9,8 +9,7 @@ import com.example.chat.domain.entity.base.user.User;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 public class ContactCreateTests {
