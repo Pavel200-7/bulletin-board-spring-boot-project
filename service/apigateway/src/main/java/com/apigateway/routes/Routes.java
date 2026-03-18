@@ -24,14 +24,14 @@ public class Routes {
                                 "/api/v1/characteristic-value/**",
                                 "/api/v1/trade-account/**"
                         )
-                        .filters(f -> f.stripPrefix(1))
+//                        .filters(f -> f.stripPrefix(1))
                         .uri(properties.getFullPath(properties.getBulletin()))
                 )
 
                 // ========== NOTIFICATION SERVICE ==========
                 .route("notification_service", r -> r
                         .path("/api/v1/subscription/**")
-                        .filters(f -> f.stripPrefix(1))
+//                        .filters(f -> f.stripPrefix(1))
                         .uri(properties.getFullPath(properties.getNotification()))
                 )
 
@@ -42,7 +42,7 @@ public class Routes {
                                 "/api/v1/contact/**",
                                 "/api/v1/profile/**"
                         )
-                        .filters(f -> f.stripPrefix(1))
+//                        .filters(f -> f.stripPrefix(1))
                         .uri(properties.getFullPath(properties.getChat()))
                 )
 
@@ -51,9 +51,10 @@ public class Routes {
                         .path(
                                 "/realms/**",
                                 "/resources/**",
-                                "/protocol/**"
+                                "/protocol/**",
+                                "/admin/**"
                         )
-                        .filters(f -> f.stripPrefix(0))
+//                        .filters(f -> f.stripPrefix(0))
                         .uri(properties.getFullPath(properties.getKeycloak()))
                 )
                 .build();
