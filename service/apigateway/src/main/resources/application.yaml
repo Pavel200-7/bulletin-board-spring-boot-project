@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: apigateway
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG
+
+    # Детальные логи Tomcat
+    org.apache.coyote.http11.Http11InputBuffer: DEBUG
+    org.apache.catalina.connector.CoyoteAdapter: DEBUG
+    org.apache.catalina.core.StandardEngine: DEBUG
+
+    # Для видимости raw запроса/ответа
+    org.apache.tomcat.util.net: DEBUG
+    org.apache.tomcat.util.http: DEBUG
