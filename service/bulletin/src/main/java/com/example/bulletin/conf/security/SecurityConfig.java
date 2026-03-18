@@ -129,6 +129,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/characteristic/*/characteristic-value/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt

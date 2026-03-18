@@ -1,10 +1,7 @@
 package com.example.chat.host.controller;
 
 import com.example.chat.application.service.chatroom.ChatRoomService;
-import com.example.chat.application.service.chatroom.data.request.GetChatRequest;
-import com.example.chat.application.service.chatroom.data.request.GetMessagePaginationRequest;
-import com.example.chat.application.service.chatroom.data.request.GetUnreadMessageCountRequest;
-import com.example.chat.application.service.chatroom.data.request.SetLastReadMessageRequest;
+import com.example.chat.application.service.chatroom.data.request.*;
 import com.example.chat.application.service.chatroom.data.response.GetChatResponse;
 import com.example.chat.application.service.chatroom.data.response.GetMessagePaginationResponse;
 import com.example.chat.application.service.chatroom.data.response.GetUnreadMessageCountResponse;
@@ -42,6 +39,24 @@ public class ChatRoomController {
             @Valid @RequestBody GetMessagePaginationRequest request) {
         request.setChatId(chatId);
         GetMessagePaginationResponse response = chatRoomService.getMessagePagination(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{chatId}/messages/first")
+    public ResponseEntity<GetMessagePaginationResponse> getFirstMessagePage(
+            @PathVariable UUID chatId,
+            @Valid @RequestBody GetFirstMessagePageRequest request) {
+        request.setChatId(chatId);
+        GetMessagePaginationResponse response = chatRoomService.getFirstMessagePage(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{chatId}/messages/last-read")
+    public ResponseEntity<GetMessagePaginationResponse> getMessagesAroundLastRead(
+            @PathVariable UUID chatId,
+            @Valid @RequestBody GetMessagesAroundLastReadRequest request) {
+        request.setChatId(chatId);
+        GetMessagePaginationResponse response = chatRoomService.getMessagesAroundLastRead(request);
         return ResponseEntity.ok(response);
     }
 

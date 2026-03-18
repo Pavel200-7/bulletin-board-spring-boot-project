@@ -7,5 +7,7 @@ public interface ChatRoomService {
     GetChatResponse getChat(GetChatRequest request);
     GetUnreadMessageCountResponse getUnreadMessageCount(GetUnreadMessageCountRequest request);
     GetMessagePaginationResponse getMessagePagination(GetMessagePaginationRequest request);
+    GetMessagePaginationResponse getFirstMessagePage(GetFirstMessagePageRequest request);
+    GetMessagePaginationResponse getMessagesAroundLastRead(GetMessagesAroundLastReadRequest request);
     SetLastReadMessageResponse setLastReadMessage(SetLastReadMessageRequest request);
 }

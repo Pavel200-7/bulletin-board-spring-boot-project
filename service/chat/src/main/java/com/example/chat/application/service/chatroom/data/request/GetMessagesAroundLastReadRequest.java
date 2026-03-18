@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Sort.Direction;
 
 import java.util.UUID;
 
@@ -15,16 +14,10 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetMessagePaginationRequest {
+public class GetMessagesAroundLastReadRequest {
 
     @NotNull
     private UUID chatId;
-
-    @NotNull
-    private UUID cursorMessageId;
-
-    @NotNull
-    private Direction direction;
 
     @NotNull
     @Min(0)

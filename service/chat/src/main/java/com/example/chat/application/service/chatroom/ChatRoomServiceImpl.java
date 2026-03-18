@@ -6,14 +6,8 @@ import com.example.chat.application.exception.AccessDeniedException;
 import com.example.chat.application.exception.ResourceNotFoundException;
 import com.example.chat.application.mapper.ChatMessageMapper;
 import com.example.chat.application.mapper.ChatRoomMapper;
-import com.example.chat.application.service.chatroom.data.request.GetChatRequest;
-import com.example.chat.application.service.chatroom.data.request.GetMessagePaginationRequest;
-import com.example.chat.application.service.chatroom.data.request.GetUnreadMessageCountRequest;
-import com.example.chat.application.service.chatroom.data.request.SetLastReadMessageRequest;
-import com.example.chat.application.service.chatroom.data.response.GetChatResponse;
-import com.example.chat.application.service.chatroom.data.response.GetMessagePaginationResponse;
-import com.example.chat.application.service.chatroom.data.response.GetUnreadMessageCountResponse;
-import com.example.chat.application.service.chatroom.data.response.SetLastReadMessageResponse;
+import com.example.chat.application.service.chatroom.data.request.*;
+import com.example.chat.application.service.chatroom.data.response.*;
 import com.example.chat.application.service.chatroom.helper.event.MessagesReadEvent;
 import com.example.chat.application.service.chatroom.helper.specification.ChatMessageSpecificationBuilder;
 import com.example.chat.application.service.chatroom.helper.specification.data.MessageCursorCriteria;
@@ -32,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,6 +100,66 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         Page<ChatMessageResponse> responsePage = messages.map(chatMessageMapper::toResponse);
         log.info("Найдено {} сообщений.", responsePage.getNumberOfElements());
+        return new GetMessagePaginationResponse(responsePage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetMessagePaginationResponse getFirstMessagePage(GetFirstMessagePageRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatId())
+                .orElseThrow(() -> new ResourceNotFoundException("Chat room not found with id: " + request.getChatId()));
+        checkIfCurrentUserIsChatParticipant(chatRoom, currentUserId);
+
+        MessageCursorCriteria criteria = MessageCursorCriteria.firstPage(request.getChatId());
+        Specification<ChatMessage> spec = specificationBuilder.fromCursorCriteria(criteria);
+        Pageable pageable = PageRequest.of(0, request.getSize());
+
+        Page<ChatMessage> messages = chatMessageRepository.findAll(spec, pageable);
+
+        Page<ChatMessageResponse> responsePage = messages.map(chatMessageMapper::toResponse);
+        log.info("Найдено {} сообщений на первой странице чата {}.", responsePage.getNumberOfElements(), request.getChatId());
+        return new GetMessagePaginationResponse(responsePage);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetMessagePaginationResponse getMessagesAroundLastRead(GetMessagesAroundLastReadRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        ChatRoom chatRoom = chatRoomRepository.findById(request.getChatId())
+                .orElseThrow(() -> new ResourceNotFoundException("Chat room not found with id: " + request.getChatId()));
+        checkIfCurrentUserIsChatParticipant(chatRoom, currentUserId);
+
+        Profile profile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user: " + currentUserId));
+        ChatParticipant participant = chatParticipantRepository
+                .findByChatRoomIdAndProfileId(chatRoom.getId(), profile.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Participant not found in chat"));
+
+        UUID lastReadMessageId = participant.getLastReadMessageId();
+
+        if (lastReadMessageId == null) {
+            MessageCursorCriteria criteria = MessageCursorCriteria.firstPage(request.getChatId());
+            Specification<ChatMessage> spec = specificationBuilder.fromCursorCriteria(criteria);
+            Pageable pageable = PageRequest.of(0, request.getSize());
+            Page<ChatMessage> messages = chatMessageRepository.findAll(spec, pageable);
+            Page<ChatMessageResponse> responsePage = messages.map(chatMessageMapper::toResponse);
+            log.info("У пользователя нет последнего прочитанного сообщения. Возвращена первая страница чата {}.", request.getChatId());
+            return new GetMessagePaginationResponse(responsePage);
+        }
+
+        ChatMessage lastReadMessage = chatMessageRepository.findById(lastReadMessageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Last read message not found with id: " + lastReadMessageId));
+
+        MessageCursorCriteria criteria = MessageCursorCriteria.fromChatMessage(request.getChatId(), lastReadMessage, Direction.DESC);
+        Specification<ChatMessage> spec = specificationBuilder.fromCursorCriteria(criteria);
+        Pageable pageable = PageRequest.of(0, request.getSize());
+
+        Page<ChatMessage> messages = chatMessageRepository.findAll(spec, pageable);
+
+        Page<ChatMessageResponse> responsePage = messages.map(chatMessageMapper::toResponse);
+        log.info("Найдено {} сообщений вокруг последнего прочитанного сообщения {} в чате {}.",
+                responsePage.getNumberOfElements(), lastReadMessageId, request.getChatId());
         return new GetMessagePaginationResponse(responsePage);
     }
 
