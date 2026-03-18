@@ -16,7 +16,7 @@ import java.util.Enumeration;
 @Slf4j
 @Component
 @Order(1)
-public class SimpleRequestLoggingFilter extends OncePerRequestFilter {
+public class RequestLoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
