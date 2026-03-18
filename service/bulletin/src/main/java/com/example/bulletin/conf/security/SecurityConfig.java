@@ -66,6 +66,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         // ========== ПУБЛИЧНЫЕ ЭНДПОИНТЫ (READ ONLY) ==========
                         // BulletinController
@@ -129,7 +131,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/characteristic/*/characteristic-value/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
