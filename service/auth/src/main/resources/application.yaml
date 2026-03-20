@@ -12,6 +12,9 @@ keycloak:
   client-id: ${KEYCLOAK_CLIENT_ID:myclient}
   client-secret: ${KEYCLOAK_CLIENT_SECRET:mysecret}
 
+backend:
+  callback-uri: ${BACKEND_CALLBACK_URI:http://localhost:8080/api/auth/callback}
+
 frontend:
   redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:5173/callback}
 

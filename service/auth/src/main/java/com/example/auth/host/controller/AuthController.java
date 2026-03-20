@@ -44,6 +44,9 @@ public class AuthController {
     @Value("${keycloak.client-secret}")
     private String clientSecret;
 
+    @Value("${backend.callback-uri}")
+    private String backendCallbackUri;
+
     @Value("${frontend.redirect-uri}")
     private String frontendRedirectUri;
 
@@ -51,7 +54,7 @@ public class AuthController {
     public ResponseEntity<Void> authorize() {
         String redirectUri = UriComponentsBuilder.fromUriString(authUri)
                 .queryParam("client_id", clientId)
-                .queryParam("redirect_uri", frontendRedirectUri)
+                .queryParam("redirect_uri", backendCallbackUri)
                 .queryParam("response_type", "code")
                 .queryParam("scope", "openid profile email")
                 .build()
@@ -72,7 +75,7 @@ public class AuthController {
         body.add("client_id", clientId);
         body.add("client_secret", clientSecret);
         body.add("code", code);
-        body.add("redirect_uri", frontendRedirectUri);
+        body.add("redirect_uri", backendCallbackUri);
         body.add("grant_type", "authorization_code");
 
         return webClient.post()
@@ -92,15 +95,14 @@ public class AuthController {
                     log.info("Successfully authenticated, redirecting to frontend");
                     return ResponseEntity.status(HttpStatus.FOUND)
                             .location(URI.create(redirectWithTokens))
-                            .<Void>build();  // Явно указываем тип Void
+                            .<Void>build();
                 })
                 .onErrorResume(e -> {
                     log.error("Failed to exchange code for tokens: {}", e.getMessage());
-                    // В случае ошибки редиректим на главную с ошибкой
                     return Mono.just(
                             ResponseEntity.status(HttpStatus.FOUND)
                                     .location(URI.create(frontendRedirectUri + "?error=auth_failed"))
-                                    .<Void>build()  // Явно указываем тип Void
+                                    .<Void>build()
                     );
                 });
     }
@@ -162,7 +164,6 @@ public class AuthController {
                 })
                 .onErrorResume(e -> {
                     log.error("Logout error: {}", e.getMessage());
-                    // Всё равно возвращаем успех, так как на стороне клиента уже чистим токены
                     return Mono.just(ResponseEntity.ok().<Void>build());
                 });
     }

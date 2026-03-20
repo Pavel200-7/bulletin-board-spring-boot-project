@@ -8,12 +8,7 @@ const { handleCallback } = useAuth()
 const router = useRouter()
 
 onMounted(() => {
-  console.log('CallbackPage mounted')  // <-- добавить для отладки
-  console.log('window.location.hash:', window.location.hash)  // <-- добавить
-  
-  const success = handleCallback()
-  console.log('handleCallback result:', success)  // <-- добавить
-  
+  const success = handleCallback()  
   if (success) {
     router.push('/home')
   } else {

@@ -143,6 +143,7 @@ services:
       - KEYCLOAK_LOGOUT_URI=http://keycloak:8080/realms/oAuth/protocol/openid-connect/logout
       - KEYCLOAK_CLIENT_ID=myclient
       - KEYCLOAK_CLIENT_SECRET=sYXnZMAiSY4ouudztjv73iHyPr5H0dQC
+      - BACKEND_CALLBACK_URI=http://localhost:8080/api/auth/callback
       - FRONTEND_REDIRECT_URI=http://localhost:5173/callback
     networks:
       - app-net
