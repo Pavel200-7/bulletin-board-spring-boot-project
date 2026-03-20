@@ -1,0 +1,21 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: auth
+
+keycloak:
+  auth-uri: ${KEYCLOAK_AUTH_URI:http://keycloak:8080/realms/oAuth/protocol/openid-connect/auth}
+  token-uri: ${KEYCLOAK_TOKEN_URI:http://keycloak:8080/realms/oAuth/protocol/openid-connect/token}
+  logout-uri: ${KEYCLOAK_LOGOUT_URI:http://keycloak:8080/realms/oAuth/protocol/openid-connect/logout}
+  client-id: ${KEYCLOAK_CLIENT_ID:myclient}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:mysecret}
+
+frontend:
+  redirect-uri: ${FRONTEND_REDIRECT_URI:http://localhost:5173/callback}
+
+logging:
+  level:
+    com.example.auth: DEBUG
+    org.springframework.security: INFO

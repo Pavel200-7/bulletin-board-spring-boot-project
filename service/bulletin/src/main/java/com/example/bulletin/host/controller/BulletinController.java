@@ -3,12 +3,9 @@ package com.example.bulletin.host.controller;
 import com.example.bulletin.application.service.bulletin.BulletinService;
 import com.example.bulletin.application.service.bulletin.data.request.*;
 import com.example.bulletin.application.service.bulletin.data.response.*;
-import com.example.bulletin.application.service.category.data.request.GetCategoryRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

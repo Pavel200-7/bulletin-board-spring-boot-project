@@ -24,14 +24,12 @@ public class Routes {
                                 "/api/v1/characteristic-value/**",
                                 "/api/v1/trade-account/**"
                         )
-//                        .filters(f -> f.stripPrefix(1))
                         .uri(properties.getFullPath(properties.getBulletin()))
                 )
 
                 // ========== NOTIFICATION SERVICE ==========
                 .route("notification_service", r -> r
                         .path("/api/v1/subscription/**")
-//                        .filters(f -> f.stripPrefix(1))
                         .uri(properties.getFullPath(properties.getNotification()))
                 )
 
@@ -42,7 +40,6 @@ public class Routes {
                                 "/api/v1/contact/**",
                                 "/api/v1/profile/**"
                         )
-//                        .filters(f -> f.stripPrefix(1))
                         .uri(properties.getFullPath(properties.getChat()))
                 )
 
@@ -54,9 +51,16 @@ public class Routes {
                                 "/protocol/**",
                                 "/admin/**"
                         )
-//                        .filters(f -> f.stripPrefix(0))
                         .uri(properties.getFullPath(properties.getKeycloak()))
+                )
+                .route("auth_service", r -> r
+                        .path("/api/auth/**")
+                        .filters(f -> f
+                                .rewritePath("/api/auth/(?<segment>.*)", "/api/auth/${segment}")
+                        )
+                        .uri(properties.getFullPath(properties.getAuth()))
                 )
                 .build();
     }
+
 }

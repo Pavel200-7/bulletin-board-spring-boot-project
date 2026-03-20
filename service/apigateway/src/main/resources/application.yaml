@@ -25,3 +25,4 @@ app:
     notification: ${NOTIFICATION_SERVICE_PATH:notification:8080}
     chat: ${CHAT_SERVICE_PATH:chat:8080}
     keycloak: ${KEYCLOAK_PATH:keycloak:8080}
+    auth: ${AUTH_PATH:auth:8080}

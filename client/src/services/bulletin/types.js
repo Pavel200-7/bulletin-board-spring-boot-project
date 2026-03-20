@@ -1,0 +1,19 @@
+export const BULLETIN_STATE = {
+  CREATED: 'CREATED',
+  MODIFIABLE: 'MODIFIABLE',
+  APPROVED: 'APPROVED',
+  PUBLISHED: 'PUBLISHED',
+  COMPLETED: 'COMPLETED'
+}
+
+
+export const BULLETIN_ORDER_BY = {
+  TITLE: 'TITLE',
+  PRICE: 'PRICE'
+}
+
+
+export const SORT_DIRECTION = {
+  ASC: 'ASC',
+  DESC: 'DESC'
+}

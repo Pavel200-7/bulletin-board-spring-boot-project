@@ -12,6 +12,7 @@ public class ServicePathProperties {
     private String notification;
     private String chat;
     private String keycloak;
+    private String auth;
 
     public String getFullPath(String path) {
         return "http://" + path;
