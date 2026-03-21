@@ -8,6 +8,7 @@ export function useAuth() {
   const isAnonymous = ref(authService.isAnonymous())
   
   const hasSession = computed(() => isAuthenticated.value || isAnonymous.value)
+  const isAdmin = computed(() => authService.isAdmin())
 
   const login = () => {
     authService.redirectToLogin()
@@ -51,15 +52,29 @@ export function useAuth() {
     return false
   }
 
+  const getUserInfo = () => {
+    return authService.getUserInfo()
+  }
+
+  const getUserRoles = () => {
+    return authService.getUserRoles()
+  }
+
   return {
+    // state
     isAuthenticated,
     isAnonymous,
     hasSession,
+    isAdmin,  // ← теперь здесь
+
+    // actions
     login,
     handleCallback,
     initAuth,
     logout,
     anonymousLogin,
-    refreshToken
+    refreshToken,
+    getUserInfo,
+    getUserRoles
   }
 }

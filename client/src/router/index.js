@@ -1,7 +1,7 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import { tokenManager } from '@/services/auth/tokenManager'
 import { authService } from '@/services/auth/authService'
+import { tokenManager } from '@/services/auth/tokenManager'
 
 const routes = [
   {
@@ -20,6 +20,12 @@ const routes = [
     name: 'home',
     component: () => import('@/views/HomePage.vue'),
     meta: { requiresAuth: false }
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/views/admin/AdminPage.vue'),
+    meta: { requiresAdmin: true }
   }
 ]
 
@@ -28,24 +34,47 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+// Проверка на админа
+const isAdmin = () => {
+  const token = tokenManager.getAccessToken()
+  if (!token) return false
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const roles = payload.spring_sec_roles || payload.realm_access?.roles || []
+    return roles.includes('admin') || roles.includes('ROLE_admin') || roles.includes('ADMIN')
+  } catch (e) {
+    return false
+  }
+}
+
+router.beforeEach((to) => {
   const isAuthenticated = tokenManager.isAuthenticated()
   const isAnonymous = authService.isAnonymous()
   const hasSession = isAuthenticated || isAnonymous
 
   // Callback всегда доступен
   if (to.path === '/callback') {
-    next()
-    return
+    return true
   }
 
-  // Гостевые страницы (главная)
+  // Админ-панель требует админских прав
+  if (to.meta.requiresAdmin) {
+    if (!isAuthenticated) {
+      return '/'
+    }
+    if (!isAdmin()) {
+      return '/home'
+    }
+    return true
+  }
+
+  // Гостевые страницы (только для неавторизованных)
   if (to.meta.requiresGuest && hasSession) {
-    next('/home')
-    return
+    return '/home'
   }
 
-  next()
+  return true
 })
 
 export default router

@@ -12,17 +12,13 @@ export const authService = {
   redirectToLogin() {
     // Используем API Gateway
     const url = `${import.meta.env.VITE_API_URL}/api/auth/authorize`
-    console.log('Redirecting to:', url)  
     window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/authorize`
   },
 
   /**
    * Обработка callback после редиректа (парсинг токенов из URL)
    */
-  handleCallback() {
-    console.log('handleCallback called')  
-    console.log('window.location.hash:', window.location.hash)  
-    
+  handleCallback() {    
     if (!window.location.hash) return false
     
     const hash = window.location.hash.substring(1) // убираем '#'
@@ -90,5 +86,63 @@ export const authService = {
    */
   isAuthenticated() {
     return tokenManager.isAuthenticated()
+  },
+  getToken() {
+    return tokenManager.getAccessToken()
+  },
+
+  /**
+   * Проверить, является ли пользователь администратором
+   */
+  isAdmin() {
+    const token = this.getToken()
+    if (!token) return false
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      const roles = payload.spring_sec_roles || payload.realm_access?.roles || []
+      return roles.includes('admin') || roles.includes('ROLE_admin') || roles.includes('ADMIN')
+    } catch (e) {
+      console.error('Failed to parse token for admin check:', e)
+      return false
+    }
+  },
+
+  /**
+   * Получить роли пользователя из токена
+   */
+  getUserRoles() {
+    const token = this.getToken()
+    if (!token) return []
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.spring_sec_roles || payload.realm_access?.roles || []
+    } catch (e) {
+      console.error('Failed to parse token for roles:', e)
+      return []
+    }
+  },
+
+  /**
+   * Получить информацию о пользователе из токена
+   */
+  getUserInfo() {
+    const token = this.getToken()
+    if (!token) return null
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return {
+        userId: payload.sub,
+        username: payload.preferred_username,
+        email: payload.email,
+        name: payload.name,
+        roles: this.getUserRoles()
+      }
+    } catch (e) {
+      console.error('Failed to parse token for user info:', e)
+      return null
+    }
   }
 }

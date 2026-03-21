@@ -1,68 +1,81 @@
 <!-- src/views/HomePage.vue -->
 <template>
   <div class="home-container">
-    <header class="home-header">
-      <h1>Главная страница</h1>
-      <button @click="handleLogout" class="logout-btn">Выйти</button>
-    </header>
+    <AppHeader />
+    
     <main class="home-content">
-      <p>Добро пожаловать!</p>
-      <p>Статус: 
-        <span v-if="isAuthenticated">✅ Авторизован</span>
-        <span v-else-if="isAnonymous">👤 Анонимный пользователь</span>
-      </p>
+      <div class="welcome-card">
+        <p class="welcome-text">Добро пожаловать!</p>
+        <p class="status-text">
+          Вы вошли как:
+          <span v-if="isAdmin" class="status-value admin">Администратор</span>
+          <span v-else-if="isAuthenticated" class="status-value auth">Авторизованный пользователь</span>
+          <span v-else-if="isAnonymous" class="status-value anon">Анонимный пользователь</span>
+        </p>
+      </div>
     </main>
   </div>
 </template>
 
 <script setup>
 import { useAuth } from '@/composables/useAuth'
-import { useRouter } from 'vue-router'
+import AppHeader from '@/components/layout/AppHeader.vue'
 
-const { isAuthenticated, isAnonymous, logout } = useAuth()
-const router = useRouter()
-
-const handleLogout = async () => {
-  await logout()
-  router.push('/')
-}
+const { isAuthenticated, isAnonymous, isAdmin } = useAuth()
 </script>
 
 <style scoped>
 .home-container {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: #f5f5f5;
 }
 
-.home-header {
-  background: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.home-header h1 {
-  margin: 0;
-  color: #333;
-}
-
-.logout-btn {
-  padding: 0.5rem 1rem;
-  background: #f56565;
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: #c53030;
-}
-
 .home-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 2rem;
+}
+
+.welcome-card {
+  background: white;
+  padding: 2rem 3rem;
   text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  width: 100%;
+}
+
+.welcome-text {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.status-text {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.status-value {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-weight: 500;
+}
+
+.status-value.admin {
+  color: #b45309;
+}
+
+.status-value.auth {
+  color: #38a169;
+}
+
+.status-value.anon {
+  color: #718096;
 }
 </style>

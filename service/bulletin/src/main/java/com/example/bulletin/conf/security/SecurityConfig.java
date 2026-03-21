@@ -158,12 +158,22 @@ public class SecurityConfig {
             var authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
             var roles =jwt.getClaimAsStringList("spring_sec_roles");
 
-            return Stream.concat(authorities.stream(),
-                            roles.stream()
-                                    .filter(role -> role.startsWith("ROLE_"))
-                                    .map(SimpleGrantedAuthority::new)
-                                    .map(GrantedAuthority.class::cast))
-                    .toList();
+            // Не работает
+//            return Stream.concat(authorities.stream(),
+//                            roles.stream()
+//                                    .filter(role -> role.startsWith("ROLE_"))
+//                                    .map(SimpleGrantedAuthority::new)
+//                                    .map(GrantedAuthority.class::cast))
+//                    .toList();
+
+            return Stream.concat(
+                    authorities.stream(),
+                    roles.stream()
+                            .filter(role -> role != null && !role.isEmpty())
+                            .map(role -> "ROLE_" + role.toUpperCase())
+                            .map(SimpleGrantedAuthority::new)
+                            .map(GrantedAuthority.class::cast)
+            ).toList();
         });
         return jwtAuthenticationConverter;
     }

@@ -27,6 +27,7 @@ const handleLogin = () => {
 }
 
 const handleAnonymous = () => {
+  console.log(111);
   anonymousLogin()
   router.push('/home')
 }
