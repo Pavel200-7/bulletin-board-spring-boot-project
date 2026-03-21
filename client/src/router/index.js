@@ -23,9 +23,20 @@ const routes = [
   },
   {
     path: '/admin',
-    name: 'admin',
-    component: () => import('@/views/admin/AdminPage.vue'),
-    meta: { requiresAdmin: true }
+    component: () => import('@/views/admin/AdminLayout.vue'),
+    meta: { requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'admin-dashboard',
+        component: () => import('@/views/admin/AdminDashboard.vue')
+      },
+      {
+        path: 'categories',
+        name: 'admin-categories',
+        component: () => import('@/views/admin/AdminCategories.vue')
+      }
+    ]
   }
 ]
 

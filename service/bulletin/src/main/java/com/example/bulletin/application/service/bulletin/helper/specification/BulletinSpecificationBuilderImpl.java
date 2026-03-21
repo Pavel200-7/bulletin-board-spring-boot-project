@@ -31,6 +31,16 @@ public class BulletinSpecificationBuilderImpl implements BulletinSpecificationBu
         return buildFromList(specs);
     }
 
+    public Specification<Bulletin> forCurrentUser(UUID ownerId, BulletinState state, String title) {
+        List<Specification<Bulletin>> specs = new ArrayList<>();
+
+        specs.add(hasOwner(ownerId));
+        specs.add(hasState(state));
+        specs.add(titleContains(title));
+
+        return buildFromList(specs);
+    }
+
     private Specification<Bulletin> buildFromList(List<Specification<Bulletin>> specs) {
         return specs.stream()
                 .reduce(Specification::and)
@@ -86,6 +96,13 @@ public class BulletinSpecificationBuilderImpl implements BulletinSpecificationBu
         return (root, query, cb) -> {
             if (ownerId == null) return cb.conjunction();
             return cb.equal(root.get("ownerInfo").get("owner").get("id"), ownerId);
+        };
+    }
+
+    private Specification<Bulletin> hasState(BulletinState state) {
+        return (root, query, cb) -> {
+            if (state == null) return cb.conjunction();
+            return cb.equal(root.get("state"), state);
         };
     }
 

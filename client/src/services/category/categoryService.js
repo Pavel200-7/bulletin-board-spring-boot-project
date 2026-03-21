@@ -28,6 +28,14 @@ export const categoryService = {
     return apiClient.get(`/category/family/${id}`)
   },
 
+  /**
+   * Получить категорию с прямыми детьми
+   * @param {string} id - UUID категории
+   */
+  getCategoryWithChildren(id) {
+    return apiClient.get(`/category/${id}/with-children`)
+  },
+
   // ========== СОЗДАНИЕ ==========
 
   /**

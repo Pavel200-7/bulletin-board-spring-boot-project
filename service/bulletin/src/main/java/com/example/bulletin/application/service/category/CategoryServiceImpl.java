@@ -5,8 +5,8 @@ import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.CategoryMapper;
 import com.example.bulletin.application.service.category.data.request.*;
 import com.example.bulletin.application.service.category.data.response.*;
-import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import com.example.bulletin.application.data.response.CategoryResponse;
+import com.example.bulletin.application.service.category.data.response.data.*;
 import com.example.bulletin.application.service.category.helper.inter.CategoryFamilyResponseBuilder;
 import com.example.bulletin.domain.entity.Category;
 import com.example.bulletin.infrastructure.repository.BulletinRepository;
@@ -37,6 +37,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
         CategoryResponse categoryResponse = mapper.toResponse(category);
         return new GetCategoryResponse(categoryResponse);
+    }
+
+    @Override
+    public GetCategoryWithChildrenResponse getCategoryWithChildren(GetCategoryWithChildrenRequest request) {
+        Category category = categoryRepository.findById(request.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("There is not any category with such id."));
+
+        CategoryWithChildrenResponse categoryWithChildrenResponse = mapper.toWithChildrenResponse(category);
+        return new GetCategoryWithChildrenResponse(categoryWithChildrenResponse);
     }
 
     @Override

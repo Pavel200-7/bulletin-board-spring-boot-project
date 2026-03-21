@@ -31,7 +31,7 @@ export const characteristicValueService = {
    * @param {string} name - название значения
    */
   createCharacteristicValue(characteristicId, name) {
-    return apiClient.post(`/characteristic/${characteristicId}/characteristic-value`, { name })
+    return apiClient.post(`/characteristic/${characteristicId}/characteristic-value`, { characteristicId, name })
   },
 
   // ========== ИЗМЕНЕНИЕ ==========

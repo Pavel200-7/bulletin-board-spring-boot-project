@@ -4,5 +4,5 @@ import com.example.bulletin.application.service.category.data.response.data.Cate
 import com.example.bulletin.domain.entity.Category;
 
 public interface CategoryFamilyResponseBuilder {
-    public CategoryFamilyResponse buildResponse(Category category);
+    CategoryFamilyResponse buildResponse(Category category);
 }

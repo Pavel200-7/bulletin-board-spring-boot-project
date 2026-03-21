@@ -6,9 +6,8 @@
       :class="{ selected: isSelected }"
       @click="handleSelect"
     >
-      <!-- Значок раскрытия показываем только для не-листовых категорий -->
       <span 
-        v-if="!category.leaf" 
+        v-if="!isLeaf && hasChildren" 
         class="expand-icon" 
         @click.stop="toggleExpand"
       >
@@ -17,44 +16,60 @@
       <span v-else class="expand-icon-placeholder"></span>
       
       <span class="category-name">{{ category.name }}</span>
-      <span v-if="category.leaf" class="leaf-badge">лист</span>
+      <span v-if="isLeaf" class="leaf-badge">лист</span>
+      
       <div class="node-actions">
-        <button class="action-btn" @click.stop="handleAddChild">+</button>
-        <button v-if="!category.leaf" class="action-btn" @click.stop="handleAddLeaf">🌿</button>
-        <button class="action-btn" @click.stop="handleRename">✏️</button>
+        <button v-if="!isLeaf" class="action-btn" @click.stop="openAddChildModal">+</button>
+        <button v-if="!isLeaf" class="action-btn" @click.stop="openAddLeafModal">🌿</button>
+        <button class="action-btn" @click.stop="openRenameModal">✏️</button>
         <button class="action-btn" @click.stop="handleDelete">🗑️</button>
       </div>
     </div>
     
-    <!-- Дети отображаем только для не-листовых и когда раскрыто -->
-    <div v-if="!category.leaf && isExpanded" class="node-children">
-      <div v-if="childrenLoading" class="loading-children">Загрузка...</div>
-      <template v-else>
+    <div v-if="!isLeaf && isExpanded" class="node-children">
+      <div v-if="loading" class="loading-children">Загрузка...</div>
+      <div v-else-if="error" class="error-children">{{ error }}</div>
+      <template v-else-if="children.length > 0">
         <CategoryNode 
           v-for="child in children" 
           :key="child.id"
           :category="child"
+          :is-leaf="child.leaf"
           :selected-category-id="selectedCategoryId"
-          @select="$emit('select', $event)"
-          @create-child="$emit('create-child', $event)"
-          @create-leaf="$emit('create-leaf', $event)"
-          @rename="$emit('rename', $event)"
-          @delete="$emit('delete', $event.id, $event.parentId)"
-          @refresh-self="$emit('refresh-self')"
+          @select="handleChildSelect"
+          @refresh-parent="handleRefreshParent"
         />
       </template>
+      <div v-else class="no-children">Нет дочерних категорий</div>
     </div>
+    
+    <CategoryFormModal
+      :visible="modalVisible"
+      :mode="modalMode"
+      :title="modalTitle"
+      :label="modalLabel"
+      :placeholder="modalPlaceholder"
+      :submit-text="modalSubmitText"
+      :initial-name="modalInitialName"
+      :on-submit="modalOnSubmit || (async () => {})"
+      @close="modalVisible = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCategory } from '@/composables/useCategory'
+import CategoryFormModal from './CategoryFormModal.vue'
 
 const props = defineProps({
   category: {
     type: Object,
     required: true
+  },
+  isLeaf: {
+    type: Boolean,
+    default: false
   },
   selectedCategoryId: {
     type: String,
@@ -62,68 +77,100 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['select', 'create-child', 'create-leaf', 'rename', 'delete', 'refresh-self'])
+const emit = defineEmits(['select', 'refresh-parent'])
 
-const { fetchCategoryWithFamily } = useCategory()
+const { 
+  fetchCategoryWithChildren, 
+  createChildCategory, 
+  createLeafCategory, 
+  renameCategory, 
+  deleteChildCategory,
+  deleteRootCategory
+} = useCategory()
+
+// Состояние модального окна
+const modalVisible = ref(false)
+const modalMode = ref('create')
+const modalInitialName = ref('')
+const modalOnSubmit = ref(null)
+
+const modalTitle = computed(() => {
+  switch (modalMode.value) {
+    case 'create-child': return 'Создание дочерней категории'
+    case 'create-leaf': return 'Создание листовой категории'
+    case 'rename': return 'Переименование категории'
+    default: return ''
+  }
+})
+const modalLabel = computed(() => 'Название категории')
+const modalPlaceholder = computed(() => {
+  switch (modalMode.value) {
+    case 'create-child': return 'Введите название дочерней категории'
+    case 'create-leaf': return 'Введите название листовой категории'
+    case 'rename': return 'Новое название'
+    default: return 'Введите название'
+  }
+})
+const modalSubmitText = computed(() => {
+  return modalMode.value === 'rename' ? 'Сохранить' : 'Создать'
+})
 
 const isExpanded = ref(false)
 const children = ref([])
-const childrenLoading = ref(false)
-const childrenLoaded = ref(false)
+const loading = ref(false)
+const error = ref(null)
+const loaded = ref(false)
 
 const isSelected = computed(() => props.selectedCategoryId === props.category.id)
+const hasChildren = computed(() => children.value.length > 0)
+
+const handleApiError = (err) => {
+  const response = err.response?.data
+  if (response?.message) {
+    return response.message
+  }
+  return err.message || 'Произошла ошибка'
+}
+
+const loadChildren = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    const response = await fetchCategoryWithChildren(props.category.id)
+    children.value = response.data?.categoryWithChildrenResponse?.children || []
+    loaded.value = true
+  } catch (err) {
+    error.value = handleApiError(err)
+    console.error('Ошибка загрузки детей:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const refreshChildren = async () => {
+  if (loaded.value) {
+    await loadChildren()
+  }
+}
+
+const handleRefreshParent = () => {
+  refreshChildren()
+}
+
+onMounted(() => {
+  if (!props.isLeaf) {
+    loadChildren()
+  }
+})
 
 const toggleExpand = async () => {
   if (isExpanded.value) {
     isExpanded.value = false
   } else {
     isExpanded.value = true
-    
-    if (!childrenLoaded.value && !props.category.leaf) {
+    if (!loaded.value) {
       await loadChildren()
     }
-  }
-}
-
-const loadChildren = async () => {
-  childrenLoading.value = true
-  try {
-        console.log(response);
-
-    const response = await fetchCategoryWithFamily(props.category.id)
-    console.log(response);
-    const categoryData = response.data?.categoryFamilyResponse
-    if (categoryData && categoryData.children) {
-      if (categoryData.id == props.category.id) {
-        children.value = categoryData.children
-      } else {
-        console.log(categoryData.children)
-        for (child in categoryData.children) {
-          if (child.id == props.category.id) {
-            children.value = categoryData.children
-          }
-        }
-      }
-
-      for (child in categoryData.children) {
-        if (child.id == props.category.id) {
-          children.value = categoryData.children
-
-        }
-      }
-    }
-    childrenLoaded.value = true
-  } catch (err) {
-    console.error('Ошибка загрузки детей категории:', err)
-  } finally {
-    childrenLoading.value = false
-  }
-}
-
-// Обновить только детей текущей категории
-const refreshChildren = async () => {
-  if (childrenLoaded.value) {
-    await loadChildren()
   }
 }
 
@@ -131,43 +178,61 @@ const handleSelect = () => {
   emit('select', props.category)
 }
 
-const handleAddChild = async () => {
-  const name = prompt('Введите название дочерней категории:')
-  if (name && name.trim()) {
-    emit('create-child', { parentId: props.category.id, name: name.trim() })
-    // Обновляем детей после создания
+const handleChildSelect = (category) => {
+  emit('select', category)
+}
+
+const openAddChildModal = () => {
+  modalMode.value = 'create-child'
+  modalInitialName.value = ''
+  modalOnSubmit.value = async (name) => {
+    await createChildCategory(props.category.id, name)
     await refreshChildren()
   }
+  modalVisible.value = true
 }
 
-const handleAddLeaf = async () => {
-  const name = prompt('Введите название листовой категории:')
-  if (name && name.trim()) {
-    emit('create-leaf', { parentId: props.category.id, name: name.trim() })
+const openAddLeafModal = () => {
+  modalMode.value = 'create-leaf'
+  modalInitialName.value = ''
+  modalOnSubmit.value = async (name) => {
+    await createLeafCategory(props.category.id, name)
     await refreshChildren()
   }
+  modalVisible.value = true
 }
 
-const handleRename = () => {
-  const newName = prompt('Новое название:', props.category.name)
-  if (newName && newName.trim() && newName !== props.category.name) {
-    emit('rename', { id: props.category.id, newName: newName.trim() })
-    // Обновляем локальное имя
-    props.category.name = newName
+const openRenameModal = () => {
+  modalMode.value = 'rename'
+  modalInitialName.value = props.category.name
+  modalOnSubmit.value = async (name) => {
+    await renameCategory(props.category.id, name)
+    props.category.name = name
   }
+  modalVisible.value = true
 }
 
-const handleDelete = () => {
-  const confirmMessage = children.value.length > 0
-    ? `Удалить категорию "${props.category.name}" и все её подкатегории?` 
+const handleDelete = async () => {
+  const msg = children.value.length > 0 
+    ? `Удалить категорию "${props.category.name}" и все её подкатегории?`
     : `Удалить категорию "${props.category.name}"?`
   
-  if (confirm(confirmMessage)) {
-    emit('delete', props.category.id, props.category.parentId)
+  if (confirm(msg)) {
+    try {
+      if (props.category.parentId === null) {
+        await deleteRootCategory(props.category.id)
+        emit('refresh-parent')
+      } else {
+        await deleteChildCategory(props.category.parentId, props.category.id)
+        emit('refresh-parent')
+      }
+    } catch (err) {
+      const errorMsg = handleApiError(err)
+      alert(errorMsg)
+    }
   }
 }
 
-// Выставляем метод для внешнего вызова
 defineExpose({
   refreshChildren
 })
@@ -223,7 +288,6 @@ defineExpose({
   padding: 0.125rem 0.375rem;
   background: #edf2f7;
   color: #4a5568;
-  border-radius: 2px;
 }
 
 .node-actions {
@@ -242,7 +306,6 @@ defineExpose({
   cursor: pointer;
   font-size: 0.75rem;
   color: #718096;
-  transition: color 0.2s;
 }
 
 .action-btn:hover {
@@ -253,10 +316,21 @@ defineExpose({
   margin-left: 1.5rem;
 }
 
-.loading-children {
+.loading-children, .error-children, .no-children {
   padding: 0.5rem;
   font-size: 0.75rem;
-  color: #a0aec0;
   text-align: center;
+}
+
+.loading-children {
+  color: #a0aec0;
+}
+
+.error-children {
+  color: #e53e3e;
+}
+
+.no-children {
+  color: #a0aec0;
 }
 </style>

@@ -73,13 +73,32 @@ public class BulletinServiceImpl implements BulletinService {
         Specification<Bulletin> spec = specificationBuilder.fromCriteria(criteria);
 
         PageData pageData = request.getPageData();
-        Sort sortOrder = Sort.by(criteria.getDirection(), criteria.getOrderBy().getFieldName());
+        Sort sort = Sort.by(criteria.getDirection(), criteria.getOrderBy().getFieldName());
+        Pageable pageable = PageRequest.of(pageData.getPage(), pageData.getSize(), sort);
 
-        Pageable pageable = PageRequest.of(pageData.getPage(), pageData.getSize(), sortOrder);
         Page<Bulletin> bulletins = bulletinRepository.findAll(spec, pageable);
 
         Page<BulletinPaginationData> paginationData = bulletins.map(mapper::toPaginationData);
         return new GetBulletinPaginationResponse(paginationData);
+    }
+
+    @Override
+    public GetMyBulletinsResponse getMyBulletins(GetMyBulletinsRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Specification<Bulletin> spec = specificationBuilder.forCurrentUser(
+                currentUserId,
+                request.getState(),
+                request.getTitle()
+        );
+
+        PageData pageData = request.getPageData();
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Pageable pageable = PageRequest.of(pageData.getPage(), pageData.getSize(), sort);
+
+        Page<Bulletin> bulletins = bulletinRepository.findAll(spec, pageable);
+
+        Page<BulletinPaginationData> paginationData = bulletins.map(mapper::toPaginationData);
+        return new GetMyBulletinsResponse(paginationData);
     }
 
     @Override

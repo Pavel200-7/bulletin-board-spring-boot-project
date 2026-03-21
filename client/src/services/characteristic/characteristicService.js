@@ -30,7 +30,10 @@ export const characteristicService = {
    * @param {string} name - название характеристики
    */
   createCharacteristic(categoryId, name) {
-    return apiClient.post(`/category/${categoryId}/characteristic`, { name })
+    console.log(111);
+    console.log(categoryId);
+
+    return apiClient.post(`/category/${categoryId}/characteristic`, { categoryId, name })
   },
 
   // ========== ИЗМЕНЕНИЕ ==========

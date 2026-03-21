@@ -11,6 +11,6 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetCategoryRequest {
+public class GetCategoryWithChildrenRequest {
     private UUID id;
 }

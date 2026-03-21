@@ -29,6 +29,12 @@ public class CategoryController {
         return ResponseEntity.ok(service.getRootCategories(request));
     }
 
+    @GetMapping("/{id}/with-children")
+    public ResponseEntity<GetCategoryWithChildrenResponse> GetCategoryWithChildren(@PathVariable UUID id) {
+        GetCategoryWithChildrenRequest request = new GetCategoryWithChildrenRequest(id);
+        return ResponseEntity.ok(service.getCategoryWithChildren(request));
+    }
+
     @GetMapping("/family/{id}")
     public ResponseEntity<GetCategoryWithFamilyResponse> getCategoryWithFamily(@PathVariable UUID id) {
         GetCategoryWithFamilyRequest request = new GetCategoryWithFamilyRequest(id);

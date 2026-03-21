@@ -7,6 +7,7 @@ export function useCategory() {
   const categories = ref([])
   const rootCategories = ref([])
   const family = ref(null)
+  const categoryWithChildren = ref(null)
   const loading = ref(false)
   const error = ref(null)
 
@@ -41,6 +42,12 @@ export function useCategory() {
   const fetchCategoryWithFamily = async (id) => {
     const response = await handleRequest(() => categoryService.getCategoryWithFamily(id))
     family.value = response.data?.categoryFamilyResponse || response.data
+    return response
+  }
+
+  const fetchCategoryWithChildren = async (id) => {
+    const response = await handleRequest(() => categoryService.getCategoryWithChildren(id))
+    categoryWithChildren.value = response.data?.categoryWithChildrenResponse || response.data
     return response
   }
 
@@ -88,6 +95,7 @@ export function useCategory() {
     categories,
     rootCategories,
     family,
+    categoryWithChildren,
     loading,
     error,
 
@@ -95,6 +103,7 @@ export function useCategory() {
     fetchCategory,
     fetchRootCategories,
     fetchCategoryWithFamily,
+    fetchCategoryWithChildren,
     createRootCategory,
     createChildCategory,
     createLeafCategory,

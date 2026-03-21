@@ -23,6 +23,8 @@ export function useBulletin() {
     }
   }
 
+  // ========== ПОЛУЧЕНИЕ ==========
+
   const fetchPublicBulletin = async (id) => {
     const response = await handleRequest(() => bulletinService.getPublicBulletin(id))
     bulletin.value = response.data?.bulletinResponse || response.data
@@ -48,6 +50,40 @@ export function useBulletin() {
     return response
   }
 
+  // ========== МОИ ОБЪЯВЛЕНИЯ ==========
+
+  const fetchMyBulletins = async ({ page = 0, size = 20, state = null, title = null } = {}) => {
+    const response = await handleRequest(() => bulletinService.getMyBulletins({ page, size, state, title }))
+    
+    const data = response.data
+    bulletins.value = data.page?.content || data.content || []
+    pagination.value = {
+      page,
+      size,
+      totalPages: data.page?.totalPages || data.totalPages,
+      totalElements: data.page?.totalElements || data.totalElements
+    }
+    return response
+  }
+
+  const fetchMyDrafts = async (page = 0, size = 20) => {
+    return fetchMyBulletins({ page, size, state: 'MODIFIABLE' })
+  }
+
+  const fetchMyApproved = async (page = 0, size = 20) => {
+    return fetchMyBulletins({ page, size, state: 'APPROVED' })
+  }
+
+  const fetchMyPublished = async (page = 0, size = 20) => {
+    return fetchMyBulletins({ page, size, state: 'PUBLISHED' })
+  }
+
+  const fetchMyCompleted = async (page = 0, size = 20) => {
+    return fetchMyBulletins({ page, size, state: 'COMPLETED' })
+  }
+
+  // ========== СОЗДАНИЕ И РЕДАКТИРОВАНИЕ ==========
+
   const createDraft = async () => {
     const response = await handleRequest(() => bulletinService.createDraft())
     bulletin.value = response.data?.bulletinResponse || response.data
@@ -60,6 +96,8 @@ export function useBulletin() {
     return response
   }
 
+  // ========== ИЗМЕНЕНИЕ СТАТУСА ==========
+
   const approveAndPublish = async (bulletinId) => {
     return handleRequest(() => bulletinService.approveAndPublish(bulletinId))
   }
@@ -71,6 +109,8 @@ export function useBulletin() {
   const closeBulletin = async (bulletinId) => {
     return handleRequest(() => bulletinService.closeBulletin(bulletinId))
   }
+
+  // ========== РАБОТА С ИЗОБРАЖЕНИЯМИ ==========
 
   const addImage = async (bulletinId, providerImageId) => {
     return handleRequest(() => bulletinService.addImage(bulletinId, providerImageId))
@@ -96,6 +136,11 @@ export function useBulletin() {
     fetchPublicBulletin,
     fetchEditableBulletin,
     fetchPublishedBulletins,
+    fetchMyBulletins,
+    fetchMyDrafts,
+    fetchMyApproved,
+    fetchMyPublished,
+    fetchMyCompleted,
     createDraft,
     updateBulletin,
     approveAndPublish,

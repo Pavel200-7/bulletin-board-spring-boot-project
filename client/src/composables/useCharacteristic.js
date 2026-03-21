@@ -22,8 +22,6 @@ export function useCharacteristic() {
     }
   }
 
-  // ========== ПОЛУЧЕНИЕ ==========
-
   const fetchCharacteristic = async (id) => {
     const response = await handleRequest(() => characteristicService.getCharacteristic(id))
     characteristic.value = response.data?.characteristicResponse || response.data
@@ -32,19 +30,18 @@ export function useCharacteristic() {
 
   const fetchCategoryCharacteristics = async (categoryId) => {
     const response = await handleRequest(() => characteristicService.getCategoryCharacteristics(categoryId))
-    characteristics.value = response.data?.characteristicResponse || response.data || []
+    // Правильно обрабатываем ответ
+    const data = response.data?.characteristicResponse || response.data
+    characteristics.value = Array.isArray(data) ? data : []
     return response
   }
 
-  // ========== СОЗДАНИЕ ==========
-
   const createCharacteristic = async (categoryId, name) => {
+    console.log('Creating characteristic with categoryId:', categoryId, 'name:', name) // для отладки
     const response = await handleRequest(() => characteristicService.createCharacteristic(categoryId, name))
     characteristic.value = response.data?.characteristicResponse || response.data
     return response
   }
-
-  // ========== ИЗМЕНЕНИЕ ==========
 
   const renameCharacteristic = async (id, name) => {
     const response = await handleRequest(() => characteristicService.renameCharacteristic(id, name))
@@ -52,20 +49,15 @@ export function useCharacteristic() {
     return response
   }
 
-  // ========== УДАЛЕНИЕ ==========
-
   const deleteCharacteristic = async (categoryId, characteristicId) => {
     return handleRequest(() => characteristicService.deleteCharacteristic(categoryId, characteristicId))
   }
 
   return {
-    // state
     characteristic,
     characteristics,
     loading,
     error,
-
-    // actions
     fetchCharacteristic,
     fetchCategoryCharacteristics,
     createCharacteristic,

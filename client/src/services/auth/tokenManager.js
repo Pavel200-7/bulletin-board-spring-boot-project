@@ -5,8 +5,8 @@ const REFRESH_TOKEN_KEY = 'refresh_token'
 
 export const tokenManager = {
   setTokens(accessToken, refreshToken) {
-    console.log(accessToken)
-    console.log(refreshToken)
+    // console.log(accessToken)
+    // console.log(refreshToken)
 
 
     if (accessToken) {

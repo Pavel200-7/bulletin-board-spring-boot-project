@@ -3,7 +3,7 @@
   <div class="category-tree">
     <div class="tree-header">
       <h3>Категории</h3>
-      <button @click="handleCreateRoot" class="btn-add-root">+ Корневая категория</button>
+      <button @click="openCreateRootModal" class="btn-add-root">+ Корневая категория</button>
     </div>
     
     <div class="tree-content">
@@ -15,51 +15,51 @@
       <CategoryNode 
         v-for="category in rootCategories" 
         :key="category.id"
-        :ref="(el) => setCategoryRef(category.id, el)"
         :category="category"
+        :is-leaf="category.leaf"
         :selected-category-id="selectedCategoryId"
         @select="selectCategory"
-        @create-child="handleCreateChild"
-        @create-leaf="handleCreateLeaf"
-        @rename="handleRename"
-        @delete="handleDelete"
-        @refresh-self="handleRefreshSelf"
+        @refresh-parent="refreshTree"
       />
     </div>
+    
+    <CategoryFormModal
+      :visible="modalVisible"
+      mode="create"
+      title="Создание корневой категории"
+      label="Название категории"
+      placeholder="Введите название корневой категории"
+      submit-text="Создать"
+      :on-submit="handleCreateRoot"
+      @close="modalVisible = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import CategoryNode from './CategoryNode.vue'
+import CategoryFormModal from './CategoryFormModal.vue'
 import { useCategory } from '@/composables/useCategory'
 
-const { 
-  fetchRootCategories, 
-  createRootCategory, 
-  createChildCategory, 
-  createLeafCategory, 
-  renameCategory, 
-  deleteChildCategory,
-  deleteRootCategory
-} = useCategory()
+const { fetchRootCategories, createRootCategory } = useCategory()
 
 const rootCategories = ref([])
 const loading = ref(false)
 const error = ref(null)
 const selectedCategoryId = ref(null)
-const categoryRefs = ref({})
+const modalVisible = ref(false)
 
 const emit = defineEmits(['category-selected'])
 
-// Сохраняем ссылки на компоненты по ID категории
-const setCategoryRef = (categoryId, el) => {
-  if (el) {
-    categoryRefs.value[categoryId] = el
+const handleApiError = (err) => {
+  const response = err.response?.data
+  if (response?.message) {
+    return response.message
   }
+  return err.message || 'Произошла ошибка'
 }
 
-// Загружаем только корневые категории
 const loadRoots = async () => {
   loading.value = true
   error.value = null
@@ -67,20 +67,15 @@ const loadRoots = async () => {
     const response = await fetchRootCategories()
     rootCategories.value = response.data?.categoryResponse || []
   } catch (err) {
-    error.value = 'Ошибка загрузки категорий'
-    console.error(err)
+    error.value = handleApiError(err)
+    console.error('Ошибка загрузки корневых категорий:', err)
   } finally {
     loading.value = false
   }
 }
 
-const refreshRoots = () => {
+const refreshTree = () => {
   loadRoots()
-}
-
-// Обновление конкретной категории (если нужно перезагрузить её детей)
-const handleRefreshSelf = () => {
-  // Ничего не делаем, так как CategoryNode сам обновляет своих детей
 }
 
 onMounted(() => {
@@ -92,60 +87,23 @@ const selectCategory = (category) => {
   emit('category-selected', category)
 }
 
-const handleCreateRoot = async () => {
-  const name = prompt('Введите название корневой категории:')
-  if (name && name.trim()) {
-    await createRootCategory(name.trim())
-    await refreshRoots()
-  }
+const openCreateRootModal = () => {
+  modalVisible.value = true
 }
 
-const handleCreateChild = async ({ parentId, name }) => {
-  await createChildCategory(parentId, name)
-  // Находим родительскую категорию по ID и обновляем её детей
-  const parentNode = categoryRefs.value[parentId]
-  if (parentNode && parentNode.refreshChildren) {
-    await parentNode.refreshChildren()
-  }
+const handleCreateRoot = async (name) => {
+  await createRootCategory(name)
+  await refreshTree()
 }
 
-const handleCreateLeaf = async ({ parentId, name }) => {
-  await createLeafCategory(parentId, name)
-  const parentNode = categoryRefs.value[parentId]
-  if (parentNode && parentNode.refreshChildren) {
-    await parentNode.refreshChildren()
-  }
-}
-
-const handleRename = async ({ id, newName }) => {
-  await renameCategory(id, newName)
-  // Переименование не требует перезагрузки детей
-}
-
-const handleDelete = async (id, parentId) => {
-  try {
-    if (parentId === null) {
-      await deleteRootCategory(id)
-      await refreshRoots()
-    } else {
-      await deleteChildCategory(parentId, id)
-      const parentNode = categoryRefs.value[parentId]
-      if (parentNode && parentNode.refreshChildren) {
-        await parentNode.refreshChildren()
-      }
-    }
-  } catch (err) {
-    console.error('Ошибка удаления категории:', err)
-    alert('Ошибка при удалении категории')
-  }
-}
+defineExpose({
+  refreshTree,
+  createRoot: openCreateRootModal
+})
 </script>
 
 <style scoped>
 .category-tree {
-  background: white;
-  border-radius: 8px;
-  padding: 1rem;
   height: 100%;
   overflow-y: auto;
 }
@@ -180,14 +138,13 @@ const handleDelete = async (id, parentId) => {
 .loading, .error, .empty {
   padding: 1rem;
   text-align: center;
-  color: #666;
+}
+
+.loading, .empty {
+  color: #a0aec0;
 }
 
 .error {
   color: #e53e3e;
-}
-
-.tree-content {
-  min-height: 200px;
 }
 </style>

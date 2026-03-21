@@ -35,6 +35,12 @@ public class BulletinController {
         return ResponseEntity.ok(service.getModifiableBulletin(request));
     }
 
+    @PostMapping("/my")
+    public ResponseEntity<GetMyBulletinsResponse> getMyBulletins(
+            @Valid @RequestBody GetMyBulletinsRequest request) {
+        return ResponseEntity.ok(service.getMyBulletins(request));
+    }
+
     @PostMapping
     public ResponseEntity<CreateBulletinResponse> createBulletin()
             throws Exception {
