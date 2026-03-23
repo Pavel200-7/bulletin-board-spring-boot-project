@@ -54,9 +54,9 @@ public class Routes {
                         .uri(properties.getFullPath(properties.getKeycloak()))
                 )
                 .route("auth_service", r -> r
-                        .path("/api/auth/**")
+                        .path("/api/v1/auth/**")
                         .filters(f -> f
-                                .rewritePath("/api/auth/(?<segment>.*)", "/api/auth/${segment}")
+                                .rewritePath("/api/v1/auth/(?<segment>.*)", "/api/v1/auth/${segment}")
                         )
                         .uri(properties.getFullPath(properties.getAuth()))
                 )

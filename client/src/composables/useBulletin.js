@@ -66,21 +66,22 @@ export function useBulletin() {
     return response
   }
 
-  const fetchMyDrafts = async (page = 0, size = 20) => {
-    return fetchMyBulletins({ page, size, state: 'MODIFIABLE' })
-  }
+const fetchMyDrafts = async (page = 0, size = 20, title = null) => {
+  return fetchMyBulletins({ page, size, state: 'MODIFIABLE', title })
+}
 
-  const fetchMyApproved = async (page = 0, size = 20) => {
-    return fetchMyBulletins({ page, size, state: 'APPROVED' })
-  }
+const fetchMyPublished = async (page = 0, size = 20, title = null) => {
+  return fetchMyBulletins({ page, size, state: 'PUBLISHED', title })
+}
 
-  const fetchMyPublished = async (page = 0, size = 20) => {
-    return fetchMyBulletins({ page, size, state: 'PUBLISHED' })
-  }
+const fetchMyCompleted = async (page = 0, size = 20, title = null) => {
+  return fetchMyBulletins({ page, size, state: 'COMPLETED', title })
+}
 
-  const fetchMyCompleted = async (page = 0, size = 20) => {
-    return fetchMyBulletins({ page, size, state: 'COMPLETED' })
-  }
+const fetchMyApproved = async (page = 0, size = 20) => {
+  return fetchMyBulletins({ page, size, state: 'APPROVED' })
+}
+
 
   // ========== СОЗДАНИЕ И РЕДАКТИРОВАНИЕ ==========
 

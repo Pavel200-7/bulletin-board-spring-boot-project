@@ -27,6 +27,12 @@ public class LoggingGlobalPreFilter implements GlobalFilter, Ordered {
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
         logger.info(">>> GATEWAY REQUEST: {} {} from {}", method, fullUrl, host);
+
+        if (method.equals("OPTIONS")) {
+            logger.info("OPTIONS request received - should return CORS headers");
+            return chain.filter(exchange);
+        }
+
         if (authHeader != null) {
             logger.info("Authorization header present: {}", authHeader.substring(0, Math.min(30, authHeader.length())) + "...");
         } else {

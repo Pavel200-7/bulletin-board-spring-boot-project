@@ -10,6 +10,7 @@ export function useAuth() {
   const isAdmin = computed(() => authService.isAdmin())
   
   let refreshTimeout = null
+  let isRefreshing = false // Флаг для предотвращения одновременных обновлений
 
   const login = () => {
     authService.redirectToLogin()
@@ -29,6 +30,7 @@ export function useAuth() {
     await authService.logout()
     isAuthenticated.value = false
     isAnonymous.value = false
+    isRefreshing = false
   }
 
   const anonymousLogin = () => {
@@ -37,13 +39,24 @@ export function useAuth() {
   }
 
   const refreshToken = async () => {
+    // Предотвращаем одновременные обновления
+    if (isRefreshing) {
+      console.log('Refresh already in progress, skipping...')
+      return false
+    }
+    
+    isRefreshing = true
     try {
       await authService.refreshToken()
       isAuthenticated.value = true
+      console.log('Token refreshed successfully')
       return true
     } catch (e) {
+      console.error('Failed to refresh token:', e)
       isAuthenticated.value = false
       return false
+    } finally {
+      isRefreshing = false
     }
   }
 
@@ -65,11 +78,12 @@ export function useAuth() {
   }
 
   const startTokenRefreshTimer = () => {
+    // Останавливаем существующий таймер
     stopTokenRefreshTimer()
     
     const expirationTime = tokenManager.getTokenExpirationTime()
     if (!expirationTime) {
-      console.log('Нет времени истечения токена')
+      console.log('No token expiration time found')
       return
     }
     
@@ -78,26 +92,30 @@ export function useAuth() {
     
     // Если токен уже истек — сразу обновляем
     if (timeUntilExpiry <= 0) {
-      console.log('Токен уже истек, обновляем...')
+      console.log('Token already expired, refreshing...')
       refreshToken().catch(console.error)
       return
     }
     
-    // Обновляем за 5 минут до истечения (или сразу, если до истечения меньше 5 минут)
-    const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0)
+    // Обновляем за 5 минут до истечения
+    const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 1000) // Минимум 1 секунда
     
-    console.log(`Токен истекает через ${Math.floor(timeUntilExpiry / 1000)} сек. Обновим через ${Math.floor(refreshTime / 1000)} сек.`)
+    console.log(`Token expires in ${Math.floor(timeUntilExpiry / 1000)} sec. Will refresh in ${Math.floor(refreshTime / 1000)} sec.`)
     
     refreshTimeout = setTimeout(async () => {
-      console.log('Время обновить токен...')
+      console.log('Time to refresh token...')
       try {
-        await refreshToken()
-        // После успешного обновления запускаем новый таймер
-        startTokenRefreshTimer()
+        const success = await refreshToken()
+        if (success) {
+          // После успешного обновления запускаем новый таймер
+          startTokenRefreshTimer()
+        } else {
+          console.error('Failed to refresh token, logging out...')
+          // await logout()
+        }
       } catch (err) {
-        console.error('Не удалось обновить токен:', err)
-        // При ошибке обновления — выходим из системы
-        await logout()
+        console.error('Error during token refresh:', err)
+        // await logout()
       }
     }, refreshTime)
   }

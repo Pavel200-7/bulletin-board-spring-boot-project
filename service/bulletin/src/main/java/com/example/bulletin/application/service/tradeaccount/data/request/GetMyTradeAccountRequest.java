@@ -4,15 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-
-import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class ChangeDescriptionTradeAccountRequest {
-    @Length(min = 0, max = 1000)
-    private String description;
+public class GetMyTradeAccountRequest {
 }

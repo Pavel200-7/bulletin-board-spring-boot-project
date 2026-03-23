@@ -29,6 +29,12 @@ export function useTradeAccount() {
     return response
   }
 
+  const fetchMyTradeAccount = async () => {
+    const response = await handleRequest(() => tradeAccountService.getMyTradeAccount())
+    account.value = response.data?.tradeAccountResponse || response.data
+    return response
+  }
+
   // ========== ОСНОВНЫЕ ДАННЫЕ ==========
 
   const updateName = async (name) => {
@@ -85,6 +91,7 @@ export function useTradeAccount() {
 
     // actions
     fetchTradeAccount,
+    fetchMyTradeAccount,
     updateName,
     updatePhone,
     updateContacts,

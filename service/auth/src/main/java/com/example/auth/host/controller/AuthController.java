@@ -23,7 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -87,6 +87,9 @@ public class AuthController {
                 .map(response -> {
                     String accessToken = (String) response.get("access_token");
                     String refreshToken = (String) response.get("refresh_token");
+                    log.info("accessToken {}", accessToken);
+                    log.info("refreshToken: {}", refreshToken);
+
 
                     String redirectWithTokens = frontendRedirectUri +
                             "#access_token=" + accessToken +
@@ -108,10 +111,62 @@ public class AuthController {
     }
 
 
+//    @PostMapping("/refresh")
+//    public Mono<ResponseEntity<LoginResponse>> refresh(@RequestBody RefreshTokenRequest request) {
+//        String refreshToken = request.getRefreshToken();
+//        log.info("Refreshing token");
+//
+//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+//        body.add("client_id", clientId);
+//        body.add("client_secret", clientSecret);
+//        body.add("refresh_token", refreshToken);
+//        body.add("grant_type", "refresh_token");
+//
+//        return webClient.post()
+//                .uri(tokenUri)
+//                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+//                .body(BodyInserters.fromFormData(body))
+//                .retrieve()
+//                .bodyToMono(Map.class)
+//                .map(response -> {
+//                    LoginResponse loginResponse = LoginResponse.builder()
+//                            .accessToken((String) response.get("access_token"))
+//                            .refreshToken((String) response.get("refresh_token"))
+//                            .expiresIn((Integer) response.get("expires_in"))
+//                            .tokenType((String) response.get("token_type"))
+//                            .build();
+//
+//                    log.info("Token refreshed successfully");
+//                    return ResponseEntity.ok(loginResponse);
+//                })
+//                .onErrorResume(e -> {
+//                    log.error("Failed to refresh token: {}", e.getMessage());
+//                    return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+//                });
+//    }
+
     @PostMapping("/refresh")
     public Mono<ResponseEntity<LoginResponse>> refresh(@RequestBody RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
-        log.info("Refreshing token");
+
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            log.error("Refresh token is empty");
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        log.info("Refreshing token with refresh token: {}",
+                refreshToken.substring(0, Math.min(20, refreshToken.length())) + "...");
+
+        // Декодируем refresh token для проверки issuer
+        try {
+            String[] parts = refreshToken.split("\\.");
+            if (parts.length > 1) {
+                String payload = new String(java.util.Base64.getDecoder().decode(parts[1]));
+                log.info("Refresh token payload: {}", payload);
+            }
+        } catch (Exception e) {
+            log.error("Failed to decode refresh token: {}", e.getMessage());
+        }
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("client_id", clientId);
@@ -119,13 +174,24 @@ public class AuthController {
         body.add("refresh_token", refreshToken);
         body.add("grant_type", "refresh_token");
 
+        log.info("Sending refresh request to Keycloak URL: {}", tokenUri);
+        log.info("Client ID: {}", clientId);
+
         return webClient.post()
                 .uri(tokenUri)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData(body))
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> {
+                    log.error("Keycloak error response status: {}", response.statusCode());
+                    return response.bodyToMono(String.class)
+                            .doOnNext(errorBody -> log.error("Keycloak error body: {}", errorBody))
+                            .then(Mono.error(new RuntimeException("Keycloak token refresh failed: " + response.statusCode())));
+                })
                 .bodyToMono(Map.class)
                 .map(response -> {
+                    log.info("Keycloak response keys: {}", response.keySet());
+
                     LoginResponse loginResponse = LoginResponse.builder()
                             .accessToken((String) response.get("access_token"))
                             .refreshToken((String) response.get("refresh_token"))

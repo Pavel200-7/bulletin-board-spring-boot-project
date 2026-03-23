@@ -39,21 +39,6 @@ public class ChangeContactsTradeAccountRequestTests {
         assertTrue(violations.isEmpty());
     }
 
-    @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "  "})
-    public void shouldForbidBlankContacts(String contacts) {
-        // Arrange
-        ChangeContactsTradeAccountRequest request = createValidRequestBuilder()
-                .contacts(contacts)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
 
     @ParameterizedTest
     @ValueSource(strings = """

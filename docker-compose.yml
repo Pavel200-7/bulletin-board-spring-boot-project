@@ -143,7 +143,7 @@ services:
       - KEYCLOAK_LOGOUT_URI=http://keycloak:8080/realms/oAuth/protocol/openid-connect/logout
       - KEYCLOAK_CLIENT_ID=myclient
       - KEYCLOAK_CLIENT_SECRET=sYXnZMAiSY4ouudztjv73iHyPr5H0dQC
-      - BACKEND_CALLBACK_URI=http://localhost:8080/api/auth/callback
+      - BACKEND_CALLBACK_URI=http://localhost:8080/api/v1/auth/callback
       - FRONTEND_REDIRECT_URI=http://localhost:5173/callback
     networks:
       - app-net
@@ -182,6 +182,8 @@ services:
       # Разное
       - KC_HOSTNAME_URL=http://localhost:8090
       - KC_HOSTNAME_ADMIN_URL=http://localhost:8090 
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_PORT=8090
       - KC_PROXY=edge
       - KC_HTTP_ENABLED=true
       - KC_SPI_COOKIE_DEFAULT_SAMESITE=None

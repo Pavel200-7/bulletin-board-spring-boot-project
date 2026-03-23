@@ -1,6 +1,5 @@
 package com.example.bulletin.application.service.tradeaccount.data.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

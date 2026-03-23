@@ -40,22 +40,6 @@ public class ChangeDescriptionTradeAccountRequestTests {
     }
 
     @ParameterizedTest
-    @NullSource
-    @ValueSource(strings = {"", "  "})
-    public void shouldForbidBlankDescription(String description) {
-        // Arrange
-        ChangeDescriptionTradeAccountRequest request = createValidRequestBuilder()
-                .description(description)
-                .build();
-
-        // Act
-        var violations = validator.validate(request);
-
-        // Assert
-        assertFalse(violations.isEmpty());
-    }
-
-    @ParameterizedTest
     @ValueSource(strings = """
             qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq
             qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq

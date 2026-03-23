@@ -41,6 +41,17 @@ public class TradeAccountServiceImpl implements TradeAccountService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public GetMyTradeAccountResponse getMyTradeAccount(GetMyTradeAccountRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
+
+        TradeAccountResponse response = mapper.toResponse(tradeAccount);
+        return new GetMyTradeAccountResponse(response);
+    }
+
+    @Override
     @Transactional
     public CreateTradeAccountResponse createTradeAccount(CreateTradeAccountRequest request) {
         User owner = userRepository.findById(request.getOwnerId())

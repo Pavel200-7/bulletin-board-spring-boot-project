@@ -23,6 +23,12 @@ public class TradeAccountController {
         return ResponseEntity.ok(service.getTradeAccount(request));
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<GetMyTradeAccountResponse> getMyTradeAccount() {
+        GetMyTradeAccountRequest request = new GetMyTradeAccountRequest();
+        return ResponseEntity.ok(service.getMyTradeAccount(request));
+    }
+
     @PutMapping("/name")
     public ResponseEntity<RenameTradeAccountResponse> changeName(@Valid @RequestBody RenameTradeAccountRequest request) {
         return ResponseEntity.ok(service.renameTradeAccount(request));

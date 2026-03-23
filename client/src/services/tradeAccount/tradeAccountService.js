@@ -15,6 +15,10 @@ export const tradeAccountService = {
     return apiClient.get(`/trade-account/${id}`)
   },
 
+  getMyTradeAccount() {
+    return apiClient.get('/trade-account/my')
+  },
+
   // ========== ОСНОВНЫЕ ДАННЫЕ ==========
 
   /**

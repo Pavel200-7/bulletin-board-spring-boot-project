@@ -37,7 +37,46 @@ const routes = [
         component: () => import('@/views/admin/AdminCategories.vue')
       }
     ]
-  }
+  },
+  {
+    path: '/trade',
+    component: () => import('@/views/trade/TradeProfileLayout.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'settings',
+        name: 'trade-settings',
+        component: () => import('@/views/trade/TradeSettings.vue')
+      },
+      {
+        path: 'drafts',
+        name: 'trade-drafts',
+        component: () => import('@/views/trade/DraftsList.vue')
+      },
+      {
+        path: 'published',
+        name: 'trade-published',
+        component: () => import('@/views/trade/PublishedList.vue')
+      },
+      {
+        path: 'closed',
+        name: 'trade-closed',
+        component: () => import('@/views/trade/ClosedList.vue')
+      }
+    ]
+  },
+{
+  path: '/bulletin/edit/:id',
+  name: 'bulletin-edit',
+  component: () => import('@/views/bulletin/BulletinEditPage.vue'),
+  meta: { requiresAuth: true }
+},
+{
+  path: '/bulletin/view/:id',
+  name: 'bulletin-view',
+  component: () => import('@/views/bulletin/BulletinViewPage.vue'),
+  meta: { requiresAuth: false }
+}
 ]
 
 const router = createRouter({

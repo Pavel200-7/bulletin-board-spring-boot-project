@@ -1,7 +1,5 @@
 package com.example.bulletin.application.service.tradeaccount.data.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +13,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangeContactsTradeAccountRequest {
-    @NotBlank
     @Length(min = 0, max = 300)
     private String contacts;
 }

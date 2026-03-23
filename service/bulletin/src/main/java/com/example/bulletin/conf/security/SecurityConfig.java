@@ -101,6 +101,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/close").authenticated()
 
                         // TradeAccountController - все PUT запросы требуют аутентификации
+                        .requestMatchers(HttpMethod.GET, "/api/v1/trade-account/my").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/name").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/phone").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/contacts").authenticated()

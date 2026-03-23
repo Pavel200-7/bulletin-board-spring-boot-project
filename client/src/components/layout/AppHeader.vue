@@ -11,6 +11,9 @@
       <AnonymousBadge v-else-if="isAnonymous" />
       
       <!-- Кнопки действий -->
+      <router-link v-if="isAuthenticated" to="/trade" class="nav-link">
+        🏪 Торговый профиль
+      </router-link>
       <AdminButton v-if="isAdmin" @click="goToAdmin" />
       <LogoutButton v-if="isAuthenticated" @click="handleLogout" />
       <LoginButton v-if="isAnonymous" @click="handleLogin" />
@@ -32,19 +35,15 @@ const { isAuthenticated, isAnonymous, isAdmin, logout, login } = useAuth()
 const router = useRouter()
 
 const handleLogout = async () => {
-  console.log('Logout clicked')
   await logout()
   router.push('/')
 }
 
-const handleLogin = async () => {
-  console.log('Logout clicked')
-  await logout()
+const handleLogin = () => {
   router.push('/')
 }
 
 const goToAdmin = () => {
-  console.log('Admin button clicked')
   router.push('/admin')
 }
 </script>
@@ -69,5 +68,17 @@ const goToAdmin = () => {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.nav-link:hover {
+  background: #5a67d8;
 }
 </style>

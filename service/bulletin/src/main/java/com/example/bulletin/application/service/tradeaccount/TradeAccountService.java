@@ -5,6 +5,7 @@ import com.example.bulletin.application.service.tradeaccount.data.response.*;
 
 public interface TradeAccountService {
     GetTradeAccountResponse getTradeAccount(GetTradeAccountRequest request);
+    GetMyTradeAccountResponse getMyTradeAccount(GetMyTradeAccountRequest request);
     CreateTradeAccountResponse createTradeAccount(CreateTradeAccountRequest request);
     RenameTradeAccountResponse renameTradeAccount(RenameTradeAccountRequest request);
     ChangePhoneTradeAccountResponse changePhone(ChangePhoneTradeAccountRequest request);
