@@ -1,27 +1,25 @@
-<!-- src/App.vue -->
-<template>
-  <router-view />
-</template>
-
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useAuth } from './composables/useAuth'
 import { useRouter } from 'vue-router'
 
-const { initAuth, isAuthenticated } = useAuth()
+const { initAuth, isAuthenticated, stopTokenRefreshTimer } = useAuth()
 const router = useRouter()
 
 onMounted(() => {
-  console.log('App mounted')  
-  console.log('Current path:', router.currentRoute.value.path) 
-  console.log('Hash:', window.location.hash) 
   if (initAuth()) {
-    console.log('initAuth returned true')  
-
     router.push('/home')
   }
 })
+
+onUnmounted(() => {
+  stopTokenRefreshTimer()
+})
 </script>
+
+<template>
+  <router-view />
+</template>
 
 <style>
 * {

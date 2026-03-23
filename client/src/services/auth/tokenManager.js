@@ -5,10 +5,6 @@ const REFRESH_TOKEN_KEY = 'refresh_token'
 
 export const tokenManager = {
   setTokens(accessToken, refreshToken) {
-    // console.log(accessToken)
-    // console.log(refreshToken)
-
-
     if (accessToken) {
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
     }
@@ -45,6 +41,18 @@ export const tokenManager = {
     } catch (e) {
       console.error('Ошибка при декодировании токена:', e)
       return true
+    }
+  },
+
+    getTokenExpirationTime() {
+    const token = this.getAccessToken()
+    if (!token) return null
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.exp * 1000
+    } catch (e) {
+      return null
     }
   }
 }
