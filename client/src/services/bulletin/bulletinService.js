@@ -90,8 +90,9 @@ export const bulletinService = {
    * Обновить существующее объявление
    */
   updateBulletin(bulletinRequest) {
-    return apiClient.put('/bulletin', { bulletinRequest })
-  },
+  console.log('bulletinService.updateBulletin called with:', bulletinRequest)
+  return apiClient.put('/bulletin', bulletinRequest)
+},
 
   // ========== ИЗМЕНЕНИЕ СТАТУСА ==========
 

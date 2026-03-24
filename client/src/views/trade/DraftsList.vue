@@ -2,20 +2,42 @@
 <template>
   <div class="drafts-list">
     <div class="list-header">
-      <h2>Черновики</h2>
-      <SearchBar @search="handleSearch" />
+      <h2>Мои объявления</h2>
+      <div class="header-actions">
+        <div class="tabs">
+          <button 
+            class="tab" 
+            :class="{ active: activeTab === 'drafts' }"
+            @click="switchTab('drafts')"
+          >
+            Черновики
+          </button>
+          <button 
+            class="tab" 
+            :class="{ active: activeTab === 'approved' }"
+            @click="switchTab('approved')"
+          >
+            Готовы к публикации
+          </button>
+        </div>
+        <SearchBar @search="handleSearch" />
+        <button class="btn-create" @click="createNew">
+          + Создать объявление
+        </button>
+      </div>
     </div>
     
     <div v-if="loading" class="loading">Загрузка...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else-if="bulletins.length === 0" class="empty">
-      Нет черновиков
+      {{ activeTab === 'drafts' ? 'Нет черновиков' : 'Нет объявлений, готовых к публикации' }}
     </div>
     <div v-else class="list-content">
       <BulletinCard 
         v-for="item in bulletins" 
         :key="item.id"
         :bulletin="item"
+        :highlight="item.state === 'APPROVED'"
         @click="goToEdit(item.id)"
       />
     </div>
@@ -48,11 +70,16 @@ import SearchBar from './components/SearchBar.vue'
 import BulletinCard from './components/BulletinCard.vue'
 
 const router = useRouter()
-const { bulletins, loading, error, pagination, fetchMyDrafts } = useBulletin()
+const { bulletins, loading, error, pagination, fetchMyDrafts, fetchMyApproved } = useBulletin()
 const searchQuery = ref('')
+const activeTab = ref('drafts')
 
 const loadData = async (page = 0, title = null) => {
-  await fetchMyDrafts(page, 20, title)
+  if (activeTab.value === 'drafts') {
+    await fetchMyDrafts(page, 20, title)
+  } else {
+    await fetchMyApproved(page, 20)
+  }
 }
 
 const loadPage = (page) => {
@@ -65,7 +92,17 @@ const handleSearch = (query) => {
 }
 
 const goToEdit = (id) => {
-  router.push(`/bulletin/edit/${id}`)
+  router.push(`/trade/bulletin/edit/${id}`)
+}
+
+const createNew = () => {
+  router.push('/trade/bulletin/edit/new')
+}
+
+const switchTab = (tab) => {
+  activeTab.value = tab
+  searchQuery.value = ''
+  loadData(0, null)
 }
 
 onMounted(() => {
@@ -85,11 +122,48 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .list-header h2 {
   margin: 0;
   color: #333;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: #f7fafc;
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab:hover:not(.active) {
+  background: #edf2f7;
 }
 
 .loading, .error, .empty {
@@ -129,5 +203,19 @@ onMounted(() => {
 .page-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-create {
+  padding: 0.5rem 1rem;
+  background: #48bb78;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-create:hover {
+  background: #38a169;
 }
 </style>

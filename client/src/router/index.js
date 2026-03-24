@@ -62,21 +62,27 @@ const routes = [
         path: 'closed',
         name: 'trade-closed',
         component: () => import('@/views/trade/ClosedList.vue')
+      },
+      {
+        path: 'bulletin/edit/new',
+        name: 'bulletin-create',
+        component: () => import('@/views/bulletin/BulletinEditPage.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'bulletin/edit/:id',
+        name: 'bulletin-edit',
+        component: () => import('@/views/bulletin/BulletinEditPage.vue'),
+        meta: { requiresAuth: true }
       }
     ]
   },
-{
-  path: '/bulletin/edit/:id',
-  name: 'bulletin-edit',
-  component: () => import('@/views/bulletin/BulletinEditPage.vue'),
-  meta: { requiresAuth: true }
-},
-{
-  path: '/bulletin/view/:id',
-  name: 'bulletin-view',
-  component: () => import('@/views/bulletin/BulletinViewPage.vue'),
-  meta: { requiresAuth: false }
-}
+  {
+    path: '/bulletin/view/:id',
+    name: 'bulletin-view',
+    component: () => import('@/views/bulletin/BulletinViewPage.vue'),
+    meta: { requiresAuth: false }
+  }
 ]
 
 const router = createRouter({

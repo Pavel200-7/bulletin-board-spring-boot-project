@@ -66,22 +66,21 @@ export function useBulletin() {
     return response
   }
 
-const fetchMyDrafts = async (page = 0, size = 20, title = null) => {
-  return fetchMyBulletins({ page, size, state: 'MODIFIABLE', title })
-}
+  const fetchMyDrafts = async (page = 0, size = 20, title = null) => {
+    return fetchMyBulletins({ page, size, state: 'MODIFIABLE', title })
+  }
 
-const fetchMyPublished = async (page = 0, size = 20, title = null) => {
-  return fetchMyBulletins({ page, size, state: 'PUBLISHED', title })
-}
+  const fetchMyPublished = async (page = 0, size = 20, title = null) => {
+    return fetchMyBulletins({ page, size, state: 'PUBLISHED', title })
+  }
 
-const fetchMyCompleted = async (page = 0, size = 20, title = null) => {
-  return fetchMyBulletins({ page, size, state: 'COMPLETED', title })
-}
+  const fetchMyCompleted = async (page = 0, size = 20, title = null) => {
+    return fetchMyBulletins({ page, size, state: 'COMPLETED', title })
+  }
 
-const fetchMyApproved = async (page = 0, size = 20) => {
-  return fetchMyBulletins({ page, size, state: 'APPROVED' })
-}
-
+  const fetchMyApproved = async (page = 0, size = 20, title = null) => {
+    return fetchMyBulletins({ page, size, state: 'APPROVED', title })
+  }
 
   // ========== СОЗДАНИЕ И РЕДАКТИРОВАНИЕ ==========
 
@@ -91,22 +90,55 @@ const fetchMyApproved = async (page = 0, size = 20) => {
     return response
   }
 
-  const updateBulletin = async (bulletinRequest) => {
-    const response = await handleRequest(() => bulletinService.updateBulletin(bulletinRequest))
+  const updateBulletin = async (data) => {  
+    const payload = {
+      bulletinRequest: data.bulletinRequest
+    }
+    
+    const response = await handleRequest(() => bulletinService.updateBulletin(payload))
+    console.log('updateBulletin response:', response.data)
     bulletin.value = response.data?.bulletinResponse || response.data
     return response
   }
 
   // ========== ИЗМЕНЕНИЕ СТАТУСА ==========
 
-  const approveAndPublish = async (bulletinId) => {
-    return handleRequest(() => bulletinService.approveAndPublish(bulletinId))
+  /**
+   * Подтвердить объявление (проверка валидности)
+   * @param {string} bulletinId - ID объявления
+   */
+  const approve = async (bulletinId) => {
+    console.log('=== approve вызван ===', bulletinId)
+    try {
+      const response = await handleRequest(() => bulletinService.approveAndPublish(bulletinId))
+      console.log('approve response:', response.data)
+      return response
+    } catch (err) {
+      console.error('approve error:', err)
+      throw err
+    }
   }
 
+  /**
+   * Опубликовать объявление (только если оно подтверждено)
+   * @param {string} bulletinId - ID объявления
+   */
   const publishBulletin = async (bulletinId) => {
-    return handleRequest(() => bulletinService.publishBulletin(bulletinId))
+    console.log('=== publishBulletin вызван ===', bulletinId)
+    try {
+      const response = await handleRequest(() => bulletinService.publishBulletin(bulletinId))
+      console.log('publishBulletin response:', response.data)
+      return response
+    } catch (err) {
+      console.error('publishBulletin error:', err)
+      throw err
+    }
   }
 
+  /**
+   * Закрыть объявление
+   * @param {string} bulletinId - ID объявления
+   */
   const closeBulletin = async (bulletinId) => {
     return handleRequest(() => bulletinService.closeBulletin(bulletinId))
   }
@@ -144,7 +176,7 @@ const fetchMyApproved = async (page = 0, size = 20) => {
     fetchMyCompleted,
     createDraft,
     updateBulletin,
-    approveAndPublish,
+    approve,  // переименовано
     publishBulletin,
     closeBulletin,
     addImage,
