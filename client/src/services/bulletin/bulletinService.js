@@ -99,7 +99,7 @@ export const bulletinService = {
   /**
    * Проверить объявление перед публикацией
    */
-  approveAndPublish(bulletinId) {
+  approveBulletin(bulletinId) {
     return apiClient.put('/bulletin/approve', { bulletinId })
   },
 

@@ -110,7 +110,7 @@ export function useBulletin() {
   const approve = async (bulletinId) => {
     console.log('=== approve вызван ===', bulletinId)
     try {
-      const response = await handleRequest(() => bulletinService.approveAndPublish(bulletinId))
+      const response = await handleRequest(() => bulletinService.approveBulletin(bulletinId))
       console.log('approve response:', response.data)
       return response
     } catch (err) {
