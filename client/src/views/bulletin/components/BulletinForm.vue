@@ -30,14 +30,22 @@
     <CategorySelector
       v-model="formData.categoryId"
       :error="errors.categoryId"
-      @update:model-value="handleCategoryChange"
     />
     
     <CharacteristicsEditor
       v-model="formData.characteristics"
       :category-id="formData.categoryId"
       :error="errors.characteristics"
-      :key="editorKey"
+    />
+    
+    <ImageUploader
+      :key="uploaderKey"
+      :bulletin-id="bulletinId"
+      :existing-files="formData.images"
+      @upload="handleImageUpload"
+      @delete="handleImageDelete"
+      @set-main="handleSetMainImage"
+      @files-updated="handleFilesUpdated"
     />
     
     <div class="form-actions">
@@ -52,12 +60,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import { useCategory } from '@/composables/useCategory'
-import TextField from './TextField.vue'
-import TextareaField from './TextareaField.vue'
-import CategorySelector from './CategorySelector.vue'
-import CharacteristicsEditor from './CharacteristicsEditor.vue'
+import { useBulletin } from '@/composables/useBulletin'
+import TextField from './wigets/TextField.vue'
+import TextareaField from './wigets/TextareaField.vue'
+import CategorySelector from './category/CategorySelector.vue'
+import CharacteristicsEditor from './characteristic/CharacteristicsEditor.vue'
+import ImageUploader from './image/ImageUploader.vue'
 
 const props = defineProps({
   bulletin: {
@@ -77,13 +87,18 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'cancel'])
 
 const { fetchCategory } = useCategory()
+const { addImage, removeImage, setMainImage } = useBulletin()
+
+const bulletinId = computed(() => props.bulletin?.id || null)
+const uploaderKey = ref(0)
 
 const formData = ref({
   title: '',
   description: '',
   price: '',
   categoryId: '',
-  characteristics: []
+  characteristics: [],
+  images: []
 })
 
 const errors = ref({
@@ -94,8 +109,7 @@ const errors = ref({
   characteristics: ''
 })
 
-// Ключ для принудительного обновления CharacteristicsEditor
-const editorKey = ref(0)
+const isUpdatingFromProps = ref(false)
 
 const validateCategoryIsLeaf = async (categoryId) => {
   if (!categoryId) return false
@@ -110,55 +124,65 @@ const validateCategoryIsLeaf = async (categoryId) => {
   }
 }
 
-// Обработчик изменения категории
-const handleCategoryChange = (newCategoryId) => {
-  console.log('Категория изменена на:', newCategoryId)
-  
-  // Если категория изменилась (и это не пустое значение)
-  if (newCategoryId !== formData.value.categoryId) {
-    // Сбрасываем характеристики
-    formData.value.characteristics = []
-    // Принудительно обновляем CharacteristicsEditor
-    editorKey.value++
-    console.log('Характеристики сброшены')
+const handleImageUpload = async ({ fileId, bulletinId: id }) => {
+  if (id) {
+    await addImage(id, fileId)
   }
 }
 
-// Преобразуем данные из бэкенда в формат формы
+const handleImageDelete = async ({ fileId, bulletinId: id }) => {
+  if (id) {
+    await removeImage(id, fileId)
+  }
+}
+
+const handleSetMainImage = async ({ imageId, bulletinId: id }) => {
+  if (id) {
+    await setMainImage(id, imageId)
+  }
+}
+
+const handleFilesUpdated = (files) => {
+  if (!isUpdatingFromProps.value) {
+    formData.value.images = files
+  }
+}
+
 const transformBulletinToForm = (bulletinData) => {
   if (!bulletinData) return null
   
-  console.log('Преобразование данных из бэкенда:', bulletinData)
+  const characteristics = (bulletinData.characteristics || []).map(char => ({
+    characteristicId: char.name?.id || char.characteristicId,
+    characteristicValueId: char.value?.id || char.characteristicValueId
+  }))
   
-  // Преобразуем характеристики
-  const characteristics = (bulletinData.characteristics || []).map(char => {
-    return {
-      characteristicId: char.name?.id || char.characteristicId,
-      characteristicValueId: char.value?.id || char.characteristicValueId
-    }
-  })
-  
-  console.log('Преобразованные характеристики:', characteristics)
+  const images = (bulletinData.images || []).map(img => ({
+    id: img.id,              // ← ID в БД (bulletin_image.id)
+    minioId: img.imageId,    // ← ID в MinIO (для URL)
+    main: img.main || false
+  }))
   
   return {
     title: bulletinData.title || '',
     description: bulletinData.description || '',
     price: bulletinData.price || '',
     categoryId: bulletinData.category?.id || '',
-    characteristics: characteristics
+    characteristics: characteristics,
+    images: images
   }
 }
 
-// Следим за изменением bulletin и обновляем форму
 watch(() => props.bulletin, (newBulletin) => {
   if (newBulletin) {
+    isUpdatingFromProps.value = true
     const transformed = transformBulletinToForm(newBulletin)
     if (transformed) {
       formData.value = transformed
-      console.log('Форма обновлена:', formData.value)
-      // Сбрасываем ключ редактора
-      editorKey.value++
+      uploaderKey.value++
     }
+    nextTick(() => {
+      isUpdatingFromProps.value = false
+    })
   }
 }, { immediate: true, deep: true })
 
@@ -202,21 +226,17 @@ const validate = async () => {
 }
 
 const handleSubmit = async () => {
-  console.log('Форма отправлена, данные:', formData.value)
-  
   if (await validate()) {
     const submitData = {
       title: formData.value.title,
       description: formData.value.description,
       price: parseFloat(formData.value.price),
       categoryId: formData.value.categoryId,
-      characteristics: formData.value.characteristics.filter(c => c.characteristicId && c.characteristicValueId)
+      characteristics: formData.value.characteristics.filter(c => c.characteristicId && c.characteristicValueId),
+      images: formData.value.images
     }
     
-    console.log('Отправляем данные:', submitData)
     emit('submit', submitData)
-  } else {
-    console.log('Валидация не пройдена')
   }
 }
 </script>

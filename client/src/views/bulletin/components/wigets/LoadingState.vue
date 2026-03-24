@@ -1,3 +1,4 @@
+<!-- src/views/bulletin/components/wigets/LoadingState.vue -->
 <template>
   <div class="loading">
     <div class="spinner"></div>

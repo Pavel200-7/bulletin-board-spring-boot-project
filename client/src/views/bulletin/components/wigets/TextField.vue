@@ -1,41 +1,35 @@
+<!-- src/views/bulletin/components/wigets/TextField.vue -->
 <template>
   <div class="form-group" :class="{ 'has-error': error }">
     <label>
       {{ label }}
       <span v-if="required" class="required-star">*</span>
     </label>
-    <textarea
+    <input
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
-      :rows="rows"
+      :type="type"
       :placeholder="placeholder"
-      :maxlength="maxLength"
-      class="form-textarea"
+      class="form-input"
       :class="{ 'has-error': error }"
-    ></textarea>
+    />
     <div v-if="error" class="field-error">{{ error }}</div>
-    <div v-if="hint" class="field-hint">
-      {{ hint }}
-      <span v-if="maxLength && modelValue?.length">
-        ({{ modelValue.length }}/{{ maxLength }})
-      </span>
-    </div>
+    <div v-if="hint" class="field-hint">{{ hint }}</div>
   </div>
 </template>
 
 <script setup>
 defineProps({
-  modelValue: String,
+  modelValue: [String, Number],
   label: String,
-  rows: {
-    type: [String, Number],
-    default: 3
+  type: {
+    type: String,
+    default: 'text'
   },
   placeholder: String,
   required: Boolean,
   error: String,
-  hint: String,
-  maxLength: [String, Number]
+  hint: String
 })
 
 defineEmits(['update:modelValue'])
@@ -62,22 +56,20 @@ defineEmits(['update:modelValue'])
   margin-left: 2px;
 }
 
-.form-textarea {
+.form-input {
   padding: 0.5rem;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
   font-size: 0.875rem;
-  font-family: inherit;
-  resize: vertical;
   transition: all 0.2s;
 }
 
-.form-textarea:focus {
+.form-input:focus {
   outline: none;
   border-color: #667eea;
 }
 
-.form-textarea.has-error {
+.form-input.has-error {
   border-color: #e53e3e;
 }
 

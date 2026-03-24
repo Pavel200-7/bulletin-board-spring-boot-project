@@ -1,4 +1,4 @@
-<!-- src/views/bulletin/components/CategorySelector.vue -->
+<!-- src/views/bulletin/components/category/CategorySelector.vue -->
 <template>
   <div class="category-selector" :class="{ 'has-error': error }">
     <label>Категория *</label>

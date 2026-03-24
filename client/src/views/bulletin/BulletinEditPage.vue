@@ -9,25 +9,20 @@
         </span>
       </div>
       <div class="header-right">
-        <button 
+        <ApproveButton 
           v-if="!isNew && bulletin && bulletin.state === 'MODIFIABLE'" 
-          class="btn-approve" 
+          :loading="approving"
           @click="handleApprove"
-          :disabled="approving"
-        >
-          {{ approving ? 'Проверка...' : 'Проверить и подтвердить' }}
-        </button>
-        <button 
+        />
+        <PublishButton 
           v-if="!isNew && bulletin && bulletin.state === 'APPROVED'" 
-          class="btn-publish" 
+          :loading="publishing"
           @click="handlePublish"
-          :disabled="publishing"
-        >
-          {{ publishing ? 'Публикация...' : 'Опубликовать' }}
-        </button>
-        <button v-if="!isNew && bulletin" class="btn-preview" @click="preview">
-          Предпросмотр
-        </button>
+        />
+        <PreviewButton 
+          v-if="!isNew && bulletin" 
+          @click="preview"
+        />
       </div>
     </div>
 
@@ -49,43 +44,21 @@
       @cancel="goBack"
     />
     
-    <!-- Модальное окно подтверждения -->
-    <div v-if="showApproveModal" class="modal-overlay" @click.self="showApproveModal = false">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Подтверждение объявления</h3>
-        </div>
-        <div class="modal-body">
-          <p>Проверить объявление на валидность?</p>
-          <p>После подтверждения объявление получит статус "Готов к публикации".</p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="showApproveModal = false">Отмена</button>
-          <button class="btn-confirm" @click="confirmApprove" :disabled="approving">
-            {{ approving ? 'Проверка...' : 'Подтвердить' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ApproveModal
+      :show="showApproveModal"
+      :loading="approving"
+      @confirm="confirmApprove"
+      @cancel="showApproveModal = false"
+      @close="showApproveModal = false"
+    />
     
-    <!-- Модальное окно публикации -->
-    <div v-if="showPublishModal" class="modal-overlay" @click.self="showPublishModal = false">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Публикация объявления</h3>
-        </div>
-        <div class="modal-body">
-          <p>Вы уверены, что хотите опубликовать это объявление?</p>
-          <p>После публикации оно станет доступно всем пользователям.</p>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-cancel" @click="showPublishModal = false">Отмена</button>
-          <button class="btn-confirm" @click="confirmPublish" :disabled="publishing">
-            {{ publishing ? 'Публикация...' : 'Опубликовать' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <PublishModal
+      :show="showPublishModal"
+      :loading="publishing"
+      @confirm="confirmPublish"
+      @cancel="showPublishModal = false"
+      @close="showPublishModal = false"
+    />
   </div>
 </template>
 
@@ -93,9 +66,14 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBulletin } from '@/composables/useBulletin'
-import LoadingState from './components/LoadingState.vue'
-import ErrorState from './components/ErrorState.vue'
+import LoadingState from './components/wigets/LoadingState.vue'
+import ErrorState from './components/wigets/ErrorState.vue'
 import BulletinForm from './components/BulletinForm.vue'
+import ApproveButton from './components/buttons/ApproveButton.vue'
+import PublishButton from './components/buttons/PublishButton.vue'
+import PreviewButton from './components/buttons/PreviewButton.vue'
+import ApproveModal from './components/modals/ApproveModal.vue'
+import PublishModal from './components/modals/PublishModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -202,7 +180,6 @@ const handleSubmit = async (formData) => {
     
     await updateBulletin({ bulletinRequest })
     
-    // Перезагружаем данные
     await fetchEditableBulletin(bulletinIdToSave)
     
     alert('Объявление успешно сохранено!')
@@ -231,7 +208,6 @@ const confirmApprove = async () => {
   approving.value = true
   try {
     await approve(bulletin.value.id)
-    // Перезагружаем данные
     await fetchEditableBulletin(bulletin.value.id)
     alert('Объявление успешно подтверждено! Теперь его можно опубликовать.')
     showApproveModal.value = false
@@ -251,7 +227,6 @@ const confirmPublish = async () => {
   publishing.value = true
   try {
     await publishBulletin(bulletin.value.id)
-    // Перезагружаем данные
     await fetchEditableBulletin(bulletin.value.id)
     alert('Объявление успешно опубликовано!')
     showPublishModal.value = false
@@ -340,127 +315,5 @@ onMounted(async () => {
 .status-completed {
   background: #fed7d7;
   color: #c53030;
-}
-
-.btn-preview, .btn-approve, .btn-publish {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.btn-preview {
-  background: #667eea;
-  color: white;
-}
-
-.btn-preview:hover {
-  background: #5a67d8;
-}
-
-.btn-approve {
-  background: #f59e0b;
-  color: white;
-}
-
-.btn-approve:hover:not(:disabled) {
-  background: #d97706;
-}
-
-.btn-publish {
-  background: #48bb78;
-  color: white;
-}
-
-.btn-publish:hover:not(:disabled) {
-  background: #38a169;
-}
-
-.btn-approve:disabled, .btn-publish:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Модальное окно */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: white;
-  width: 400px;
-  max-width: 90%;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.modal-header {
-  padding: 1rem;
-  background: #f7fafc;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.modal-header h3 {
-  margin: 0;
-  color: #333;
-}
-
-.modal-body {
-  padding: 1rem;
-}
-
-.modal-body p {
-  margin: 0.5rem 0;
-  color: #4a5568;
-}
-
-.modal-footer {
-  padding: 1rem;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-}
-
-.btn-cancel {
-  padding: 0.5rem 1rem;
-  background: #e2e8f0;
-  color: #4a5568;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-cancel:hover {
-  background: #cbd5e0;
-}
-
-.btn-confirm {
-  padding: 0.5rem 1rem;
-  background: #48bb78;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-confirm:hover:not(:disabled) {
-  background: #38a169;
-}
-
-.btn-confirm:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 </style>

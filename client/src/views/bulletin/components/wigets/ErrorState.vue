@@ -1,3 +1,4 @@
+<!-- src/views/bulletin/components/wigets/ErrorState.vue -->
 <template>
   <div class="error-container">
     <div class="error-icon">⚠️</div>

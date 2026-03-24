@@ -1,4 +1,4 @@
-<!-- src/views/bulletin/components/CategoryNode.vue -->
+<!-- src/views/bulletin/components/category/CategoryNode.vue -->
 <template>
   <div class="category-node">
     <div 
