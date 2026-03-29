@@ -21,19 +21,19 @@
         v-if="hasMultipleImages" 
         class="gallery-btn next" 
         @click="nextImage"
-        :disabled="currentIndex === images.length - 1"
+        :disabled="currentIndex === sortedImages.length - 1"
       >
         →
       </button>
       <div class="image-counter" v-if="hasMultipleImages">
-        {{ currentIndex + 1 }} / {{ images.length }}
+        {{ currentIndex + 1 }} / {{ sortedImages.length }}
       </div>
     </div>
 
     <!-- Миниатюры -->
     <div v-if="hasMultipleImages" class="thumbnails">
       <div 
-        v-for="(image, index) in images" 
+        v-for="(image, index) in sortedImages" 
         :key="image.id"
         class="thumbnail"
         :class="{ active: currentIndex === index }"
@@ -76,7 +76,20 @@ const props = defineProps({
 const currentIndex = ref(0)
 const lightboxOpen = ref(false)
 
-const hasMultipleImages = computed(() => props.images.length > 1)
+// Сортировка изображений: главное (main: true) первым
+const sortedImages = computed(() => {
+  const images = [...props.images]
+  return images.sort((a, b) => {
+    // Если a главное, а b нет → a вперёд
+    if (a.main === true && b.main !== true) return -1
+    // Если b главное, а a нет → b вперёд
+    if (a.main !== true && b.main === true) return 1
+    // Иначе порядок не меняем
+    return 0
+  })
+})
+
+const hasMultipleImages = computed(() => sortedImages.value.length > 1)
 
 const getImageUrl = (image) => {
   if (!image) return '/images/image-placeholder.svg'
@@ -88,13 +101,13 @@ const getImageUrl = (image) => {
 }
 
 const currentImage = computed(() => {
-  if (!props.images.length) return '/images/image-placeholder.svg'
-  const image = props.images[currentIndex.value]
+  if (!sortedImages.value.length) return '/images/image-placeholder.svg'
+  const image = sortedImages.value[currentIndex.value]
   return getImageUrl(image)
 })
 
 const imageUrls = computed(() => {
-  return props.images.map(img => getImageUrl(img))
+  return sortedImages.value.map(img => getImageUrl(img))
 })
 
 const prevImage = () => {
@@ -104,13 +117,13 @@ const prevImage = () => {
 }
 
 const nextImage = () => {
-  if (currentIndex.value < props.images.length - 1) {
+  if (currentIndex.value < sortedImages.value.length - 1) {
     currentIndex.value++
   }
 }
 
 const openLightbox = () => {
-  if (props.images.length > 0) {
+  if (sortedImages.value.length > 0) {
     lightboxOpen.value = true
   }
 }

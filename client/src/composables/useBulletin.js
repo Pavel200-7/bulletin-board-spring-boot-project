@@ -38,15 +38,35 @@ export function useBulletin() {
   }
 
   const fetchPublishedBulletins = async (params = {}) => {
-    const response = await handleRequest(() => bulletinService.getPublishedBulletins(params))
-    const data = response.data
-    bulletins.value = data.content || []
+    const { page = 0, size = 15, criteria = {} } = params
+    
+    // Подготавливаем параметры для сервиса
+    const requestParams = {
+      page,
+      size,
+      criteria: {
+        title: criteria.title || null,
+        minPrice: criteria.minPrice ?? null,
+        maxPrice: criteria.maxPrice ?? null,
+        categoryId: criteria.categoryId || null,
+        characteristicValueIds: criteria.characteristicValueIds || null,
+        orderBy: criteria.orderBy || 'TITLE',
+        direction: criteria.direction || 'ASC'
+      }
+    }    
+    const response = await handleRequest(() => bulletinService.getPublishedBulletins(requestParams))
+    
+    // Получаем данные (бэкенд возвращает в поле page)
+    const pageData = response.data?.page || response.data
+    
+    bulletins.value = pageData?.content || []
     pagination.value = {
-      page: params.page || 0,
-      size: params.size || 20,
-      totalPages: data.totalPages,
-      totalElements: data.totalElements
+      page,
+      size,
+      totalPages: pageData?.totalPages || 0,
+      totalElements: pageData?.totalElements || 0
     }
+        
     return response
   }
 

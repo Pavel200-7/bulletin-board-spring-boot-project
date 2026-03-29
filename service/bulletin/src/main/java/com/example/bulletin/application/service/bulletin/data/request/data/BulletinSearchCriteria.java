@@ -16,8 +16,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BulletinSearchCriteria {
     private String title;
-    private double minPrice;
-    private double maxPrice;
+    private Double minPrice;
+    private Double maxPrice;
     private UUID categoryId;
     private List<UUID> characteristicValueIds;
     private UUID ownerId;

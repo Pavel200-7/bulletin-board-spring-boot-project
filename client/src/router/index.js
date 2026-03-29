@@ -18,7 +18,7 @@ const routes = [
   {
     path: '/home',
     name: 'home',
-    component: () => import('@/views/HomePage.vue'),
+    component: () => import('@/views/home/HomePage.vue'),
     meta: { requiresAuth: false }
   },
   {
@@ -81,6 +81,12 @@ const routes = [
     path: '/bulletin/view/:id',
     name: 'bulletin-view',
     component: () => import('@/views/bulletin/BulletinViewPage.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/search',
+    name: 'bulletin-search',
+    component: () => import('@/views/bulletin/SearchResultsPage.vue'),
     meta: { requiresAuth: false }
   }
 ]

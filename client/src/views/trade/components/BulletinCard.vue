@@ -5,7 +5,6 @@
       <h3 class="card-title">{{ bulletin.title }}</h3>
       <span class="card-state" :class="stateClass">{{ stateText }}</span>
     </div>
-    <p class="card-description">{{ bulletin.description || 'Нет описания' }}</p>
     <div class="card-footer">
       <span class="card-price">{{ formatPrice(bulletin.price) }} ₽</span>
       <span class="card-date">{{ formatDate(bulletin.createdAt) }}</span>

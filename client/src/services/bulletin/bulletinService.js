@@ -29,7 +29,9 @@ export const bulletinService = {
       pageData: { page, size },
       criteria
     }
-    return apiClient.post('/bulletin/page', request)
+    const response = apiClient.post('/bulletin/page', request)
+
+    return response;
   },
 
    /**

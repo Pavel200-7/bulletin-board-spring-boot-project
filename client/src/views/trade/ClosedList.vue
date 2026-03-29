@@ -12,11 +12,10 @@
       Нет закрытых объявлений
     </div>
     <div v-else class="list-content">
-      <BulletinCard 
+      <ClosedBulletinCard 
         v-for="item in bulletins" 
         :key="item.id"
         :bulletin="item"
-        @click="goToView(item.id)"
       />
     </div>
     
@@ -42,12 +41,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { useBulletin } from '@/composables/useBulletin'
 import SearchBar from './components/SearchBar.vue'
-import BulletinCard from './components/BulletinCard.vue'
+import ClosedBulletinCard from './components/ClosedBulletinCard.vue'
 
-const router = useRouter()
 const { bulletins, loading, error, pagination, fetchMyCompleted } = useBulletin()
 const searchQuery = ref('')
 
@@ -62,10 +59,6 @@ const loadPage = (page) => {
 const handleSearch = (query) => {
   searchQuery.value = query
   loadData(0, query)
-}
-
-const goToView = (id) => {
-  router.push(`/bulletin/view/${id}`)
 }
 
 onMounted(() => {
