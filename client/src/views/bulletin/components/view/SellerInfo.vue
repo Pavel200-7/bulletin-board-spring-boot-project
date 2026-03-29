@@ -18,6 +18,12 @@
       <div class="seller-arrow">▶</div>
     </div>
     
+    <!-- Кнопка подписки (только для авторизованных) -->
+    <SubscribeButton 
+      v-if="isAuthenticated" 
+      :owner-id="ownerId"
+    />
+    
     <SellerModal
       :show="showModal"
       :owner-id="ownerId"
@@ -28,8 +34,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 import { useTradeAccount } from '@/composables/useTradeAccount'
 import SellerModal from '../modals/SellerModal.vue'
+import SubscribeButton from '../buttons/SubscribeButton.vue'
 
 const props = defineProps({
   ownerId: {
@@ -38,6 +46,7 @@ const props = defineProps({
   }
 })
 
+const { isAuthenticated } = useAuth()
 const { fetchTradeAccountByUserId, account } = useTradeAccount()
 const showModal = ref(false)
 const sellerName = ref('')

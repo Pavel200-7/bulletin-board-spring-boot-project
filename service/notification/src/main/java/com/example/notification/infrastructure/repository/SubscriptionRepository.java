@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -30,13 +31,13 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     );
 
     @Query(value = """
-            SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+            SELECT s
             FROM Subscription s
             WHERE s.ownerInfo.owner.id = :ownerId
             AND s.type = :type
             AND s.publisherId = :publisherId
             """)
-    boolean existsByCurrentUserTypeAndPublisher(
+    Optional<Subscription> findByCurrentUserTypeAndPublisher(
             @Param("ownerId") UUID ownerId,
             @Param("type") NotificationType type,
             @Param("publisherId") UUID publisherId

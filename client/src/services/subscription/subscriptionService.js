@@ -13,10 +13,20 @@ export const subscriptionService = {
   },
 
   /**
+   * Проверить существование подписки по критериям
+   * @param {string} subscriptionType - тип уведомления
+   * @param {string} publisherId - ID издателя
+   * @returns {Promise<{exists: boolean, subscriptionResponse: object|null}>}
+   */
+  existsByCriteria(subscriptionType, publisherId) {
+    return apiClient.get(`/subscription/exists/${subscriptionType}/${publisherId}`)
+  },
+
+  /**
    * Создать новую подписку
    * @param {Object} data - данные подписки
-   * @param {string} data.subscriptionType - тип уведомления (BULLETIN_PUBLISHED, TEST_USER_NOTIFICATION, TEST_SYSTEM_NOTIFICATION)
-   * @param {string} [data.publisherId] - ID издателя (если нужен, например ID пользователя)
+   * @param {string} data.subscriptionType - тип уведомления
+   * @param {string} [data.publisherId] - ID издателя
    */
   createSubscription({ subscriptionType, publisherId }) {
     const request = { subscriptionType }

@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,18 +55,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional(readOnly = true)
     public GetExistsByCriteriaSubscriptionResponse existsByCriteria(GetExistsByCriteriaSubscriptionRequest request) {
         UUID currentUserId = securityService.getCurrentUserIdAsUUID();
-
-        boolean exists = subscriptionRepository.existsByCurrentUserTypeAndPublisher(
+        Optional<Subscription> subscription = subscriptionRepository.findByCurrentUserTypeAndPublisher(
                 currentUserId,
                 request.getSubscriptionType(),
                 request.getPublisherId()
         );
 
-        log.info("Subscription {} у пользователя с Id: {}",
-                exists ? "есть" : "отсутствует",
-                currentUserId);
-
-        return new GetExistsByCriteriaSubscriptionResponse(exists);
+        if (subscription.isPresent()) {
+            SubscriptionResponse response = subscriptionMapper.toResponse(subscription.get());
+            log.info("Subscription есть у пользователя с Id: {}", currentUserId);
+            return new GetExistsByCriteriaSubscriptionResponse(true, response);
+        } else {
+            log.info("Subscription отсутствует у пользователя с Id: {}", currentUserId);
+            return new GetExistsByCriteriaSubscriptionResponse(false, null);
+        }
     }
 
     @Override
