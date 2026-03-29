@@ -58,7 +58,13 @@ public class TradeAccountController {
     @PutMapping("/exact-location")
     public ResponseEntity<SetExactLocationTradeAccountResponse> setExactLocation(
             @Valid @RequestBody SetExactLocationTradeAccountRequest request) {
-        return ResponseEntity.ok(service.SetExactLocation(request));
+        return ResponseEntity.ok(service.setExactLocation(request));
+    }
+
+    @PutMapping("/image")
+    public ResponseEntity<ChangeImageTradeAccountResponse> setExactLocation(
+            @Valid @RequestBody ChangeImageTradeAccountRequest request) {
+        return ResponseEntity.ok(service.changeImage(request));
     }
 
     @PutMapping("/approve")

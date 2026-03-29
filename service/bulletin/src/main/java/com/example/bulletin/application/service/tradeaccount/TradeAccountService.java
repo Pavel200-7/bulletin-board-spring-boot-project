@@ -12,6 +12,7 @@ public interface TradeAccountService {
     ChangeContactsTradeAccountResponse changeContacts(ChangeContactsTradeAccountRequest request);
     ChangeDescriptionTradeAccountResponse changeDescription(ChangeDescriptionTradeAccountRequest request);
     SetApproximateLocationTradeAccountResponse setApproximateLocation(SetApproximateLocationTradeAccountRequest request);
-    SetExactLocationTradeAccountResponse SetExactLocation(SetExactLocationTradeAccountRequest request);
+    SetExactLocationTradeAccountResponse setExactLocation(SetExactLocationTradeAccountRequest request);
+    ChangeImageTradeAccountResponse changeImage(ChangeImageTradeAccountRequest request);
     ApproveTradeAccountResponse approveTradeAccount(ApproveTradeAccountRequest request);
 }

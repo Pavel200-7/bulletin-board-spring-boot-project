@@ -108,6 +108,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/description").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/approximate-location").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/exact-location").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/image").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/trade-account/approve").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/approve").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/bulletin/publish").authenticated()

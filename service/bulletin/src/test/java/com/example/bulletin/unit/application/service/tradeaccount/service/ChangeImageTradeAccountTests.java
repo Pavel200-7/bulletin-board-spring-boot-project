@@ -3,8 +3,8 @@ package com.example.bulletin.unit.application.service.tradeaccount.service;
 import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.application.service.tradeaccount.TradeAccountServiceImpl;
-import com.example.bulletin.application.service.tradeaccount.data.request.SetExactLocationTradeAccountRequest;
-import com.example.bulletin.application.service.tradeaccount.data.response.SetExactLocationTradeAccountResponse;
+import com.example.bulletin.application.service.tradeaccount.data.request.ChangeImageTradeAccountRequest;
+import com.example.bulletin.application.service.tradeaccount.data.response.ChangeImageTradeAccountResponse;
 import com.example.bulletin.application.data.response.TradeAccountResponse;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class SetExactLocationTests {
+public class ChangeImageTradeAccountTests {
 
     private TradeAccountMapper mapperHelper = Mappers.getMapper(
             TradeAccountMapper.class);
@@ -52,6 +52,7 @@ public class SetExactLocationTests {
 
     @Captor
     private ArgumentCaptor<TradeAccount> tradeAccountCaptor;
+
     private TradeAccount tradeAccount;
 
     @BeforeEach
@@ -77,37 +78,33 @@ public class SetExactLocationTests {
     @Test
     public void shouldThrowWhenTradeAccountNotFound() {
         // Arrange
-        SetExactLocationTradeAccountRequest request = createRequest();
+        ChangeImageTradeAccountRequest request = createRequest();
         when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> service.setExactLocation(request));
+        assertThrows(ResourceNotFoundException.class, () -> service.changeImage(request));
     }
 
     @Test
-    public void shouldSetExactLocationAndSave() {
+    public void shouldChangeImageIdAndSave() {
         // Arrange
-        SetExactLocationTradeAccountRequest request = createRequest();
+        ChangeImageTradeAccountRequest request = createRequest();
 
         // Act
-        service.setExactLocation(request);
+        service.changeImage(request);
 
         // Assert
         verify(tradeAccountRepository).save(tradeAccountCaptor.capture());
         TradeAccount actual = tradeAccountCaptor.getValue();
 
-        assertThat(actual.getLocation().getLatitude()).isEqualTo(request.getLatitude());
-        assertThat(actual.getLocation().getLongitude()).isEqualTo(request.getLongitude());
-        assertThat(actual.getLocation().getTownName()).isEqualTo(request.getTownName());
-        assertThat(actual.getLocation().getLocationName()).isEqualTo(request.getLocationName());
-        assertThat(actual.isCoordinatesExact()).isTrue();
+        assertThat(actual.getImageId()).isEqualTo(request.getImageId());
     }
 
     @Test
     public void shouldMapBeforeReturn() {
         // Arrange
-        SetExactLocationTradeAccountRequest request = createRequest();
+        ChangeImageTradeAccountRequest request = createRequest();
         TradeAccountResponse expected = mapperHelper.toResponse(tradeAccount);
         expected = TradeAccountResponse.builder()
                 .ownerId(expected.getOwnerId())
@@ -115,17 +112,16 @@ public class SetExactLocationTests {
                 .phone(expected.getPhone())
                 .contacts(expected.getContacts())
                 .description(expected.getDescription())
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .townName(request.getTownName())
-                .locationName(request.getLocationName())
-                .coordinatesExact(true)
-                .approved(false)
-                .imageId(expected.getImageId())
+                .latitude(expected.getLatitude())
+                .longitude(expected.getLongitude())
+                .locationName(expected.getLocationName())
+                .coordinatesExact(expected.isCoordinatesExact())
+                .approved(expected.isApproved())
+                .imageId(request.getImageId())
                 .build();
 
         // Act
-        SetExactLocationTradeAccountResponse response = service.setExactLocation(request);
+        ChangeImageTradeAccountResponse response = service.changeImage(request);
         TradeAccountResponse actual = response.getTradeAccountResponse();
 
         // Assert
@@ -135,12 +131,9 @@ public class SetExactLocationTests {
                 .isEqualTo(expected);
     }
 
-    private SetExactLocationTradeAccountRequest createRequest() {
-        return SetExactLocationTradeAccountRequest.builder()
-                .latitude(55.7558)
-                .longitude(37.6173)
-                .townName("Moscow")
-                .locationName("Red Square, 1")
+    private ChangeImageTradeAccountRequest createRequest() {
+        return ChangeImageTradeAccountRequest.builder()
+                .imageId(UUID.randomUUID())
                 .build();
     }
 
@@ -150,6 +143,8 @@ public class SetExactLocationTests {
         TradeAccount tradeAccount = TradeAccount.createTradeAccount(ownerInfo);
         tradeAccount.setName("Test Account");
         tradeAccount.setPhone("+79991234567");
+        tradeAccount.setContacts("Old contacts");
+        tradeAccount.setImageId(UUID.randomUUID());
         return tradeAccount;
     }
 

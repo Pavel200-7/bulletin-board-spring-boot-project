@@ -158,6 +158,11 @@ public class Bulletin extends BaseEntity {
 
     public BulletinImage addImage(UUID imageId) {
         BulletinImage image = BulletinImage.createBulletinImage(this, imageId);
+
+        if (this.images.isEmpty()) {
+            image.setMain();
+        }
+
         this.images.add(image);
         return image;
     }

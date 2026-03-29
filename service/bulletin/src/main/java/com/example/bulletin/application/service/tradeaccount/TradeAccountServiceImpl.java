@@ -144,7 +144,7 @@ public class TradeAccountServiceImpl implements TradeAccountService {
 
     @Override
     @Transactional
-    public SetExactLocationTradeAccountResponse SetExactLocation(SetExactLocationTradeAccountRequest request) {
+    public SetExactLocationTradeAccountResponse setExactLocation(SetExactLocationTradeAccountRequest request) {
         UUID currentUserId = securityService.getCurrentUserIdAsUUID();
         TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
@@ -161,6 +161,20 @@ public class TradeAccountServiceImpl implements TradeAccountService {
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new SetExactLocationTradeAccountResponse(response);
+    }
+
+    @Override
+    @Transactional
+    public ChangeImageTradeAccountResponse changeImage(ChangeImageTradeAccountRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found with id: " + currentUserId));
+
+        tradeAccount.setImageId(request.getImageId());
+        tradeAccountRepository.save(tradeAccount);
+
+        TradeAccountResponse response = mapper.toResponse(tradeAccount);
+        return new ChangeImageTradeAccountResponse(response);
     }
 
     @Override
