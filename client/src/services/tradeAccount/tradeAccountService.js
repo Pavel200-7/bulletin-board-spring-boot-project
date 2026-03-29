@@ -15,6 +15,14 @@ export const tradeAccountService = {
     return apiClient.get(`/trade-account/${id}`)
   },
 
+  /**
+   * Получить данные торгового аккаунта по ID пользователя
+   * @param {string} userId - UUID пользователя
+   */
+  getTradeAccountByUserId(userId) {
+    return apiClient.get(`/trade-account/by-user/${userId}`)
+  },
+
   getMyTradeAccount() {
     return apiClient.get('/trade-account/my')
   },
@@ -51,6 +59,14 @@ export const tradeAccountService = {
    */
   changeDescription(description) {
     return apiClient.put('/trade-account/description', { description })
+  },
+
+  /**
+   * Изменить описание
+   * @param {string} imageId - Id (UUID) Изображения
+   */
+  changeImage(imageId) {
+    return apiClient.put('/trade-account/image', { imageId })
   },
 
   // ========== ЛОКАЦИЯ ==========

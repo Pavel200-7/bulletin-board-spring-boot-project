@@ -23,6 +23,12 @@ public class TradeAccountController {
         return ResponseEntity.ok(service.getTradeAccount(request));
     }
 
+    @GetMapping("by-user/{userId}")
+    public ResponseEntity<GetByUserIdTradeAccountResponse> getTradeAccountByUserId(@PathVariable UUID userId) {
+        GetByUserIdTradeAccountRequest request = new GetByUserIdTradeAccountRequest(userId);
+        return ResponseEntity.ok(service.getTradeAccountByUserId(request));
+    }
+
     @GetMapping("/my")
     public ResponseEntity<GetMyTradeAccountResponse> getMyTradeAccount() {
         GetMyTradeAccountRequest request = new GetMyTradeAccountRequest();

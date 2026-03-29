@@ -1,3 +1,4 @@
+<!-- src/views/trade/TradeSettings.vue -->
 <template>
   <div class="trade-settings">
     <div class="settings-card">
@@ -20,6 +21,8 @@
         :approving="approving"
         @submit="handleSubmit"
         @approve="handleApprove"
+        @image-upload="handleImageUpload"
+        @image-delete="handleImageDelete"
       />
     </div>
     
@@ -35,9 +38,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useTradeAccount } from '@/composables/useTradeAccount'
-import LoadingState from './components/LoadingState.vue'
-import ErrorState from './components/ErrorState.vue'
-import EmptyState from './components/EmptyState.vue'
+import LoadingState from './components/wiget/LoadingState.vue'
+import ErrorState from './components/wiget/ErrorState.vue'
+import EmptyState from './components/wiget/EmptyState.vue'
 import SettingsForm from './components/SettingsForm.vue'
 import ValidationErrorModal from './components/ValidationErrorModal.vue'
 
@@ -50,6 +53,7 @@ const {
   updatePhone, 
   updateContacts, 
   updateDescription,
+  updateImage,
   setApproximateLocation,
   setExactLocation,
   approveAccount 
@@ -73,6 +77,26 @@ const loadData = async () => {
   }
 }
 
+const handleImageUpload = async ({ imageId }) => {
+  try {
+    await updateImage(imageId)
+    await loadData()
+  } catch (err) {
+    console.error('Ошибка загрузки изображения:', err)
+    alert('Не удалось сохранить изображение')
+  }
+}
+
+const handleImageDelete = async ({ imageId }) => {
+  try {
+    await updateImage(null)
+    await loadData()
+  } catch (err) {
+    console.error('Ошибка удаления изображения:', err)
+    alert('Не удалось удалить изображение')
+  }
+}
+
 const handleSubmit = async (formData) => {
   saving.value = true
   
@@ -92,6 +116,8 @@ const handleSubmit = async (formData) => {
     if (formData.description !== account.value.description) {
       await updateDescription(formData.description)
     }
+    
+    // Обработка изображения уже через handleImageUpload
     
     const hasLocationData = formData.townName || 
                            formData.latitude || 

@@ -5,7 +5,6 @@ import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.application.service.tradeaccount.data.request.*;
 import com.example.bulletin.application.service.tradeaccount.data.response.*;
 import com.example.bulletin.application.data.response.TradeAccountResponse;
-import com.example.bulletin.application.service.bulletin.helper.specification.BulletinSpecificationBuilder;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.Location;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
@@ -38,6 +37,16 @@ public class TradeAccountServiceImpl implements TradeAccountService {
 
         TradeAccountResponse response = mapper.toResponse(tradeAccount);
         return new GetTradeAccountResponse(response);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetByUserIdTradeAccountResponse getTradeAccountByUserId(GetByUserIdTradeAccountRequest request) {
+        TradeAccount tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Trade account not found of user with id: " + request.getUserId()));
+
+        TradeAccountResponse response = mapper.toResponse(tradeAccount);
+        return new GetByUserIdTradeAccountResponse(response);
     }
 
     @Override

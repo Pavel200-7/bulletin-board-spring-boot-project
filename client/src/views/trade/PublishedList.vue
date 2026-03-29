@@ -12,11 +12,11 @@
       Нет действующих объявлений
     </div>
     <div v-else class="list-content">
-      <BulletinCard 
+      <PublishedBulletinCard 
         v-for="item in bulletins" 
         :key="item.id"
         :bulletin="item"
-        @click="goToView(item.id)"
+        @complete="handleComplete"
       />
     </div>
     
@@ -45,10 +45,10 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBulletin } from '@/composables/useBulletin'
 import SearchBar from './components/SearchBar.vue'
-import BulletinCard from './components/BulletinCard.vue'
+import PublishedBulletinCard from './components/PublishedBulletinCard.vue'
 
 const router = useRouter()
-const { bulletins, loading, error, pagination, fetchMyPublished } = useBulletin()
+const { bulletins, loading, error, pagination, fetchMyPublished, closeBulletin } = useBulletin()
 const searchQuery = ref('')
 
 const loadData = async (page = 0, title = null) => {
@@ -64,8 +64,16 @@ const handleSearch = (query) => {
   loadData(0, query)
 }
 
-const goToView = (id) => {
-  router.push(`/bulletin/view/${id}`)
+const handleComplete = async (bulletinId) => {
+  try {
+    await closeBulletin(bulletinId)
+    // Перезагружаем список
+    await loadData(pagination.value.page, searchQuery.value)
+    alert('Объявление успешно завершено')
+  } catch (err) {
+    console.error('Ошибка завершения объявления:', err)
+    alert(err.response?.data?.message || 'Ошибка при завершении объявления')
+  }
 }
 
 onMounted(() => {

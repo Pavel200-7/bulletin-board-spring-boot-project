@@ -29,6 +29,12 @@ export function useTradeAccount() {
     return response
   }
 
+  const fetchTradeAccountByUserId = async (userId) => {
+    const response = await handleRequest(() => tradeAccountService.getTradeAccountByUserId(userId))
+    account.value = response.data?.tradeAccountResponse || response.data
+    return response
+  }
+
   const fetchMyTradeAccount = async () => {
     const response = await handleRequest(() => tradeAccountService.getMyTradeAccount())
     account.value = response.data?.tradeAccountResponse || response.data
@@ -61,6 +67,12 @@ export function useTradeAccount() {
     return response
   }
 
+  const updateImage = async (imageId) => {
+  const response = await handleRequest(() => tradeAccountService.changeImage(imageId))
+  account.value = response.data?.tradeAccountResponse || response.data
+  return response
+}
+
   // ========== ЛОКАЦИЯ ==========
 
   const setApproximateLocation = async (locationData) => {
@@ -91,6 +103,7 @@ export function useTradeAccount() {
 
     // actions
     fetchTradeAccount,
+    fetchTradeAccountByUserId,
     fetchMyTradeAccount,
     updateName,
     updatePhone,
@@ -98,6 +111,7 @@ export function useTradeAccount() {
     updateDescription,
     setApproximateLocation,
     setExactLocation,
+    updateImage,
     approveAccount
   }
 }
