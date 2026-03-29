@@ -30,6 +30,19 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     );
 
     @Query(value = """
+            SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+            FROM Subscription s
+            WHERE s.ownerInfo.owner.id = :ownerId
+            AND s.type = :type
+            AND s.publisherId = :publisherId
+            """)
+    boolean existsByCurrentUserTypeAndPublisher(
+            @Param("ownerId") UUID ownerId,
+            @Param("type") NotificationType type,
+            @Param("publisherId") UUID publisherId
+    );
+
+    @Query(value = """
         SELECT DISTINCT s 
         FROM Subscription s 
         JOIN FETCH s.ownerInfo.owner u

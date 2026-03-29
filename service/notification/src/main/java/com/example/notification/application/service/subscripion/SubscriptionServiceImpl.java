@@ -6,9 +6,11 @@ import com.example.notification.application.exception.ResourceNotFoundException;
 import com.example.notification.application.mapper.SubscriptionMapper;
 import com.example.notification.application.service.subscripion.data.request.CreateSubscriptionRequest;
 import com.example.notification.application.service.subscripion.data.request.DeleteSubscriptionRequest;
+import com.example.notification.application.service.subscripion.data.request.GetExistsByCriteriaSubscriptionRequest;
 import com.example.notification.application.service.subscripion.data.request.GetSubscriptionsRequest;
 import com.example.notification.application.service.subscripion.data.response.CreateSubscriptionResponse;
 import com.example.notification.application.service.subscripion.data.response.DeleteSubscriptionResponse;
+import com.example.notification.application.service.subscripion.data.response.GetExistsByCriteriaSubscriptionResponse;
 import com.example.notification.application.service.subscripion.data.response.GetSubscriptionsResponse;
 import com.example.notification.domain.entity.Subscription;
 import com.example.notification.domain.entity.base.OwnerInfo;
@@ -46,6 +48,24 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .map(subscriptionMapper::toResponse)
                 .collect(Collectors.toList());
         return new GetSubscriptionsResponse(responses);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetExistsByCriteriaSubscriptionResponse existsByCriteria(GetExistsByCriteriaSubscriptionRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+
+        boolean exists = subscriptionRepository.existsByCurrentUserTypeAndPublisher(
+                currentUserId,
+                request.getSubscriptionType(),
+                request.getPublisherId()
+        );
+
+        log.info("Subscription {} у пользователя с Id: {}",
+                exists ? "есть" : "отсутствует",
+                currentUserId);
+
+        return new GetExistsByCriteriaSubscriptionResponse(exists);
     }
 
     @Override

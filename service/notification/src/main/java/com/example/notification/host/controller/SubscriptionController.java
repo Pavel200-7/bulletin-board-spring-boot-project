@@ -3,10 +3,13 @@ package com.example.notification.host.controller;
 import com.example.notification.application.service.subscripion.SubscriptionService;
 import com.example.notification.application.service.subscripion.data.request.CreateSubscriptionRequest;
 import com.example.notification.application.service.subscripion.data.request.DeleteSubscriptionRequest;
+import com.example.notification.application.service.subscripion.data.request.GetExistsByCriteriaSubscriptionRequest;
 import com.example.notification.application.service.subscripion.data.request.GetSubscriptionsRequest;
 import com.example.notification.application.service.subscripion.data.response.CreateSubscriptionResponse;
 import com.example.notification.application.service.subscripion.data.response.DeleteSubscriptionResponse;
+import com.example.notification.application.service.subscripion.data.response.GetExistsByCriteriaSubscriptionResponse;
 import com.example.notification.application.service.subscripion.data.response.GetSubscriptionsResponse;
+import com.example.notification.domain.enums.NotificationType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,17 @@ public class SubscriptionController {
     @GetMapping()
     public ResponseEntity<GetSubscriptionsResponse> getSubscriptions() {
         return ResponseEntity.ok(service.getSubscriptions(new GetSubscriptionsRequest()));
+    }
+
+    @GetMapping("/exists/{subscriptionType}/{publisherId}")
+    public ResponseEntity<GetExistsByCriteriaSubscriptionResponse> existsByCriteria(
+            @PathVariable NotificationType subscriptionType,
+            @PathVariable UUID publisherId) {
+        GetExistsByCriteriaSubscriptionRequest request = GetExistsByCriteriaSubscriptionRequest.builder()
+                .subscriptionType(subscriptionType)
+                .publisherId(publisherId)
+                .build();
+        return ResponseEntity.ok(service.existsByCriteria(request));
     }
 
     @PostMapping

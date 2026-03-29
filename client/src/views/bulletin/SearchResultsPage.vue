@@ -44,7 +44,6 @@
             v-for="bulletin in bulletins"
             :key="bulletin.id"
             :bulletin="bulletin"
-            @click="goToBulletin(bulletin.id)"
           />
         </div>
 
