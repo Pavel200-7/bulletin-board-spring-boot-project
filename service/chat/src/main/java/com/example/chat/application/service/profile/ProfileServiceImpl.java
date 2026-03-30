@@ -16,6 +16,7 @@ import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
 import com.example.chat.infrastructure.repository.ProfileRepository;
 import com.example.chat.infrastructure.repository.UserRepository;
+import com.example.chat.infrastructure.repository.ContactRepository;
 import com.example.chat.infrastructure.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -36,6 +39,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
+    private final ContactRepository contactRepository;
     private final SecurityService securityService;
     private final ProfileMapper profileMapper;
     private final ProfileAccessValidator accessValidator;
@@ -54,6 +58,21 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    public GetMyProfileResponse getMyProfile(GetMyProfileRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        log.info("Getting profile for current user: {}", currentUserId);
+
+        Profile profile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Profile not found for user with id: %s", currentUserId)
+                ));
+
+        ProfileResponse profileResponse = profileMapper.toResponse(profile);
+        return new GetMyProfileResponse(profileResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public GetProfileByUserIdResponse getProfileByUserId(GetProfileByUserIdRequest request) {
         Profile profile = profileRepository.findByOwnerInfoOwnerId(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user with id: " + request.getId()));
@@ -65,6 +84,10 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     @Transactional(readOnly = true)
     public GetProfilePaginationResponse getProfilePagination(GetProfilePaginationRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Profile currentProfile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for current user"));
+
         ProfileSearchCriteria criteria = request.getCriteria();
         Specification<Profile> spec = specificationBuilder.fromCriteria(criteria);
         PageData pageData = request.getPageData();
@@ -77,8 +100,30 @@ public class ProfileServiceImpl implements ProfileService {
         Page<Profile> profiles = profileRepository.findAll(spec, pageable);
         log.info("Найдено {} профилей в текущей странице.", profiles.getSize());
 
-        Page<ProfilePaginationData> paginationData = profiles.map(profileMapper::toPaginationData);
+        Set<UUID> contactProfileIds = contactRepository.findContactProfileIdsByOwnerProfileId(currentProfile.getId());
+
+        Page<ProfilePaginationData> paginationData = profiles.map(profile -> {
+            boolean isContact = contactProfileIds.contains(profile.getId());
+            return profileMapper.toPaginationData(profile, isContact);
+        });
+
         return new GetProfilePaginationResponse(paginationData);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetExistsMyProfileResponse existsMyProfile(GetExistsMyProfileRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Optional<Profile> profileOpt = profileRepository.findByOwnerInfoOwnerId(currentUserId);
+
+        if (profileOpt.isPresent()) {
+            ProfileResponse profileResponse = profileMapper.toResponse(profileOpt.get());
+            log.info("Profile существует у пользователя с id: {}", currentUserId);
+            return new GetExistsMyProfileResponse(true, profileResponse);
+        } else {
+            log.info("Profile нет у пользователя с id: {}", currentUserId);
+            return new GetExistsMyProfileResponse(false, null);
+        }
     }
 
     @Override

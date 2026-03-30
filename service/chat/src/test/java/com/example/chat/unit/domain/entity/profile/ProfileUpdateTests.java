@@ -77,14 +77,14 @@ public class ProfileUpdateTests {
     }
 
     @Test
-    public void shouldTwoPartyAddChatWhenAddContact() {
+    public void shouldTwoPartyAddChat() {
         // Arrange
         Profile ownerProfile = createProfile("Public Name");
         Profile contactProfile = createProfile("friend");
-        String contactName = "My Friend";
+        Contact contact = ownerProfile.addContact(contactProfile);
 
         // Act
-        ownerProfile.addContact(contactProfile);
+        ownerProfile.addChatRoom(contact);
 
         // Assert
         assertFalse(ownerProfile.getChatParticipants().isEmpty());

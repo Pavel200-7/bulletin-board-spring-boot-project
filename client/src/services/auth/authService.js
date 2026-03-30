@@ -162,5 +162,9 @@ export const authService = {
       console.error('Failed to parse token for user info:', e)
       return null
     }
+  },
+  getUserId() {
+  const userInfo = this.getUserInfo()
+  return userInfo?.userId || null
   }
 }

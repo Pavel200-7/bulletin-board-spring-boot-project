@@ -4,6 +4,8 @@ package com.example.chat.unit.application.mapper;
 import com.example.chat.application.data.response.ChatParticipantResponse;
 import com.example.chat.application.mapper.ChatParticipantMapper;
 import com.example.chat.domain.entity.ChatParticipant;
+import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -36,12 +38,8 @@ public class ChatParticipantMapperTests {
         currentProfile = createProfile(currentUserId, "Current User");
         otherProfile = createProfile(otherUserId, "Other User");
 
-        currentProfile.addContact(otherProfile);
-
-        var chatRoom = currentProfile.getChatParticipants().stream()
-                .findFirst()
-                .map(p -> p.getChatRoom())
-                .orElseThrow(() -> new AssertionError("Chat room should exist"));
+        Contact contact = currentProfile.addContact(otherProfile);
+        ChatRoom chatRoom = currentProfile.addChatRoom(contact);
 
         currentParticipant = chatRoom.getParticipants().stream()
                 .filter(p -> p.getProfile().getId().equals(currentProfile.getId()))
@@ -136,33 +134,6 @@ public class ChatParticipantMapperTests {
         assertNotEquals(currentResponse.getId(), otherResponse.getId());
         assertNotEquals(currentResponse.getProfileId(), otherResponse.getProfileId());
         assertNotEquals(currentResponse.isOwner(), otherResponse.isOwner());
-    }
-
-    @Test
-    void shouldMapParticipantFromDifferentChat() {
-        // Arrange
-        Profile thirdProfile = createProfile(UUID.randomUUID(), "Third User");
-        currentProfile.addContact(thirdProfile);
-
-        var newChatRoom = currentProfile.getChatParticipants().stream()
-                .map(p -> p.getChatRoom())
-                .filter(room -> room.getParticipants().stream()
-                        .anyMatch(p -> p.getProfile().getId().equals(thirdProfile.getId())))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("New chat room should exist"));
-
-        ChatParticipant thirdParticipant = newChatRoom.getParticipants().stream()
-                .filter(p -> p.getProfile().getId().equals(thirdProfile.getId()))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Third participant not found"));
-
-        // Act
-        ChatParticipantResponse response = mapper.toResponse(thirdParticipant);
-
-        // Assert
-        assertEquals(thirdProfile.getId(), response.getProfileId());
-        assertEquals(newChatRoom.getId(), response.getChatRoomId());
-        assertFalse(response.isOwner());
     }
 
     @Test

@@ -30,10 +30,23 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<GetMyProfileResponse> getMyProfile() {
+        GetMyProfileRequest request = new GetMyProfileRequest();
+        GetMyProfileResponse response = profileService.getMyProfile(request);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/search")
     public ResponseEntity<GetProfilePaginationResponse> getProfilePagination(
             @Valid @RequestBody GetProfilePaginationRequest request) {
         GetProfilePaginationResponse response = profileService.getProfilePagination(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/exists/my")
+    public ResponseEntity<GetExistsMyProfileResponse> existsMyProfile() {
+        GetExistsMyProfileResponse response = profileService.existsMyProfile(new GetExistsMyProfileRequest());
         return ResponseEntity.ok(response);
     }
 

@@ -79,7 +79,7 @@ const routes = [
   },
   {
     path: '/chat',
-    component: () => import('@/views/chat/ChatLayout.vue'),
+    component: () => import('@/views/chat/components/layout/ChatLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {

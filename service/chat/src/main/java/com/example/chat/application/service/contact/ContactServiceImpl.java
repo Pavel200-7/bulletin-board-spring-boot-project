@@ -14,9 +14,11 @@ import com.example.chat.application.service.contact.data.response.ChangeContactN
 import com.example.chat.application.service.contact.data.response.CreateContactResponse;
 import com.example.chat.application.service.contact.data.response.GetContactsResponse;
 import com.example.chat.application.service.profile.validator.ProfileAccessValidator;
+import com.example.chat.domain.entity.ChatParticipant;
 import com.example.chat.domain.entity.ChatRoom;
 import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
+import com.example.chat.domain.enums.ChatRoomType;
 import com.example.chat.infrastructure.repository.ChatRoomRepository;
 import com.example.chat.infrastructure.repository.ContactRepository;
 import com.example.chat.infrastructure.repository.ProfileRepository;
@@ -69,19 +71,21 @@ public class ContactServiceImpl implements ContactService {
         Profile contactProfile = profileRepository.findById(request.getProfileId())
                 .orElseThrow(() -> new ResourceNotFoundException("Contact profile not found with id: " + request.getProfileId()));
 
+        log.info("Начало создания");
         Contact contact = ownerProfile.addContact(contactProfile);
-        ChatRoom newChatRoom = getChatRoomCreatedForNewContact(ownerProfile);
+        log.info("Извлекаем newChatRoom");
+        ChatRoom newChatRoom = ownerProfile.addChatRoom(contact);
+
+        log.info("new chat {}", newChatRoom.toString());
         chatRoomRepository.save(newChatRoom);
+
+        log.info("profile {}", ownerProfile.toString());
         profileRepository.save(ownerProfile);
 
         log.info("Создан новый контакт с id: {}, чат так же создан.", contact.getId());
         
         ContactResponse contactResponse = contactMapper.toResponse(contact);
         return new CreateContactResponse(contactResponse);
-    }
-
-    private ChatRoom getChatRoomCreatedForNewContact(Profile profile) {
-        return profile.getChatParticipants().getFirst().getChatRoom();
     }
 
     @Override

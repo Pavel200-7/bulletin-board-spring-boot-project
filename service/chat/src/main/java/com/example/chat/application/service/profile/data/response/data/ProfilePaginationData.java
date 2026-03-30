@@ -17,4 +17,5 @@ public class ProfilePaginationData {
     private String publicName;
     private String description;
     private UUID imageId;
+    private boolean isContact;
 }

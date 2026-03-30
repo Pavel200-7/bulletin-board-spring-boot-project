@@ -1,13 +1,12 @@
 package com.example.chat.unit.domain.entity.chatroom.check;
 
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.parameters.P;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
@@ -60,8 +59,8 @@ public class IsParticipantByUserIdTests {
     }
 
     private ChatRoom createChatRoom(Profile creator, Profile other) {
-        creator.addContact(other);
-        ChatRoom chatRoom = creator.getChatParticipants().getFirst().getChatRoom();
+        Contact contact = creator.addContact(other);
+        ChatRoom chatRoom = creator.addChatRoom(contact);
         return chatRoom;
     }
 

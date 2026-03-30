@@ -16,11 +16,18 @@ export const profileService = {
   },
 
   /**
-   * Получить профиль по ID пользователя (из общего сервиса авторизации)
+   * Получить профиль по ID пользователя
    * @param {string} userId - UUID пользователя
    */
   getProfileByUserId(userId) {
     return apiClient.get(`/profile/by-user/${userId}`)
+  },
+
+  /**
+   * Получить профиль текущего пользователя
+   */
+  getMyProfile() {
+    return apiClient.get('/profile/my')
   },
 
   /**
@@ -38,7 +45,29 @@ export const profileService = {
       pageData: { page, size },
       criteria
     }
-    return apiClient.post('/profile/search', request)
+    const res = apiClient.post('/profile/search', request)
+    console.log(res)
+    return res
+  },
+
+  /**
+   * Проверить существование профиля текущего пользователя
+   * @returns {Promise<{exists: boolean, profileResponse: Object|null}>}
+   */
+  existsMyProfile() {
+    return apiClient.get('/profile/exists/my')
+  },
+
+  // ========== СОЗДАНИЕ ==========
+
+  /**
+   * Создать профиль
+   * @param {Object} data - данные профиля
+   * @param {string} data.ownerId - ID пользователя
+   * @param {string} data.ownerName - имя пользователя (опционально)
+   */
+  createProfile({ ownerId, ownerName }) {
+    return apiClient.post('/profile', { ownerId, ownerName })
   },
 
   // ========== ИЗМЕНЕНИЕ ==========
@@ -57,5 +86,13 @@ export const profileService = {
    */
   changeDescription(description) {
     return apiClient.put('/profile/description', { description })
+  },
+
+  /**
+   * Изменить изображение профиля
+   * @param {string} imageId - ID изображения в MinIO
+   */
+  changeImage(imageId) {
+    return apiClient.put('/profile/image', { imageId })
   }
 }

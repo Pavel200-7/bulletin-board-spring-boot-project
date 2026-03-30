@@ -5,11 +5,12 @@ import com.example.chat.application.service.profile.data.response.*;
 
 public interface ProfileService {
     GetProfileResponse getProfile(GetProfileRequest request);
+    GetMyProfileResponse getMyProfile(GetMyProfileRequest request);
     GetProfileByUserIdResponse getProfileByUserId(GetProfileByUserIdRequest request);
     GetProfilePaginationResponse getProfilePagination(GetProfilePaginationRequest request);
+    GetExistsMyProfileResponse existsMyProfile(GetExistsMyProfileRequest request);
     CreateProfileResponse createProfile(CreateProfileRequest request);
     ChangePublicNameResponse changePublicName(ChangePublicNameRequest request);
     ChangeDescriptionResponse changeDescription(ChangeDescriptionRequest request);
     ChangeImageProfileResponse changeImage(ChangeImageProfileRequest request);
-
 }

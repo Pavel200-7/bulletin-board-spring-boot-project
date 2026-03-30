@@ -26,7 +26,8 @@ export function useContact() {
    */
   const fetchContacts = async () => {
     const response = await handleRequest(() => contactService.getMyContacts())
-    contacts.value = response.data?.contactResponse || response.data || []
+    console.log('Contacts:', response.data)
+    contacts.value = response.data?.contacts || response.data || []
     return response
   }
 
@@ -38,7 +39,7 @@ export function useContact() {
     const response = await handleRequest(() => contactService.createContact(profileId))
     
     // Добавляем новый контакт в список (если он там уже есть по id)
-    const newContact = response.data?.contactResponse || response.data
+    const newContact = response.data?.contact || response.data
     if (newContact) {
       contacts.value = [...contacts.value, newContact]
     }
@@ -55,7 +56,7 @@ export function useContact() {
     const response = await handleRequest(() => contactService.changeContactName(contactId, newName))
     
     // Обновляем имя в локальном списке
-    const updatedContact = response.data?.contactResponse || response.data
+    const updatedContact = response.data?.contact || response.data
     if (updatedContact) {
       contacts.value = contacts.value.map(c => 
         c.id === contactId ? updatedContact : c

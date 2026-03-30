@@ -135,6 +135,10 @@ export function useAuth() {
     return authService.getUserRoles()
   }
 
+  const getUserId = () => {
+    return authService.getUserId()
+  }
+
   onUnmounted(() => {
     stopTokenRefreshTimer()
   })
@@ -152,6 +156,7 @@ export function useAuth() {
     refreshToken,
     getUserInfo,
     getUserRoles,
+    getUserId,
     startTokenRefreshTimer,
     stopTokenRefreshTimer
   }

@@ -1,4 +1,3 @@
-<!-- src/views/chat/ChatLayout.vue -->
 <template>
   <div class="chat-layout">
     <header class="chat-header">

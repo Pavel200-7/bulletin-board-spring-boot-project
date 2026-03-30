@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Delegate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@ToString
 @Table(name = "profile")
 public class Profile extends BaseEntity {
 
@@ -86,9 +88,6 @@ public class Profile extends BaseEntity {
         validateContactAddition(contactProfile);
         Contact contact = Contact.createContact(this, contactProfile);
         this.contacts.add(contact);
-
-        ChatRoom.createTwoPartyChat(this, contactProfile);
-
         return contact;
     }
 
@@ -119,6 +118,10 @@ public class Profile extends BaseEntity {
             throw new IllegalStateException("This contact does not belong to this profile");
         }
         this.contacts.remove(contact);
+    }
+
+    public ChatRoom addChatRoom(Contact contact) {
+        return ChatRoom.createTwoPartyChat(this, contact.getContactProfile());
     }
 
     public Contact updateContactName(UUID contactId, String newContactName) {

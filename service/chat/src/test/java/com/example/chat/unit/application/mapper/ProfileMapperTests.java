@@ -42,7 +42,7 @@ public class ProfileMapperTests {
         Profile profile = createProfile();
 
         // Act
-        ProfilePaginationData response = mapper.toPaginationData(profile);
+        ProfilePaginationData response = mapper.toPaginationData(profile, true);
 
         // Assert
         assertNotNull(response);
@@ -51,6 +51,7 @@ public class ProfileMapperTests {
         assertEquals(profile.getPublicName(), response.getPublicName());
         assertEquals(profile.getDescription(), response.getDescription());
         assertEquals(profile.getImageId(), response.getImageId());
+        assertTrue(response.isContact());
     }
 
     @Test
@@ -60,7 +61,7 @@ public class ProfileMapperTests {
 
         // Act
         ProfileResponse response = mapper.toResponse(profile);
-        ProfilePaginationData paginationData = mapper.toPaginationData(profile);
+        ProfilePaginationData paginationData = mapper.toPaginationData(profile, true);
 
         // Assert
         assertEquals(response.getId(), paginationData.getId());
@@ -68,6 +69,8 @@ public class ProfileMapperTests {
         assertEquals(response.getPublicName(), paginationData.getPublicName());
         assertEquals(response.getDescription(), paginationData.getDescription());
         assertEquals(response.getImageId(), paginationData.getImageId());
+        assertTrue(paginationData.isContact());
+
     }
 
     private Profile createProfile() {

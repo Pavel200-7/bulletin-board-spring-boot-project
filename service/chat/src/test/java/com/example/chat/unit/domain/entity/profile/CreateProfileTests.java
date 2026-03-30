@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CreateProfileTests {
 
     @Test
-    public void shouldCreateTradeAccount() {
+    public void shouldCreateProfile() {
         // Arrange
         OwnerInfo ownerInfo = createOwnerInfo();
         String publicName = "someName";

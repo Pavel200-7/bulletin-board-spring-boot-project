@@ -13,6 +13,7 @@ public interface ProfileMapper {
     @Mapping(target = "ownerId", source = "ownerInfo.owner.id")
     ProfileResponse toResponse(Profile entity);
 
-    @Mapping(target = "ownerId", source = "ownerInfo.owner.id")
-    ProfilePaginationData toPaginationData(Profile entity);
+    @Mapping(target = "ownerId", expression = "java(entity.getOwnerInfo().getOwnerId())")
+    @Mapping(target = "isContact", source = "isContact")
+    ProfilePaginationData toPaginationData(Profile entity, boolean isContact);
 }

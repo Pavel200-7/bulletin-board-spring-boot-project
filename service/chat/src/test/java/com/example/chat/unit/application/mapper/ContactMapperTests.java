@@ -25,6 +25,7 @@ public class ContactMapperTests {
     private Profile ownerProfile;
     private Profile contactProfile;
     private Contact contact;
+    private ChatRoom chatRoom;
 
     @BeforeEach
     void setUp() {
@@ -38,16 +39,12 @@ public class ContactMapperTests {
         contactProfile = Profile.createProfile(contactInfo, "Contact Name");
 
         contact = ownerProfile.addContact(contactProfile);
+        chatRoom = ownerProfile.addChatRoom(contact);
     }
 
     @Test
     void shouldFindChatId() {
         // Arrange
-        ChatRoom chatRoom = ownerProfile.getChatParticipants().stream()
-                .map(ChatParticipant::getChatRoom)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Chat should exist"));
-
         UUID chatRoomId = chatRoom.getId();
 
         // Act
@@ -77,12 +74,6 @@ public class ContactMapperTests {
         // Arrange
         String customContactName = "Best Friend Forever";
         contact.changeContactName(customContactName);
-
-        ChatRoom chatRoom = ownerProfile.getChatParticipants().stream()
-                .map(ChatParticipant::getChatRoom)
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("Chat should exist"));
-
         UUID chatRoomId = chatRoom.getId();
 
         // Act

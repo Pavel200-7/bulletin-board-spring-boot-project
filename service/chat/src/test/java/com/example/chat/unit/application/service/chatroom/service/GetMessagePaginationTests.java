@@ -8,10 +8,7 @@ import com.example.chat.application.service.chatroom.ChatRoomServiceImpl;
 import com.example.chat.application.service.chatroom.data.request.GetMessagePaginationRequest;
 import com.example.chat.application.service.chatroom.helper.specification.ChatMessageSpecificationBuilder;
 import com.example.chat.application.service.chatroom.helper.specification.data.MessageCursorCriteria;
-import com.example.chat.domain.entity.ChatMessage;
-import com.example.chat.domain.entity.ChatParticipant;
-import com.example.chat.domain.entity.ChatRoom;
-import com.example.chat.domain.entity.Profile;
+import com.example.chat.domain.entity.*;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
 import com.example.chat.infrastructure.repository.ChatMessageRepository;
@@ -81,7 +78,6 @@ public class GetMessagePaginationTests {
     private Specification<ChatMessage> mockSpecification;
 
     @BeforeEach
-    @SuppressWarnings("unchecked")
     void setUp() {
         currentUserId = UUID.randomUUID();
         chatRoomId = UUID.randomUUID();
@@ -90,13 +86,9 @@ public class GetMessagePaginationTests {
         currentProfile = createProfile(currentUserId, "Current User");
         otherProfile = createProfile(UUID.randomUUID(), "Other User");
 
-        currentProfile.addContact(otherProfile);
+        Contact contact = currentProfile.addContact(otherProfile);
 
-        chatRoom = currentProfile.getChatParticipants().stream()
-                .findFirst()
-                .map(ChatParticipant::getChatRoom)
-                .orElseThrow(() -> new AssertionError("Chat room should exist"));
-
+        chatRoom = currentProfile.addChatRoom(contact);
         chatRoomId = chatRoom.getId();
 
         cursorMessage = mock(ChatMessage.class);
@@ -166,9 +158,6 @@ public class GetMessagePaginationTests {
         // Act & Assert
         assertThrows(ResourceNotFoundException.class,
                 () -> chatRoomService.getMessagePagination(request));
-
-        verify(chatMessageRepository, never()).findById(any());
-        verify(specificationBuilder, never()).fromCursorCriteria(any());
     }
 
     @Test

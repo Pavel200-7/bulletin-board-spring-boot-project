@@ -4,6 +4,7 @@ import com.example.chat.application.data.response.ChatMessageResponse;
 import com.example.chat.application.mapper.ChatMessageMapper;
 import com.example.chat.domain.entity.ChatMessage;
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -37,13 +38,8 @@ public class ChatMessageMapperTests {
         sender = createProfile(senderId, "Sender");
         otherParticipant = createProfile(otherId, "Other");
 
-        // Создаем чат через добавление контакта
-        sender.addContact(otherParticipant);
-
-        chatRoom = sender.getChatParticipants().stream()
-                .findFirst()
-                .map(p -> p.getChatRoom())
-                .orElseThrow(() -> new AssertionError("Chat room should exist"));
+        Contact contact = sender.addContact(otherParticipant);
+        chatRoom = sender.addChatRoom(contact);
 
         textContent = "Hello, world!";
         imageId = UUID.randomUUID();

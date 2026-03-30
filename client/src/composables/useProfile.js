@@ -1,6 +1,7 @@
 // src/composables/useProfile.js
 import { ref } from 'vue'
 import { profileService } from '@/services/profile/profileService'
+import { useAuth } from './useAuth'
 
 export function useProfile() {
   const profile = ref(null)
@@ -8,6 +9,8 @@ export function useProfile() {
   const loading = ref(false)
   const error = ref(null)
   const pagination = ref({})
+
+  const { getUserId, getUserInfo } = useAuth()
 
   const handleRequest = async (requestFn) => {
     loading.value = true
@@ -44,6 +47,33 @@ export function useProfile() {
   }
 
   /**
+   * Загрузить профиль текущего пользователя
+   */
+  const fetchMyProfile = async () => {
+    const response = await handleRequest(() => profileService.getMyProfile())
+    profile.value = response.data?.profileResponse || response.data
+    return response
+  }
+
+  /**
+   * Проверить, существует ли профиль текущего пользователя
+   * @returns {Promise<{exists: boolean, profile: Object|null}>}
+   */
+  const checkMyProfileExists = async () => {
+    try {
+      const response = await handleRequest(() => profileService.existsMyProfile())
+      const data = response.data
+      return {
+        exists: data?.exists || false,
+        profile: data?.profileResponse || null
+      }
+    } catch (err) {
+      console.error('Ошибка проверки существования профиля:', err)
+      return { exists: false, profile: null }
+    }
+  }
+
+  /**
    * Поиск профилей с пагинацией
    */
   const searchProfiles = async ({ page = 0, size = 20, criteria = {} } = {}) => {
@@ -57,6 +87,30 @@ export function useProfile() {
       totalPages: data.page?.totalPages || data.totalPages,
       totalElements: data.page?.totalElements || data.totalElements
     }
+    return response
+  }
+
+  // ========== СОЗДАНИЕ ==========
+
+  /**
+   * Создать профиль для текущего пользователя
+   * @param {string} publicName - публичное имя (опционально, по умолчанию username)
+   */
+  const createMyProfile = async (publicName = null) => {
+    const userId = getUserId()
+    if (!userId) {
+      throw new Error('User not authenticated')
+    }
+
+    const userInfo = getUserInfo()
+    const defaultName = publicName || userInfo?.username || userInfo?.name || 'Пользователь'
+    
+    const response = await handleRequest(() => profileService.createProfile({
+      ownerId: userId,
+      ownerName: defaultName
+    }))
+    
+    profile.value = response.data?.profileResponse || response.data
     return response
   }
 
@@ -80,6 +134,15 @@ export function useProfile() {
     return response
   }
 
+  /**
+   * Обновить изображение
+   */
+  const updateImage = async (imageId) => {
+    const response = await handleRequest(() => profileService.changeImage(imageId))
+    profile.value = response.data?.profileResponse || response.data
+    return response
+  }
+
   return {
     // state
     profile,
@@ -91,8 +154,12 @@ export function useProfile() {
     // actions
     fetchProfile,
     fetchProfileByUserId,
+    fetchMyProfile,
+    checkMyProfileExists,  
     searchProfiles,
+    createMyProfile,
     updatePublicName,
-    updateDescription
+    updateDescription,
+    updateImage
   }
 }

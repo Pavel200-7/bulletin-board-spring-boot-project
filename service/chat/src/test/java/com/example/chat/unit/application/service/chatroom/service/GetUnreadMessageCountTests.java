@@ -6,6 +6,7 @@ import com.example.chat.application.service.chatroom.ChatRoomServiceImpl;
 import com.example.chat.application.service.chatroom.data.request.GetUnreadMessageCountRequest;
 import com.example.chat.domain.entity.ChatParticipant;
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -60,12 +61,8 @@ public class GetUnreadMessageCountTests {
         currentProfile = createProfile(currentUserId, "Current User");
         otherProfile = createProfile(UUID.randomUUID(), "Other User");
 
-        currentProfile.addContact(otherProfile);
-
-        chatRoom = currentProfile.getChatParticipants().stream()
-                .findFirst()
-                .map(ChatParticipant::getChatRoom)
-                .orElseThrow(() -> new AssertionError("Chat room should exist"));
+        Contact contact = currentProfile.addContact(otherProfile);
+        ChatRoom chatRoom = currentProfile.addChatRoom(contact);
 
         chatRoomId = chatRoom.getId();
 

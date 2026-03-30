@@ -6,6 +6,7 @@ import com.example.chat.application.mapper.ChatParticipantMapper;
 import com.example.chat.application.mapper.ChatRoomMapper;
 import com.example.chat.application.mapper.ChatRoomMapperImpl;
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -125,11 +126,8 @@ public class ChatRoomMapperTests {
     }
 
     private ChatRoom createChatRoom(Profile owner, Profile otherProfile) {
-        owner.addContact(otherProfile);
-        return owner.getChatParticipants().stream()
-                .findFirst()
-                .map(p -> p.getChatRoom())
-                .orElseThrow(() -> new AssertionError("Chat room should exist"));
+        Contact contact = currentProfile.addContact(otherProfile);
+        return currentProfile.addChatRoom(contact);
     }
 
 }

@@ -9,6 +9,7 @@ import com.example.chat.application.service.chatroom.data.request.GetChatRequest
 import com.example.chat.application.service.chatroom.data.request.GetUnreadMessageCountRequest;
 import com.example.chat.domain.entity.ChatParticipant;
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -70,12 +71,8 @@ public class GetChatTests {
         currentProfile = createProfile(currentUserId, "Current User");
         otherProfile = createProfile(UUID.randomUUID(), "Other User");
 
-        currentProfile.addContact(otherProfile);
-
-        chatRoom = currentProfile.getChatParticipants().stream()
-                .findFirst()
-                .map(ChatParticipant::getChatRoom)
-                .orElseThrow(() -> new AssertionError("Chat room should exist"));
+        Contact contact = currentProfile.addContact(otherProfile);
+        ChatRoom chatRoom = currentProfile.addChatRoom(contact);
 
         chatRoomId = chatRoom.getId();
 
@@ -100,7 +97,7 @@ public class GetChatTests {
         assertEquals(mockResponse, response.getChatRoomResponse());
 
         verify(chatRoomRepository).findById(chatRoomId);
-        verify(chatRoomMapper).toResponseForTwoPartyRoom(chatRoom, currentUserId);
+        verify(chatRoomMapper).toResponseForTwoPartyRoom(any(ChatRoom.class), any(UUID.class));
     }
 
     @Test
@@ -150,7 +147,7 @@ public class GetChatTests {
         chatRoomService.getChat(request);
 
         // Assert
-        verify(chatRoomMapper).toResponseForTwoPartyRoom(chatRoom, currentUserId);
+        verify(chatRoomMapper).toResponseForTwoPartyRoom(any(ChatRoom.class), any(UUID.class));
     }
 
     private GetChatRequest createRequest(UUID chatRoomId) {

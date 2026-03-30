@@ -1,6 +1,7 @@
 package com.example.chat.unit.domain.entity.chatroom.update;
 
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -23,7 +24,6 @@ public class ChatRoomUpdateTests {
         // Act & Assert
         assertThrows(IllegalStateException.class, () ->
                 chatRoom.rename(newName));
-
     }
 
     @Test
@@ -42,8 +42,8 @@ public class ChatRoomUpdateTests {
         Profile creator = createProfile("creator@example.com", "Creator");
         Profile other = createProfile("other@example.com", "Other");
 
-        creator.addContact(other);
-        ChatRoom chatRoom = creator.getChatParticipants().getFirst().getChatRoom();
+        Contact contact = creator.addContact(other);
+        ChatRoom chatRoom = creator.addChatRoom(contact);
         return chatRoom;
     }
 

@@ -2,6 +2,7 @@ package com.example.chat.unit.domain.entity.chatmessage.check;
 
 import com.example.chat.domain.entity.ChatMessage;
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -56,8 +57,8 @@ public class IsYoungerThanTests {
     }
 
     private ChatRoom createChatRoom(Profile creator, Profile other) {
-        creator.addContact(other);
-        ChatRoom chatRoom = creator.getChatParticipants().getFirst().getChatRoom();
+        Contact contact = creator.addContact(other);
+        ChatRoom chatRoom = creator.addChatRoom(contact);
         return chatRoom;
     }
 

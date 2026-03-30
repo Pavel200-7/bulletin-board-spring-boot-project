@@ -2,6 +2,7 @@ package com.example.chat.unit.domain.entity.chatroom.update;
 
 import com.example.chat.domain.entity.ChatMessage;
 import com.example.chat.domain.entity.ChatRoom;
+import com.example.chat.domain.entity.Contact;
 import com.example.chat.domain.entity.Profile;
 import com.example.chat.domain.entity.base.OwnerInfo;
 import com.example.chat.domain.entity.base.user.User;
@@ -30,8 +31,8 @@ public class ChatRoomMessageTests {
         sender = createProfile("sender@example.com", "Sender");
         otherParticipant = createProfile("other@example.com", "Other");
         nonParticipant = createProfile("non@example.com", "Non Participant");
-        sender.addContact(otherParticipant);
-        chatRoom = sender.getChatParticipants().getFirst().getChatRoom();
+        Contact contact = sender.addContact(otherParticipant);
+        chatRoom = sender.addChatRoom(contact);
     }
 
     @Test
