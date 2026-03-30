@@ -78,6 +78,28 @@ const routes = [
     ]
   },
   {
+    path: '/chat',
+    component: () => import('@/views/chat/ChatLayout.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'settings',
+        name: 'chat-settings',
+        component: () => import('@/views/chat/ChatSettings.vue')
+      },
+      {
+        path: 'contacts',
+        name: 'chat-contacts',
+        component: () => import('@/views/chat/ChatContacts.vue')
+      },
+      {
+        path: 'search',
+        name: 'chat-search',
+        component: () => import('@/views/chat/ChatSearch.vue')
+      }
+    ]
+  },
+  {
     path: '/bulletin/view/:id',
     name: 'bulletin-view',
     component: () => import('@/views/bulletin/BulletinViewPage.vue'),
@@ -115,12 +137,10 @@ router.beforeEach((to) => {
   const isAnonymous = authService.isAnonymous()
   const hasSession = isAuthenticated || isAnonymous
 
-  // Callback всегда доступен
   if (to.path === '/callback') {
     return true
   }
 
-  // Админ-панель требует админских прав
   if (to.meta.requiresAdmin) {
     if (!isAuthenticated) {
       return '/'
@@ -131,7 +151,6 @@ router.beforeEach((to) => {
     return true
   }
 
-  // Гостевые страницы (только для неавторизованных)
   if (to.meta.requiresGuest && hasSession) {
     return '/home'
   }

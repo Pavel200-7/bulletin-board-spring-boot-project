@@ -15,6 +15,7 @@
         🏪 Торговый профиль
       </router-link>
       <AdminButton v-if="isAdmin" @click="goToAdmin" />
+      <ChatButton v-if="isAuthenticated" @click="goToChat" />
       <LogoutButton v-if="isAuthenticated" @click="handleLogout" />
       <LoginButton v-if="isAnonymous" @click="handleLogin" />
     </div>
@@ -30,6 +31,8 @@ import AnonymousBadge from '@/components/badges/AnonymousBadge.vue'
 import AdminButton from '@/components/buttons/AdminButton.vue'
 import LogoutButton from '@/components/buttons/LogoutButton.vue'
 import LoginButton from '@/components/buttons/LoginButton.vue'
+import ChatButton from '@/components/buttons/ChatButton.vue'
+
 
 const { isAuthenticated, isAnonymous, isAdmin, logout, login } = useAuth()
 const router = useRouter()
@@ -45,6 +48,10 @@ const handleLogin = () => {
 
 const goToAdmin = () => {
   router.push('/admin')
+}
+
+const goToChat = () => {
+  router.push('/chat')
 }
 </script>
 
