@@ -58,4 +58,10 @@ public class ProfileController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/image")
+    public ResponseEntity<ChangeImageProfileResponse> changeImage(
+            @Valid @RequestBody ChangeImageProfileRequest request) {
+        return ResponseEntity.ok(profileService.changeImage(request));
+    }
+
 }

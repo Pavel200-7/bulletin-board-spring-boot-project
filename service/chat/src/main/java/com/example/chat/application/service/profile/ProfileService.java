@@ -10,4 +10,6 @@ public interface ProfileService {
     CreateProfileResponse createProfile(CreateProfileRequest request);
     ChangePublicNameResponse changePublicName(ChangePublicNameRequest request);
     ChangeDescriptionResponse changeDescription(ChangeDescriptionRequest request);
+    ChangeImageProfileResponse changeImage(ChangeImageProfileRequest request);
+
 }

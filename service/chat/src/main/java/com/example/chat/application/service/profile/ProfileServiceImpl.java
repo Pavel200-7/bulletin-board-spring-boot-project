@@ -136,4 +136,23 @@ public class ProfileServiceImpl implements ProfileService {
         return new ChangeDescriptionResponse(profileResponse);
     }
 
+    @Override
+    @Transactional
+    public ChangeImageProfileResponse changeImage(ChangeImageProfileRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Profile profile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Profile not found for current user with id: " + currentUserId));
+
+        accessValidator.validateOwnership(profile);
+
+        profile.changeImage(request.getImageId());
+        profileRepository.save(profile);
+        log.info("Изменено изображение для profile с id: {}, новый imageId: {}",
+                profile.getId(), request.getImageId());
+
+        ProfileResponse profileResponse = profileMapper.toResponse(profile);
+        return new ChangeImageProfileResponse(profileResponse);
+    }
+
 }
