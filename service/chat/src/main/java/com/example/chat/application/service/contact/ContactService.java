@@ -7,4 +7,6 @@ public interface ContactService {
     GetContactsResponse getContacts(GetContactsRequest request);
     CreateContactResponse createContact(CreateContactRequest request);
     ChangeContactNameResponse changeContactName(ChangeContactNameRequest request);
+    GetContactByIdResponse getContactById(GetContactByIdRequest request);
+    GetContactByProfileIdResponse getContactByProfileId(GetContactByProfileIdRequest request);
 }

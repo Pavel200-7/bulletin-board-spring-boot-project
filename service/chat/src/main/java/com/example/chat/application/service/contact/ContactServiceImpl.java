@@ -7,12 +7,8 @@ import com.example.chat.application.exception.AccessDeniedException;
 import com.example.chat.application.exception.DuplicateResourceException;
 import com.example.chat.application.exception.ResourceNotFoundException;
 import com.example.chat.application.mapper.ContactMapper;
-import com.example.chat.application.service.contact.data.request.ChangeContactNameRequest;
-import com.example.chat.application.service.contact.data.request.CreateContactRequest;
-import com.example.chat.application.service.contact.data.request.GetContactsRequest;
-import com.example.chat.application.service.contact.data.response.ChangeContactNameResponse;
-import com.example.chat.application.service.contact.data.response.CreateContactResponse;
-import com.example.chat.application.service.contact.data.response.GetContactsResponse;
+import com.example.chat.application.service.contact.data.request.*;
+import com.example.chat.application.service.contact.data.response.*;
 import com.example.chat.application.service.profile.validator.ProfileAccessValidator;
 import com.example.chat.domain.entity.ChatParticipant;
 import com.example.chat.domain.entity.ChatRoom;
@@ -71,15 +67,10 @@ public class ContactServiceImpl implements ContactService {
         Profile contactProfile = profileRepository.findById(request.getProfileId())
                 .orElseThrow(() -> new ResourceNotFoundException("Contact profile not found with id: " + request.getProfileId()));
 
-        log.info("Начало создания");
         Contact contact = ownerProfile.addContact(contactProfile);
-        log.info("Извлекаем newChatRoom");
         ChatRoom newChatRoom = ownerProfile.addChatRoom(contact);
 
-        log.info("new chat {}", newChatRoom.toString());
         chatRoomRepository.save(newChatRoom);
-
-        log.info("profile {}", ownerProfile.toString());
         profileRepository.save(ownerProfile);
 
         log.info("Создан новый контакт с id: {}, чат так же создан.", contact.getId());
@@ -105,6 +96,45 @@ public class ContactServiceImpl implements ContactService {
 
         ContactResponse contactResponse = contactMapper.toResponse(contact);
         return new ChangeContactNameResponse(contactResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetContactByIdResponse getContactById(GetContactByIdRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Profile currentProfile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for current user with id: " + currentUserId));
+        Contact contact = contactRepository.findById(request.getContactId())
+                .orElseThrow(() -> new ResourceNotFoundException("Contact not found with id: " + request.getContactId()));
+
+        if (!contact.getOwnerProfile().getId().equals(currentProfile.getId()) &&
+                !contact.getContactProfile().getId().equals(currentProfile.getId())) {
+            throw new AccessDeniedException("You don't have permission to view this contact");
+        }
+
+        log.info("Найден контакт с id: {} для пользователя: {}", contact.getId(), currentUserId);
+
+        ContactResponse contactResponse = contactMapper.toResponse(contact);
+        return new GetContactByIdResponse(contactResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public GetContactByProfileIdResponse getContactByProfileId(GetContactByProfileIdRequest request) {
+        UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Profile currentProfile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for current user with id: " + currentUserId));
+        Profile contactProfile = profileRepository.findById(request.getProfileId())
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found with id: " + request.getProfileId()));
+
+        Contact contact = contactRepository.findByProfilesId(currentProfile.getId(), contactProfile.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Contact not found between profiles: %s and %s",
+                                currentProfile.getId(), contactProfile.getId())));
+
+        log.info("Найден контакт между профилями {} и {}", currentProfile.getId(), contactProfile.getId());
+        ContactResponse contactResponse = contactMapper.toResponse(contact);
+        return new GetContactByProfileIdResponse(contactResponse);
     }
 
 }

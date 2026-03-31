@@ -1,12 +1,8 @@
 package com.example.chat.host.controller;
 
 import com.example.chat.application.service.contact.ContactService;
-import com.example.chat.application.service.contact.data.request.ChangeContactNameRequest;
-import com.example.chat.application.service.contact.data.request.CreateContactRequest;
-import com.example.chat.application.service.contact.data.request.GetContactsRequest;
-import com.example.chat.application.service.contact.data.response.ChangeContactNameResponse;
-import com.example.chat.application.service.contact.data.response.CreateContactResponse;
-import com.example.chat.application.service.contact.data.response.GetContactsResponse;
+import com.example.chat.application.service.contact.data.request.*;
+import com.example.chat.application.service.contact.data.response.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +17,23 @@ import java.util.UUID;
 public class ContactController {
 
     private final ContactService contactService;
+
+    @GetMapping("/{contactId}")
+    public ResponseEntity<GetContactByIdResponse> getContactById(@PathVariable UUID contactId) {
+        GetContactByIdRequest request = GetContactByIdRequest.builder()
+                .contactId(contactId)
+                .build();
+        return ResponseEntity.ok(contactService.getContactById(request));
+    }
+
+    @GetMapping("/by-profile/{profileId}")
+    public ResponseEntity<GetContactByProfileIdResponse> getContactByProfileId(@PathVariable UUID profileId) {
+        GetContactByProfileIdRequest request = GetContactByProfileIdRequest.builder()
+                .profileId(profileId)
+                .build();
+        return ResponseEntity.ok(contactService.getContactByProfileId(request));
+    }
+
 
     @GetMapping
     public ResponseEntity<GetContactsResponse> getContacts() {
