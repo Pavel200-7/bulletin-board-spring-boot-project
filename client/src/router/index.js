@@ -96,6 +96,12 @@ const routes = [
         path: 'search',
         name: 'chat-search',
         component: () => import('@/views/chat/ChatSearch.vue')
+      },
+      {
+        path: '/chat/room/:id',
+        name: 'chat-room',
+        component: () => import('@/views/chat/ChatRoom.vue'),
+        meta: { requiresAuth: true }
       }
     ]
   },

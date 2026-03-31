@@ -8,6 +8,22 @@ export const contactService = {
   // ========== ПОЛУЧЕНИЕ ==========
 
   /**
+   * Получить контакт по ID
+   * @param {string} contactId - ID контакта
+   */
+  getContactById(contactId) {
+    return apiClient.get(`/contact/${contactId}`)
+  },
+
+  /**
+   * Получить контакт по ID профиля
+   * @param {string} profileId - ID профиля
+   */
+  getContactByProfileId(profileId) {
+    return apiClient.get(`/contact/by-profile/${profileId}`)
+  },
+
+  /**
    * Получить список контактов текущего пользователя
    */
   getMyContacts() {

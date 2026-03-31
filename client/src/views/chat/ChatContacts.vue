@@ -39,10 +39,11 @@
           v-for="contact in filteredContacts"
           :key="contact.id"
           :contact-id="contact.id"
-          :profile-id="contact.contactProfileId"
+          :profile-id="getContactProfileId(contact)"
           :contact-name="contact.contactName"
           :chat-id="contact.chatId"
-          @click="goToChat(contact.chatId, contact.contactProfileId)"
+          :is-owner="contact.ownerProfileId === myProfile?.id"
+          @click="goToChat(contact.chatId)"
         />
       </div>
     </div>
@@ -53,11 +54,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useContact } from '@/composables/useContact'
+import { useProfile } from '@/composables/useProfile'
 import SearchInput from './components/wiget/SearchInput.vue'
 import ContactCard from './components/card/ContactCard.vue'
 
 const router = useRouter()
 const { contacts, loading, error, fetchContacts } = useContact()
+const { fetchMyProfile, profile: myProfile } = useProfile()
 
 const searchQuery = ref('')
 
@@ -68,19 +71,32 @@ const filteredContacts = computed(() => {
   )
 })
 
+// Определяем ID собеседника
+const getContactProfileId = (contact) => {
+  if (!myProfile.value) return contact.contactProfileId
+  
+  // Если текущий профиль является владельцем контакта
+  if (myProfile.value.id === contact.ownerProfileId) {
+    return contact.contactProfileId // собеседник
+  }
+  // Если текущий профиль является контактом
+  return contact.ownerProfileId // владелец контакта
+}
+
 const loadContacts = async () => {
-  await fetchContacts()
+  await Promise.all([
+    fetchContacts(),
+    fetchMyProfile()
+  ])
 }
 
 const handleSearch = (query) => {
   searchQuery.value = query
 }
 
-const goToChat = (chatId, profileId) => {
+const goToChat = (chatId) => {
   if (chatId) {
     router.push(`/chat/room/${chatId}`)
-  } else if (profileId) {
-    router.push(`/chat/room/${profileId}`)
   }
 }
 
@@ -92,6 +108,7 @@ onMounted(() => {
   loadContacts()
 })
 </script>
+
 
 <style scoped>
 .chat-contacts {

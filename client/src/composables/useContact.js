@@ -4,6 +4,7 @@ import { contactService } from '@/services/contact/contactService'
 
 export function useContact() {
   const contacts = ref([])
+  const currentContact = ref(null)
   const loading = ref(false)
   const error = ref(null)
 
@@ -26,8 +27,27 @@ export function useContact() {
    */
   const fetchContacts = async () => {
     const response = await handleRequest(() => contactService.getMyContacts())
-    console.log('Contacts:', response.data)
     contacts.value = response.data?.contacts || response.data || []
+    return response
+  }
+
+  /**
+   * Получить контакт по ID
+   * @param {string} contactId - ID контакта
+   */
+  const fetchContactById = async (contactId) => {
+    const response = await handleRequest(() => contactService.getContactById(contactId))
+    currentContact.value = response.data?.contactResponse || response.data
+    return response
+  }
+
+  /**
+   * Получить контакт по ID профиля
+   * @param {string} profileId - ID профиля
+   */
+  const fetchContactByProfileId = async (profileId) => {
+    const response = await handleRequest(() => contactService.getContactByProfileId(profileId))
+    currentContact.value = response.data?.contactResponse || response.data
     return response
   }
 
@@ -38,7 +58,6 @@ export function useContact() {
   const addContact = async (profileId) => {
     const response = await handleRequest(() => contactService.createContact(profileId))
     
-    // Добавляем новый контакт в список (если он там уже есть по id)
     const newContact = response.data?.contact || response.data
     if (newContact) {
       contacts.value = [...contacts.value, newContact]
@@ -55,7 +74,6 @@ export function useContact() {
   const renameContact = async (contactId, newName) => {
     const response = await handleRequest(() => contactService.changeContactName(contactId, newName))
     
-    // Обновляем имя в локальном списке
     const updatedContact = response.data?.contact || response.data
     if (updatedContact) {
       contacts.value = contacts.value.map(c => 
@@ -69,11 +87,14 @@ export function useContact() {
   return {
     // state
     contacts,
+    currentContact,
     loading,
     error,
 
     // actions
     fetchContacts,
+    fetchContactById,
+    fetchContactByProfileId,
     addContact,
     renameContact
   }

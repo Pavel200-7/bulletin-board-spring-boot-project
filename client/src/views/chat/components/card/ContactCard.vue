@@ -24,7 +24,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useProfile } from '@/composables/useProfile'
 
 const props = defineProps({
   contactId: {
@@ -47,10 +48,39 @@ const props = defineProps({
 
 defineEmits(['click'])
 
+const { fetchProfile, profile } = useProfile()
+const imageId = ref(null)
+const loading = ref(true)
+
+const getImageUrl = (id) => {
+  if (!id) return null
+  const MINIO_URL = import.meta.env.VITE_MINIO_URL || 'http://localhost:9001'
+  const BUCKET = import.meta.env.VITE_MINIO_BUCKET || 'bulletins'
+  return `${MINIO_URL}/${BUCKET}/${id}`
+}
+
 const avatarUrl = computed(() => {
-  // В текущем ответе нет imageId, пока используем заглушку
-  // TODO: добавить получение аватара через profileId
-  return null
+  return getImageUrl(imageId.value)
+})
+
+const loadProfile = async () => {
+  if (!props.profileId) return
+  
+  loading.value = true
+  try {
+    await fetchProfile(props.profileId)
+    if (profile.value) {
+      imageId.value = profile.value.imageId
+    }
+  } catch (err) {
+    console.error('Ошибка загрузки профиля:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  loadProfile()
 })
 </script>
 
