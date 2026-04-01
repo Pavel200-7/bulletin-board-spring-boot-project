@@ -50,178 +50,101 @@ export function useChat() {
   }
 
   /**
- * Загрузить сообщения вокруг последнего прочитанного
- * @param {string} chatId - ID чата
- * @param {number} size - количество сообщений
- */
-const loadMessagesAroundLastRead = async (chatId, size = 20) => {
-  try {
-    loading.value = true
-    const response = await chatService.getMessagesAroundLastRead(chatId, size)
-    const pageData = response.data?.chatMessagePage || response.data
-    
-    // Важно: правильно определяем first и last
-    const content = pageData?.content || []
-    
-    messages.value = content
-    
-    if (content.length > 0) {
-      firstMessageId.value = content[0]?.id
-      lastMessageId.value = content[content.length - 1]?.id
-    }
-    
-    // Определяем наличие старых и новых сообщений
-    // first = true означает, что это первая страница (нет более старых)
-    // last = true означает, что это последняя страница (нет более новых)
-    hasOlder.value = !pageData?.first && content.length > 0
-    hasNewer.value = !pageData?.last && content.length > 0
-    
-    console.log('loadMessagesAroundLastRead result:', {
-      contentLength: content.length,
-      hasOlder: hasOlder.value,
-      hasNewer: hasNewer.value,
-      first: pageData?.first,
-      last: pageData?.last
-    })
-    
-    return response
-  } catch (err) {
-    error.value = err.response?.data?.message || err.message
-    throw err
-  } finally {
-    loading.value = false
-  }
-}
+   * Загрузить сообщения вокруг последнего прочитанного
+   * @param {string} chatId - ID чата
+   * @param {number} size - количество сообщений
+   */
+  const loadMessagesAroundLastRead = async (chatId, size = 20) => {
+    try {
+      loading.value = true
+      const response = await chatService.getMessagesAroundLastRead(chatId, size)
+      const pageData = response.data?.chatMessagePage || response.data
+      
+      // Важно: правильно определяем first и last
+      const content = pageData?.content || []
+      
+      messages.value = content
+      
+      if (content.length > 0) {
+        firstMessageId.value = content[0]?.id
+        lastMessageId.value = content[content.length - 1]?.id
+      }
+      console.log(firstMessageId.value)
+      console.log(lastMessageId.value)
 
-/**
- * Загрузить более старые сообщения (скролл вверх)
- * @param {string} chatId - ID чата
- * @param {number} size - количество сообщений
- */
-const loadOlderMessages = async (chatId, size = 20) => {
-  if (!chatId) {
-    console.error('loadOlderMessages: chatId is required')
-    return
-  }
-  
-  if (loadingOlder.value || !hasOlder.value || !firstMessageId.value) {
-    console.log('Skipping load older:', { 
-      loadingOlder: loadingOlder.value, 
-      hasOlder: hasOlder.value, 
-      firstMessageId: firstMessageId.value 
-    })
-    return
-  }
-  
-  loadingOlder.value = true
-  
-  try {
-    const response = await chatService.getOlderMessages(chatId, firstMessageId.value, size)
-    const pageData = response.data?.chatMessagePage || response.data
-    const olderMessages = pageData?.content || []
-    
-    console.log('loadOlderMessages result:', {
-      olderCount: olderMessages.length,
-      first: pageData?.first,
-      last: pageData?.last
-    })
-    
-    if (olderMessages.length > 0) {
-      messages.value = [...olderMessages, ...messages.value]
-      firstMessageId.value = messages.value[0]?.id
+      console.log(pageData)
+      // Определяем наличие старых и новых сообщений
       hasOlder.value = !pageData?.first
-    } else {
-      hasOlder.value = false
-    }
-    
-    return response
-  } catch (err) {
-    console.error('Ошибка загрузки старых сообщений:', err)
-    error.value = err.response?.data?.message || err.message
-    throw err
-  } finally {
-    loadingOlder.value = false
-  }
-}
-
-/**
- * Загрузить более новые сообщения (скролл вниз / при получении новых)
- * @param {string} chatId - ID чата
- * @param {number} size - количество сообщений
- */
-const loadNewerMessages = async (chatId, size = 20) => {
-  if (!chatId) {
-    console.error('loadNewerMessages: chatId is required')
-    return
-  }
-  
-  if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) {
-    console.log('Skipping load newer:', { 
-      loadingNewer: loadingNewer.value, 
-      hasNewer: hasNewer.value, 
-      lastMessageId: lastMessageId.value 
-    })
-    return
-  }
-  
-  loadingNewer.value = true
-  
-  try {
-    const response = await chatService.getNewerMessages(chatId, lastMessageId.value, size)
-    const pageData = response.data?.chatMessagePage || response.data
-    const newerMessages = pageData?.content || []
-    
-    console.log('loadNewerMessages result:', {
-      newerCount: newerMessages.length,
-      first: pageData?.first,
-      last: pageData?.last
-    })
-    
-    if (newerMessages.length > 0) {
-      messages.value = [...messages.value, ...newerMessages]
-      lastMessageId.value = messages.value[messages.value.length - 1]?.id
       hasNewer.value = !pageData?.last
-    } else {
-      hasNewer.value = false
+
+      return response
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message
+      throw err
+    } finally {
+      loading.value = false
     }
+  }
+
+  /**
+   * Загрузить более старые сообщения (скролл вверх)
+   */
+  const loadOlderMessages = async (chatId, size = 20) => {
+    if (loadingOlder.value || !hasOlder.value || !firstMessageId.value) return
     
-    return response
-  } catch (err) {
-    console.error('Ошибка загрузки новых сообщений:', err)
-    error.value = err.response?.data?.message || err.message
-    throw err
-  } finally {
-    loadingNewer.value = false
-  }
-}
-
-  /**
-   * Добавить сообщение в список (оптимистичное обновление)
-   * @param {Object} message - сообщение
-   */
-  const addMessage = (message) => {
-    messages.value = [...messages.value, message]
-    lastMessageId.value = message.id
-  }
-
-  /**
-   * Обновить сообщение в списке
-   * @param {string} messageId - ID сообщения
-   * @param {Object} updatedData - обновленные данные
-   */
-  const updateMessageInList = (messageId, updatedData) => {
-    const index = messages.value.findIndex(m => m.id === messageId)
-    if (index !== -1) {
-      messages.value[index] = { ...messages.value[index], ...updatedData }
+    loadingOlder.value = true
+    
+    try {
+      const response = await chatService.getOlderMessages(chatId, firstMessageId.value, size)
+      const pageData = response.data?.chatMessagePage || response.data
+      const olderMessages = pageData?.content || []
+      
+      if (olderMessages.length > 0) {
+        messages.value = [...olderMessages, ...messages.value]
+        firstMessageId.value = messages.value[0]?.id
+        hasOlder.value = !pageData?.first
+      } else {
+        hasOlder.value = false
+      }
+      
+      return response
+    } catch (err) {
+      console.error('Ошибка загрузки старых сообщений:', err)
+      throw err
+    } finally {
+      loadingOlder.value = false
     }
   }
 
   /**
-   * Удалить сообщение из списка
-   * @param {string} messageId - ID сообщения
+   * Загрузить более новые сообщения (скролл вниз / кнопка)
    */
-  const removeMessageFromList = (messageId) => {
-    messages.value = messages.value.filter(m => m.id !== messageId)
+  const loadNewerMessages = async (chatId, size = 20) => {
+    console.log('loadNewerMessages', chatId)
+    if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) return
+    
+    loadingNewer.value = true
+    
+    try {
+      const response = await chatService.getNewerMessages(chatId, lastMessageId.value, size)
+      const pageData = response.data?.chatMessagePage || response.data
+      const newerMessages = pageData?.content || []
+      
+      if (newerMessages.length > 0) {
+        messages.value = [...messages.value, ...newerMessages]
+        lastMessageId.value = messages.value[messages.value.length - 1]?.id
+        hasNewer.value = !pageData?.last
+      } else {
+        hasNewer.value = false
+      }
+      
+      return response
+    } catch (err) {
+      console.error('Ошибка загрузки новых сообщений:', err)
+      throw err
+    } finally {
+      loadingNewer.value = false
+    }
   }
 
   /**
@@ -258,9 +181,6 @@ const loadNewerMessages = async (chatId, size = 20) => {
     loadMessagesAroundLastRead,
     loadOlderMessages,
     loadNewerMessages,
-    addMessage,
-    updateMessageInList,
-    removeMessageFromList,
     setLastRead
   }
 }

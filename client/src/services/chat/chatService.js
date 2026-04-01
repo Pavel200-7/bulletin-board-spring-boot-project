@@ -30,12 +30,16 @@ export const chatService = {
    * @param {number} params.size - количество сообщений
    */
   getMessagesByCursor(chatId, { cursorMessageId, direction, size }) {
-    return apiClient.post(`/chat/${chatId}/messages/search`, {
+    const res = apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
       direction,
       size
     })
+
+    console.log(res)
+
+    return res
   },
 
   /**
@@ -58,12 +62,18 @@ export const chatService = {
       console.error('Invalid parameters for getOlderMessages:', { chatId, cursorMessageId })
       return Promise.reject(new Error('chatId and cursorMessageId are required'))
     }
-    return apiClient.post(`/chat/${chatId}/messages/search`, {
+    console.log(cursorMessageId)
+
+    const res = apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
-      direction: 'ASC',
+      direction: 'DESC',
       size
     })
+
+    console.log(res)
+
+    return res
   },
 
   /**
@@ -77,12 +87,18 @@ export const chatService = {
       console.error('Invalid parameters for getNewerMessages:', { chatId, cursorMessageId })
       return Promise.reject(new Error('chatId and cursorMessageId are required'))
     }
-    return apiClient.post(`/chat/${chatId}/messages/search`, {
+    console.log(cursorMessageId)
+
+    const res =  apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
-      direction: 'DESC',
+      direction: 'ASC',
       size
     })
+
+    console.log(res)
+
+    return res
   },
 
   /**

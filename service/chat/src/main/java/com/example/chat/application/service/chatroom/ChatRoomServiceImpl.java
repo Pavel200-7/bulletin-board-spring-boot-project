@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -32,8 +33,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -97,10 +98,26 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Pageable pageable = PageRequest.of(0, request.getSize());
 
         Page<ChatMessage> messages = chatMessageRepository.findAll(spec, pageable);
+        Page<ChatMessageResponse> responsePage = toResponsePage(messages, criteria.getDirection());
 
-        Page<ChatMessageResponse> responsePage = messages.map(chatMessageMapper::toResponse);
         log.info("Найдено {} сообщений.", responsePage.getNumberOfElements());
         return new GetMessagePaginationResponse(responsePage);
+    }
+
+    private Page<ChatMessageResponse> toResponsePage(Page<ChatMessage> page, Direction direction) {
+        List<ChatMessageResponse> messageResponses = new ArrayList<>(page.getContent().stream()
+                .map(chatMessageMapper::toResponse)
+                .toList());
+
+        if (direction == Direction.DESC) {
+            Collections.reverse(messageResponses);
+        }
+
+        return new PageImpl<>(
+                messageResponses,
+                page.getPageable(),
+                page.getTotalElements()
+        );
     }
 
     @Override
@@ -157,7 +174,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         Page<ChatMessage> messages = chatMessageRepository.findAll(spec, pageable);
 
-        Page<ChatMessageResponse> responsePage = messages.map(chatMessageMapper::toResponse);
+        Page<ChatMessageResponse> responsePage = toResponsePage(messages, criteria.getDirection());
+
         log.info("Найдено {} сообщений вокруг последнего прочитанного сообщения {} в чате {}.",
                 responsePage.getNumberOfElements(), lastReadMessageId, request.getChatId());
         return new GetMessagePaginationResponse(responsePage);

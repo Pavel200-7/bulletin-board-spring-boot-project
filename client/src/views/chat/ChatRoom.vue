@@ -13,7 +13,14 @@
     <MessagesContainer
       ref="messagesContainer"
       :messages="messages"
+      :loading="loadingMessages"
+      :loading-older="loadingOlder"
+      :loading-newer="loadingNewer"
       :current-user-id="currentUserId"
+      :has-older="hasOlder"
+      :has-newer="hasNewer"
+      @load-older="() => loadOlderMessages(chatId)"
+      @load-newer="() => loadNewerMessages(chatId)"
     />
 
     <ChatInput
@@ -53,7 +60,13 @@ const {
   fetchChat, 
   fetchUnreadCount,
   loadMessagesAroundLastRead,
+  loadOlderMessages,
+  loadNewerMessages,
   messages, 
+  loadingOlder,
+  loadingNewer,
+  hasOlder,
+  hasNewer,
   currentChat 
 } = useChat()
 const { sendMessage: sendTextMessage, sending } = useTextMessage()
@@ -94,6 +107,12 @@ const loadChatData = async () => {
     await fetchChat(chatId)
     await fetchUnreadCount(chatId)
     await loadMessagesAroundLastRead(chatId)
+    
+    console.log('After loadMessagesAroundLastRead:', {
+      hasOlder: hasOlder.value,
+      hasNewer: hasNewer.value,
+      messagesCount: messages.value.length
+    })
     
     if (!currentChat.value) return
     
@@ -142,6 +161,7 @@ const sendMessage = async (text) => {
   try {
     await sendTextMessage(chatId, text)
     messageText.value = ''
+    // После отправки обновляем список
     await loadMessagesAroundLastRead(chatId)
   } catch (err) {
     console.error('Ошибка отправки сообщения:', err)
