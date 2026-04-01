@@ -152,13 +152,7 @@ const scrollToLastMessages = () => {
       
       // Плавная анимация прокрутки
       smoothScrollTo(finalPosition, 400)
-      
-      console.log('Scrolled to last messages:', {
-        scrollHeight,
-        clientHeight,
-        targetScrollTop,
-        finalPosition
-      })
+    
       
       if (resizeObserver) {
         resizeObserver.disconnect()
@@ -188,7 +182,6 @@ const handleScroll = () => {
   const el = container.value
   if (!el) return
   
-  // Если идет анимация, не прерываем её событиями скролла
   if (animationFrameId) return
   
   const scrollTop = el.scrollTop
@@ -200,7 +193,6 @@ const handleScroll = () => {
   
   // Загрузка старых сообщений при скролле вверх
   if (isNearTop && props.hasOlder && !props.loadingOlder) {
-    console.log('🚀 Loading older messages...')
     previousScrollHeight = scrollHeight
     previousScrollTop = scrollTop
     emit('load-older')
@@ -208,7 +200,6 @@ const handleScroll = () => {
   
   // Загрузка новых сообщений при скролле вниз (если есть непрочитанные)
   if (isNearBottom && props.hasNewer && !props.loadingNewer) {
-    console.log('📩 Loading newer messages...')
     emit('load-newer')
   }
 }
@@ -231,11 +222,6 @@ const preserveScrollPosition = () => {
   if (heightDiff > 0) {
     const newScrollTop = previousScrollTop + heightDiff
     container.value.scrollTop = newScrollTop
-    console.log('Preserving scroll position:', {
-      previousScrollTop,
-      heightDiff,
-      newScrollTop
-    })
   }
   
   previousScrollHeight = newScrollHeight

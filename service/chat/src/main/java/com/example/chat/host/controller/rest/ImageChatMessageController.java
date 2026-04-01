@@ -1,4 +1,4 @@
-package com.example.chat.host.controller;
+package com.example.chat.host.controller.rest;
 
 import com.example.chat.application.service.message.image.ImageChatMessageService;
 import com.example.chat.application.service.message.image.data.request.CreateImageChatMessageRequest;

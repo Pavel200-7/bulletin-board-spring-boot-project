@@ -96,14 +96,6 @@ export function useChat() {
         hasNewer.value = false
       }
 
-      console.log('loadMessagesAroundLastRead result:', {
-        contentLength: content.length,
-        hasOlder: hasOlder.value,
-        hasNewer: hasNewer.value,
-        firstMessageId: firstMessageId.value,
-        lastMessageId: lastMessageId.value
-      })
-
       return response
     } catch (err) {
       error.value = err.response?.data?.message || err.message
@@ -118,11 +110,6 @@ export function useChat() {
    */
   const loadOlderMessages = async (chatId, size = 20) => {
     if (loadingOlder.value || !hasOlder.value || !firstMessageId.value) {
-      console.log('Skipping load older:', { 
-        loadingOlder: loadingOlder.value, 
-        hasOlder: hasOlder.value, 
-        firstMessageId: firstMessageId.value 
-      })
       return
     }
     
@@ -155,13 +142,7 @@ export function useChat() {
    * Загрузить более новые сообщения (скролл вниз / кнопка)
    */
   const loadNewerMessages = async (chatId, size = 20) => {
-    console.log('loadNewerMessages', chatId)
     if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) {
-      console.log('Skipping load newer:', { 
-        loadingNewer: loadingNewer.value, 
-        hasNewer: hasNewer.value, 
-        lastMessageId: lastMessageId.value 
-      })
       return
     }
     

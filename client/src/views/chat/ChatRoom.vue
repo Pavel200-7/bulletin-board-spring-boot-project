@@ -108,12 +108,6 @@ const loadChatData = async () => {
     await fetchUnreadCount(chatId)
     await loadMessagesAroundLastRead(chatId)
     
-    console.log('After loadMessagesAroundLastRead:', {
-      hasOlder: hasOlder.value,
-      hasNewer: hasNewer.value,
-      messagesCount: messages.value.length
-    })
-    
     if (!currentChat.value) return
     
     const participants = currentChat.value.participantResponses || []

@@ -1,4 +1,4 @@
-package com.example.chat.host.controller;
+package com.example.chat.host.controller.rest;
 
 import com.example.chat.application.service.chatroom.ChatRoomService;
 import com.example.chat.application.service.chatroom.data.request.*;
@@ -8,7 +8,6 @@ import com.example.chat.application.service.chatroom.data.response.GetUnreadMess
 import com.example.chat.application.service.chatroom.data.response.SetLastReadMessageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

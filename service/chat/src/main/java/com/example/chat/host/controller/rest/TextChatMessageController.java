@@ -1,4 +1,4 @@
-package com.example.chat.host.controller;
+package com.example.chat.host.controller.rest;
 
 import com.example.chat.application.service.message.text.TextChatMessageService;
 import com.example.chat.application.service.message.text.data.request.CreateTextChatMessageRequest;

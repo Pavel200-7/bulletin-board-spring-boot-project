@@ -36,9 +36,6 @@ export const chatService = {
       direction,
       size
     })
-
-    console.log(res)
-
     return res
   },
 
@@ -62,17 +59,12 @@ export const chatService = {
       console.error('Invalid parameters for getOlderMessages:', { chatId, cursorMessageId })
       return Promise.reject(new Error('chatId and cursorMessageId are required'))
     }
-    console.log(cursorMessageId)
-
     const res = apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
       direction: 'DESC',
       size
     })
-
-    console.log(res)
-
     return res
   },
 
@@ -87,17 +79,12 @@ export const chatService = {
       console.error('Invalid parameters for getNewerMessages:', { chatId, cursorMessageId })
       return Promise.reject(new Error('chatId and cursorMessageId are required'))
     }
-    console.log(cursorMessageId)
-
     const res =  apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
       direction: 'ASC',
       size
     })
-
-    console.log(res)
-
     return res
   },
 

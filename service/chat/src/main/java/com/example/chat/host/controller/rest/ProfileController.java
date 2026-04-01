@@ -1,4 +1,4 @@
-package com.example.chat.host.controller;
+package com.example.chat.host.controller.rest;
 
 import com.example.chat.application.service.profile.ProfileService;
 import com.example.chat.application.service.profile.data.request.*;
