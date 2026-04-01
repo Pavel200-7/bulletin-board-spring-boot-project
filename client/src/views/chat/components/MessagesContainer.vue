@@ -84,6 +84,10 @@ const emit = defineEmits(['load-older', 'load-newer'])
 
 const container = ref(null)
 let previousScrollHeight = 0
+let previousScrollTop = 0
+let isFirstLoad = true
+let resizeObserver = null
+let animationFrameId = null
 
 const getImageUrl = (imageId) => {
   if (!imageId) return null
@@ -100,9 +104,92 @@ const formatTime = (date) => {
   })
 }
 
+const smoothScrollTo = (targetPosition, duration = 300) => {
+  if (!container.value) return
+  
+  const element = container.value
+  const startPosition = element.scrollTop
+  const distance = targetPosition - startPosition
+  const startTime = performance.now()
+  
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId)
+  }
+  
+  const animation = (currentTime) => {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    
+    // easeOutCubic для плавного замедления в конце
+    const easeProgress = 1 - Math.pow(1 - progress, 3)
+    const newPosition = startPosition + distance * easeProgress
+    
+    element.scrollTop = newPosition
+    
+    if (progress < 1) {
+      animationFrameId = requestAnimationFrame(animation)
+    } else {
+      animationFrameId = null
+    }
+  }
+  
+  animationFrameId = requestAnimationFrame(animation)
+}
+
+const scrollToLastMessages = () => {
+  if (!container.value) return
+  
+  const el = container.value
+  
+  const performScroll = () => {
+    const scrollHeight = el.scrollHeight
+    const clientHeight = el.clientHeight
+    
+    if (scrollHeight > clientHeight) {
+      const targetScrollTop = scrollHeight - clientHeight
+      const offset = 100
+      const finalPosition = Math.max(0, targetScrollTop - offset)
+      
+      // Плавная анимация прокрутки
+      smoothScrollTo(finalPosition, 400)
+      
+      console.log('Scrolled to last messages:', {
+        scrollHeight,
+        clientHeight,
+        targetScrollTop,
+        finalPosition
+      })
+      
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+        resizeObserver = null
+      }
+    }
+  }
+  
+  performScroll()
+  
+  if (window.ResizeObserver && !resizeObserver) {
+    resizeObserver = new ResizeObserver(() => {
+      performScroll()
+    })
+    resizeObserver.observe(el)
+    
+    setTimeout(() => {
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+        resizeObserver = null
+      }
+    }, 1000)
+  }
+}
+
 const handleScroll = () => {
   const el = container.value
   if (!el) return
+  
+  // Если идет анимация, не прерываем её событиями скролла
+  if (animationFrameId) return
   
   const scrollTop = el.scrollTop
   const scrollHeight = el.scrollHeight
@@ -115,6 +202,7 @@ const handleScroll = () => {
   if (isNearTop && props.hasOlder && !props.loadingOlder) {
     console.log('🚀 Loading older messages...')
     previousScrollHeight = scrollHeight
+    previousScrollTop = scrollTop
     emit('load-older')
   }
   
@@ -129,7 +217,8 @@ const scrollToBottom = () => {
   if (!container.value) return
   
   nextTick(() => {
-    container.value.scrollTop = container.value.scrollHeight
+    const targetScrollTop = container.value.scrollHeight
+    smoothScrollTo(targetScrollTop, 300)
   })
 }
 
@@ -139,32 +228,47 @@ const preserveScrollPosition = () => {
   const newScrollHeight = container.value.scrollHeight
   const heightDiff = newScrollHeight - previousScrollHeight
   
-  // Если добавились старые сообщения, сохраняем позицию
   if (heightDiff > 0) {
-    container.value.scrollTop += heightDiff
+    const newScrollTop = previousScrollTop + heightDiff
+    container.value.scrollTop = newScrollTop
+    console.log('Preserving scroll position:', {
+      previousScrollTop,
+      heightDiff,
+      newScrollTop
+    })
   }
   
   previousScrollHeight = newScrollHeight
+  previousScrollTop = container.value.scrollTop
 }
 
 const openImage = (imageId) => {
   window.open(getImageUrl(imageId), '_blank')
 }
 
-// При добавлении старых сообщений (в начало) сохраняем позицию
+// При добавлении сообщений
 watch(() => props.messages.length, (newLen, oldLen) => {
   if (newLen <= oldLen) return
   
-  // Если была загрузка старых сообщений (previousScrollHeight > 0)
+  if (isFirstLoad) {
+    isFirstLoad = false
+    scrollToLastMessages()
+    return
+  }
+  
   if (previousScrollHeight > 0) {
     preserveScrollPosition()
-    previousScrollHeight = 0
+    nextTick(() => {
+      previousScrollHeight = 0
+      previousScrollTop = 0
+    })
   }
 })
 
 onMounted(() => {
   if (container.value) {
     previousScrollHeight = container.value.scrollHeight
+    previousScrollTop = container.value.scrollTop
   }
 })
 
@@ -180,6 +284,7 @@ defineExpose({
   padding: 1rem;
   background: #f8f9fa;
   position: relative;
+  scroll-behavior: auto; /* Отключаем стандартную анимацию, используем свою */
 }
 
 .empty-state {

@@ -102,6 +102,46 @@ export const chatService = {
   },
 
   /**
+   * Проверить, есть ли более старые сообщения (до указанного)
+   * @param {string} chatId - ID чата
+   * @param {string} cursorMessageId - ID опорного сообщения
+   */
+  hasOlderMessages(chatId, cursorMessageId) {
+    if (!chatId || !cursorMessageId) {
+      return Promise.resolve(false)
+    }
+    return apiClient.post(`/chat/${chatId}/messages/search`, {
+      chatId,
+      cursorMessageId,
+      direction: 'ASC',
+      size: 1
+    }).then(response => {
+      const content = response.data?.chatMessagePage?.content || []
+      return content.length > 0
+    }).catch(() => false)
+  },
+
+  /**
+   * Проверить, есть ли более новые сообщения (после указанного)
+   * @param {string} chatId - ID чата
+   * @param {string} cursorMessageId - ID опорного сообщения
+   */
+  hasNewerMessages(chatId, cursorMessageId) {
+    if (!chatId || !cursorMessageId) {
+      return Promise.resolve(false)
+    }
+    return apiClient.post(`/chat/${chatId}/messages/search`, {
+      chatId,
+      cursorMessageId,
+      direction: 'DESC',
+      size: 1
+    }).then(response => {
+      const content = response.data?.chatMessagePage?.content || []
+      return content.length > 0
+    }).catch(() => false)
+  },
+
+  /**
    * Установить последнее прочитанное сообщение
    * @param {string} chatId - ID чата
    * @param {string} messageId - ID сообщения

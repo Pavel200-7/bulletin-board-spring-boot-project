@@ -50,6 +50,26 @@ export function useChat() {
   }
 
   /**
+   * Проверить, есть ли более старые сообщения
+   * @param {string} chatId - ID чата
+   * @param {string} messageId - ID опорного сообщения
+   */
+  const checkHasOlder = async (chatId, messageId) => {
+    if (!messageId) return false
+    return await chatService.hasOlderMessages(chatId, messageId)
+  }
+
+  /**
+   * Проверить, есть ли более новые сообщения
+   * @param {string} chatId - ID чата
+   * @param {string} messageId - ID опорного сообщения
+   */
+  const checkHasNewer = async (chatId, messageId) => {
+    if (!messageId) return false
+    return await chatService.hasNewerMessages(chatId, messageId)
+  }
+
+  /**
    * Загрузить сообщения вокруг последнего прочитанного
    * @param {string} chatId - ID чата
    * @param {number} size - количество сообщений
@@ -60,7 +80,6 @@ export function useChat() {
       const response = await chatService.getMessagesAroundLastRead(chatId, size)
       const pageData = response.data?.chatMessagePage || response.data
       
-      // Важно: правильно определяем first и last
       const content = pageData?.content || []
       
       messages.value = content
@@ -68,14 +87,22 @@ export function useChat() {
       if (content.length > 0) {
         firstMessageId.value = content[0]?.id
         lastMessageId.value = content[content.length - 1]?.id
+        
+        // Проверяем наличие старых и новых сообщений
+        hasOlder.value = await checkHasOlder(chatId, firstMessageId.value)
+        hasNewer.value = await checkHasNewer(chatId, lastMessageId.value)
+      } else {
+        hasOlder.value = false
+        hasNewer.value = false
       }
-      console.log(firstMessageId.value)
-      console.log(lastMessageId.value)
 
-      console.log(pageData)
-      // Определяем наличие старых и новых сообщений
-      hasOlder.value = !pageData?.first
-      hasNewer.value = !pageData?.last
+      console.log('loadMessagesAroundLastRead result:', {
+        contentLength: content.length,
+        hasOlder: hasOlder.value,
+        hasNewer: hasNewer.value,
+        firstMessageId: firstMessageId.value,
+        lastMessageId: lastMessageId.value
+      })
 
       return response
     } catch (err) {
@@ -90,7 +117,14 @@ export function useChat() {
    * Загрузить более старые сообщения (скролл вверх)
    */
   const loadOlderMessages = async (chatId, size = 20) => {
-    if (loadingOlder.value || !hasOlder.value || !firstMessageId.value) return
+    if (loadingOlder.value || !hasOlder.value || !firstMessageId.value) {
+      console.log('Skipping load older:', { 
+        loadingOlder: loadingOlder.value, 
+        hasOlder: hasOlder.value, 
+        firstMessageId: firstMessageId.value 
+      })
+      return
+    }
     
     loadingOlder.value = true
     
@@ -102,7 +136,8 @@ export function useChat() {
       if (olderMessages.length > 0) {
         messages.value = [...olderMessages, ...messages.value]
         firstMessageId.value = messages.value[0]?.id
-        hasOlder.value = !pageData?.first
+        // Проверяем, есть ли еще более старые
+        hasOlder.value = await checkHasOlder(chatId, firstMessageId.value)
       } else {
         hasOlder.value = false
       }
@@ -121,7 +156,14 @@ export function useChat() {
    */
   const loadNewerMessages = async (chatId, size = 20) => {
     console.log('loadNewerMessages', chatId)
-    if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) return
+    if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) {
+      console.log('Skipping load newer:', { 
+        loadingNewer: loadingNewer.value, 
+        hasNewer: hasNewer.value, 
+        lastMessageId: lastMessageId.value 
+      })
+      return
+    }
     
     loadingNewer.value = true
     
@@ -133,7 +175,8 @@ export function useChat() {
       if (newerMessages.length > 0) {
         messages.value = [...messages.value, ...newerMessages]
         lastMessageId.value = messages.value[messages.value.length - 1]?.id
-        hasNewer.value = !pageData?.last
+        // Проверяем, есть ли еще более новые
+        hasNewer.value = await checkHasNewer(chatId, lastMessageId.value)
       } else {
         hasNewer.value = false
       }
@@ -181,6 +224,8 @@ export function useChat() {
     loadMessagesAroundLastRead,
     loadOlderMessages,
     loadNewerMessages,
-    setLastRead
+    setLastRead,
+    checkHasOlder,
+    checkHasNewer
   }
 }
