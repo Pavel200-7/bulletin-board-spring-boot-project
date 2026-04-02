@@ -16,11 +16,13 @@
       :loading="loadingMessages"
       :loading-older="loadingOlder"
       :loading-newer="loadingNewer"
-      :current-user-id="currentUserId"
+      :current-user-profile-id="currentUserProfileId"
       :has-older="hasOlder"
       :has-newer="hasNewer"
       @load-older="() => loadOlderMessages(chatId)"
       @load-newer="() => loadNewerMessages(chatId)"
+      @edit-message="handleEditMessage"
+      @delete-message="handleDeleteMessage"
     />
 
     <ChatInput
@@ -87,7 +89,11 @@ const {
   isConnected: wsIsConnected,
   connected: wsConnected
 } = useSubscription()
-const { sendMessage: wsSendMessage } = useTextMessageWebSocket()
+const { 
+  sendMessage: wsSendMessage,
+  updateMessage: wsUpdateMessage, 
+  deleteMessage: wsDeleteMessage 
+} = useTextMessageWebSocket()
 
 const chatId = route.params.id
 const messageText = ref('')
@@ -100,6 +106,8 @@ const otherParticipantAvatar = ref(null)
 const otherParticipantPublicName = ref('')
 const showUserModal = ref(false)
 const currentUserId = ref(null)
+const currentUserProfileId = ref(null)
+
 
 const getImageUrl = (imageId) => {
   if (!imageId) return null
@@ -119,8 +127,13 @@ const loadChatData = async () => {
     console.log('📥 Loading chat data for chat:', chatId)
     
     await fetchMyProfile()
+
     currentUserId.value = getUserId()
     console.log('Current user ID:', currentUserId.value)
+
+    currentUserProfileId.value = myProfile.value?.id
+    console.log('Current user Profile ID:', currentUserProfileId.value)
+
     
     await fetchChat(chatId)
     await fetchUnreadCount(chatId)
@@ -246,6 +259,44 @@ const sendMessage = async (text) => {
   } catch (err) {
     console.error('❌ Error sending message:', err)
     alert('Не удалось отправить сообщение')
+  }
+}
+
+const handleEditMessage = async ({ messageId, newText }) => {
+  try {
+    // Обновляем локально сразу (оптимистично)
+    // updateMessageInList(messageId, { content: newText, updated: true })
+    
+    // Отправляем запрос на сервер
+    const sent = wsUpdateMessage(chatId, messageId, newText)
+    console.log('✅ Message update sent via WebSocket')
+
+    
+    if (!sent) {
+      // Если WebSocket не работает, используем REST (TODO: добавить REST метод)
+      console.warn('WebSocket update failed, need REST fallback')
+    }
+  } catch (err) {
+    console.error('Error editing message:', err)
+    alert('Не удалось изменить сообщение')
+  }
+}
+
+// Обработчик удаления сообщения
+const handleDeleteMessage = async (messageId) => {
+  try {
+    // Удаляем локально сразу (оптимистично)
+    // removeMessageFromList(messageId)
+    
+    // Отправляем запрос на сервер
+    const sent = wsDeleteMessage(chatId, messageId)
+    
+    if (!sent) {
+      console.warn('WebSocket delete failed, need REST fallback')
+    }
+  } catch (err) {
+    console.error('Error deleting message:', err)
+    alert('Не удалось удалить сообщение')
   }
 }
 

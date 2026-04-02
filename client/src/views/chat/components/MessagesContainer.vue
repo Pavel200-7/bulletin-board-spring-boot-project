@@ -1,6 +1,6 @@
 <!-- src/views/chat/components/MessagesContainer.vue -->
 <template>
-  <div class="messages-container" ref="container" @scroll="handleScroll">
+  <div class="messages-container" ref="container" @scroll="handleScroll" @contextmenu.prevent>
     <!-- Индикатор загрузки старых сообщений -->
     <div v-if="loadingOlder" class="loading-indicator top">
       <div class="spinner-small"></div>
@@ -23,14 +23,34 @@
         v-for="message in messages"
         :key="message.id"
         class="message-item"
-        :class="{ 'message-own': message.senderId === currentUserId }"
+        :class="{ 
+          'message-own': message.senderId === currentUserProfileId,
+          'message-own-edit': message.senderId === currentUserProfileId && editingMessageId === message.id
+        }"
+        @contextmenu="(e) => openContextMenu(e, message)"
       >
         <div class="message-bubble">
           <div v-if="message.type === 'TEXT'" class="message-text">
-            {{ message.content }}
+            <template v-if="editingMessageId === message.id">
+              <textarea
+                ref="editTextareaRef"
+                v-model="editText"
+                class="edit-input"
+                @keyup.enter.prevent="saveEdit(message.id)"
+                @keyup.esc="cancelEdit"
+              ></textarea>
+              <div class="edit-actions">
+                <button @click="saveEdit(message.id)" class="save-btn">✓</button>
+                <button @click="cancelEdit" class="cancel-btn">✕</button>
+              </div>
+            </template>
+            <template v-else>
+              {{ message.content }}
+              <span v-if="message.updated" class="edited-badge">(изменено)</span>
+            </template>
           </div>
           <div v-else-if="message.type === 'IMAGE'" class="message-image">
-            <img :src="getImageUrl(message.content)" alt="Изображение" />
+            <img :src="getImageUrl(message.content)" alt="Изображение" @click="openImage(message.content)" />
           </div>
           <div class="message-time">
             {{ formatTime(message.createdAt) }}
@@ -43,11 +63,38 @@
       <div class="spinner-small"></div>
       <span>Загрузка новых...</span>
     </div>
+
+    <!-- Контекстное меню -->
+    <MessageActions
+      :show="contextMenu.show"
+      :position="contextMenu.position"
+      @edit="handleEditMessage"
+      @delete="handleDeleteMessage"
+      @close="closeContextMenu"
+    />
+
+    <!-- Модальное окно редактирования -->
+    <EditMessageModal
+      :show="showEditModal"
+      :current-text="editText"
+      @save="confirmEdit"
+      @close="closeEditModal"
+    />
+
+    <!-- Модальное окно подтверждения удаления -->
+    <DeleteConfirmModal
+      :show="showDeleteModal"
+      @confirm="confirmDelete"
+      @close="closeDeleteModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, watch, nextTick, onMounted } from 'vue'
+import MessageActions from './MessageActions.vue'
+import EditMessageModal from './EditMessageModal.vue'
+import DeleteConfirmModal from './DeleteConfirmModal.vue'
 
 const props = defineProps({
   messages: {
@@ -66,7 +113,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  currentUserId: {
+  currentUserProfileId: {
     type: String,
     default: null
   },
@@ -80,14 +127,19 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['load-older', 'load-newer'])
+const emit = defineEmits(['load-older', 'load-newer', 'edit-message', 'delete-message'])
 
 const container = ref(null)
-let previousScrollHeight = 0
-let previousScrollTop = 0
-let isFirstLoad = true
-let resizeObserver = null
-let animationFrameId = null
+const isUserAtBottom = ref(true)
+const selectedMessage = ref(null)
+const editText = ref('')
+const editingMessageId = ref(null)
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+const contextMenu = ref({
+  show: false,
+  position: { x: 0, y: 0 }
+})
 
 const getImageUrl = (imageId) => {
   if (!imageId) return null
@@ -104,85 +156,9 @@ const formatTime = (date) => {
   })
 }
 
-const smoothScrollTo = (targetPosition, duration = 300) => {
-  if (!container.value) return
-  
-  const element = container.value
-  const startPosition = element.scrollTop
-  const distance = targetPosition - startPosition
-  const startTime = performance.now()
-  
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId)
-  }
-  
-  const animation = (currentTime) => {
-    const elapsed = currentTime - startTime
-    const progress = Math.min(elapsed / duration, 1)
-    
-    // easeOutCubic для плавного замедления в конце
-    const easeProgress = 1 - Math.pow(1 - progress, 3)
-    const newPosition = startPosition + distance * easeProgress
-    
-    element.scrollTop = newPosition
-    
-    if (progress < 1) {
-      animationFrameId = requestAnimationFrame(animation)
-    } else {
-      animationFrameId = null
-    }
-  }
-  
-  animationFrameId = requestAnimationFrame(animation)
-}
-
-const scrollToLastMessages = () => {
-  if (!container.value) return
-  
-  const el = container.value
-  
-  const performScroll = () => {
-    const scrollHeight = el.scrollHeight
-    const clientHeight = el.clientHeight
-    
-    if (scrollHeight > clientHeight) {
-      const targetScrollTop = scrollHeight - clientHeight
-      const offset = 100
-      const finalPosition = Math.max(0, targetScrollTop - offset)
-      
-      // Плавная анимация прокрутки
-      smoothScrollTo(finalPosition, 400)
-    
-      
-      if (resizeObserver) {
-        resizeObserver.disconnect()
-        resizeObserver = null
-      }
-    }
-  }
-  
-  performScroll()
-  
-  if (window.ResizeObserver && !resizeObserver) {
-    resizeObserver = new ResizeObserver(() => {
-      performScroll()
-    })
-    resizeObserver.observe(el)
-    
-    setTimeout(() => {
-      if (resizeObserver) {
-        resizeObserver.disconnect()
-        resizeObserver = null
-      }
-    }, 1000)
-  }
-}
-
 const handleScroll = () => {
   const el = container.value
   if (!el) return
-  
-  if (animationFrameId) return
   
   const scrollTop = el.scrollTop
   const scrollHeight = el.scrollHeight
@@ -191,71 +167,99 @@ const handleScroll = () => {
   const isNearTop = scrollTop < 50
   const isNearBottom = scrollHeight - scrollTop - clientHeight < 50
   
-  // Загрузка старых сообщений при скролле вверх
+  isUserAtBottom.value = isNearBottom
+  
   if (isNearTop && props.hasOlder && !props.loadingOlder) {
-    previousScrollHeight = scrollHeight
-    previousScrollTop = scrollTop
     emit('load-older')
   }
   
-  // Загрузка новых сообщений при скролле вниз (если есть непрочитанные)
   if (isNearBottom && props.hasNewer && !props.loadingNewer) {
     emit('load-newer')
   }
 }
 
 const scrollToBottom = () => {
-  if (!container.value) return
-  
-  nextTick(() => {
-    const targetScrollTop = container.value.scrollHeight
-    smoothScrollTo(targetScrollTop, 300)
-  })
-}
-
-const preserveScrollPosition = () => {
-  if (!container.value) return
-  
-  const newScrollHeight = container.value.scrollHeight
-  const heightDiff = newScrollHeight - previousScrollHeight
-  
-  if (heightDiff > 0) {
-    const newScrollTop = previousScrollTop + heightDiff
-    container.value.scrollTop = newScrollTop
-  }
-  
-  previousScrollHeight = newScrollHeight
-  previousScrollTop = container.value.scrollTop
-}
-
-const openImage = (imageId) => {
-  window.open(getImageUrl(imageId), '_blank')
-}
-
-// При добавлении сообщений
-watch(() => props.messages.length, (newLen, oldLen) => {
-  if (newLen <= oldLen) return
-  
-  if (isFirstLoad) {
-    isFirstLoad = false
-    scrollToLastMessages()
-    return
-  }
-  
-  if (previousScrollHeight > 0) {
-    preserveScrollPosition()
+  if (isUserAtBottom.value && container.value) {
     nextTick(() => {
-      previousScrollHeight = 0
-      previousScrollTop = 0
+      container.value.scrollTop = container.value.scrollHeight
     })
   }
-})
+}
+
+const openContextMenu = (event, message) => {
+  event.preventDefault()
+  
+  // Только свои сообщения можно редактировать/удалять
+  if (message.senderId !== props.currentUserProfileId) return
+  
+  selectedMessage.value = message
+  console.log(selectedMessage.value)
+
+  contextMenu.value = {
+    show: true,
+    position: { x: event.clientX, y: event.clientY }
+  }
+}
+
+const closeContextMenu = () => {
+  contextMenu.value.show = false
+  // selectedMessage.value = null
+}
+
+const handleEditMessage = () => {
+  if (!selectedMessage.value) return
+  editText.value = selectedMessage.value.content
+  showEditModal.value = true
+}
+
+const handleDeleteMessage = () => {
+  if (!selectedMessage.value) return
+  showDeleteModal.value = true
+}
+
+const confirmEdit = (newText) => {
+  console.log('Sending 22222222222222222222222211111111111')
+  console.log('Sending newText', newText)
+  console.log(selectedMessage.value)
+  console.log(newText.trim())
+
+
+  if (selectedMessage.value && newText.trim()) {
+    console.log('Sending 222222222222222222222222')
+
+    emit('edit-message', {
+      messageId: selectedMessage.value.id,
+      newText: newText.trim()
+    })
+  }
+  closeEditModal()
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  editText.value = ''
+}
+
+const confirmDelete = () => {
+  if (selectedMessage.value) {
+    emit('delete-message', selectedMessage.value.id)
+  }
+  closeDeleteModal()
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+}
+
+// Закрываем контекстное меню при клике вне его
+const handleClickOutside = () => {
+  if (contextMenu.value.show) {
+    closeContextMenu()
+  }
+}
 
 onMounted(() => {
-  if (container.value) {
-    previousScrollHeight = container.value.scrollHeight
-    previousScrollTop = container.value.scrollTop
-  }
+  document.addEventListener('click', handleClickOutside)
 })
 
 defineExpose({
@@ -270,7 +274,6 @@ defineExpose({
   padding: 1rem;
   background: #f8f9fa;
   position: relative;
-  scroll-behavior: auto; /* Отключаем стандартную анимацию, используем свою */
 }
 
 .empty-state {
@@ -309,12 +312,17 @@ defineExpose({
   justify-content: flex-end;
 }
 
+.message-own-edit {
+  opacity: 0.5;
+}
+
 .message-bubble {
   max-width: 70%;
   padding: 0.5rem 0.75rem;
   border-radius: 18px;
   background: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  word-break: break-word;
 }
 
 .message-own .message-bubble {
@@ -325,7 +333,7 @@ defineExpose({
 .message-text {
   font-size: 0.875rem;
   line-height: 1.4;
-  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .message-image img {
@@ -344,6 +352,54 @@ defineExpose({
 
 .message-own .message-time {
   color: rgba(255, 255, 255, 0.7);
+}
+
+.edited-badge {
+  font-size: 0.65rem;
+  margin-left: 0.25rem;
+  opacity: 0.7;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.save-btn, .cancel-btn {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.save-btn {
+  background: #48bb78;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #38a169;
+}
+
+.cancel-btn {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.cancel-btn:hover {
+  background: #cbd5e0;
 }
 
 .loading-indicator {

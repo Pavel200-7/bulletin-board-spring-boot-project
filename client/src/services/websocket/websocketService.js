@@ -30,7 +30,7 @@ class WebSocketService {
           this.client = new Client({
               webSocketFactory: () => socket,
               connectHeaders: {
-                  Authorization: `Bearer ${token}`  // ← правильный заголовок
+                  Authorization: `Bearer ${token}`  
               },
               reconnectDelay: 5000,
               heartbeatIncoming: 4000,
