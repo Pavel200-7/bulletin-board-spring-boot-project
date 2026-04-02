@@ -9,15 +9,18 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -35,9 +38,8 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
         }
 
         String command = accessor.getCommand() != null ? accessor.getCommand().name() : "UNKNOWN";
-        log.debug("WebSocket command: {}", command);
+        log.info("WebSocket command: {}", command);
 
-        // Для CONNECT сообщений сохраняем аутентификацию в сессию
         if ("CONNECT".equals(command)) {
             String token = extractToken(accessor);
             if (token != null) {
@@ -47,58 +49,53 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     String username = jwt.getClaimAsString("preferred_username");
                     List<String> roles = jwt.getClaimAsStringList("spring_sec_roles");
 
-                    log.info("✅ WebSocket CONNECT: user={}, roles={}", username, roles);
+                    log.info("User: {}, roles: {}", username, roles);
 
-                    // Создаем Authentication
-                    Authentication auth = new UsernamePasswordAuthenticationToken(
-                            userId,
-                            null,
-                            roles != null ?
-                                    roles.stream().map(SimpleGrantedAuthority::new).toList() :
-                                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
-                    );
+                    // ✅ Преобразуем List<String> в List<GrantedAuthority>
+                    List<GrantedAuthority> authorities = roles != null ?
+                            roles.stream()
+                                    .map(role -> new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role : "ROLE_" + role))
+                                    .collect(Collectors.toList()) :
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
-                    // Сохраняем в атрибуты сессии для последующих сообщений
+                    // ✅ Создаем JwtAuthenticationToken с правильными параметрами
+                    JwtAuthenticationToken auth = new JwtAuthenticationToken(jwt, authorities, username);
+
+                    // Сохраняем в атрибуты сессии
                     Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
                     if (sessionAttributes != null) {
                         sessionAttributes.put("authentication", auth);
                         log.info("✅ Authentication saved to session");
                     }
 
-                    // Устанавливаем в заголовки сообщения
                     accessor.setUser(auth);
-
-                    // Устанавливаем в SecurityContext (для текущего потока)
                     SecurityContextHolder.getContext().setAuthentication(auth);
 
                 } catch (Exception e) {
-                    log.error("❌ Failed to authenticate WebSocket: {}", e.getMessage());
+                    log.error("❌ Failed to authenticate: {}", e.getMessage(), e);
                 }
-            } else {
-                log.warn("⚠️ No token found in WebSocket CONNECT");
             }
         }
 
-        // Для остальных сообщений восстанавливаем аутентификацию из сессии
+        // Восстанавливаем аутентификацию для последующих сообщений
         Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
         if (sessionAttributes != null && sessionAttributes.containsKey("authentication")) {
             Authentication auth = (Authentication) sessionAttributes.get("authentication");
             accessor.setUser(auth);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            log.debug("✅ Authentication restored for user: {}", auth.getPrincipal());
         }
 
         return message;
     }
 
     private String extractToken(StompHeaderAccessor accessor) {
-        // 1. Пробуем из заголовка Authorization
+        // Из заголовка Authorization
         String authHeader = accessor.getFirstNativeHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
 
-        // 2. Пробуем из query параметра (для SockJS)
+        // Из query параметра (для SockJS)
         String query = accessor.getFirstNativeHeader("query");
         if (query != null && query.contains("access_token=")) {
             return query.split("access_token=")[1].split("&")[0];

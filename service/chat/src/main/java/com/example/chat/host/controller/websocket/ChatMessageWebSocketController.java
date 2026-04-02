@@ -27,7 +27,6 @@ public class ChatMessageWebSocketController {
 
     private final TextChatMessageService textChatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final SecurityService securityService;
 
 
      //     /app/chat/{chatId}/message/create
@@ -43,7 +42,7 @@ public class ChatMessageWebSocketController {
         CreateTextChatMessageResponse response = textChatMessageService.createTextMessage(request);
 
         messagingTemplate.convertAndSendToUser(
-                securityService.getCurrentUsername(),
+                principal.getName(),
                 "/queue/reply",
                 response
         );
