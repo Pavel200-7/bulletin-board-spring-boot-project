@@ -7,6 +7,7 @@ import com.example.chat.application.service.message.text.data.request.UpdateText
 import com.example.chat.application.service.message.text.data.response.CreateTextChatMessageResponse;
 import com.example.chat.host.controller.websocket.data.response.ChatMessageWebSocketDto;
 import com.example.chat.host.controller.websocket.data.response.DeleteMessageWebSocketDto;
+import com.example.chat.infrastructure.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -26,6 +27,7 @@ public class ChatMessageWebSocketController {
 
     private final TextChatMessageService textChatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SecurityService securityService;
 
 
      //     /app/chat/{chatId}/message/create
@@ -34,11 +36,14 @@ public class ChatMessageWebSocketController {
             @DestinationVariable UUID chatId,
             CreateTextChatMessageRequest request,
             Principal principal) {
+//        log.info("WebSocket create message for chat: {}, from: {}", chatId, securityService.getCurrentUsername());
+
         log.info("WebSocket create message for chat: {}, from: {}", chatId, principal.getName());
         request.setChatId(chatId);
         CreateTextChatMessageResponse response = textChatMessageService.createTextMessage(request);
+
         messagingTemplate.convertAndSendToUser(
-                principal.getName(),
+                securityService.getCurrentUsername(),
                 "/queue/reply",
                 response
         );

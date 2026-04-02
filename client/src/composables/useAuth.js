@@ -127,6 +127,10 @@ export function useAuth() {
     }
   }
 
+  const getToken = () => {
+    return authService.getToken()
+  }
+
   const getUserInfo = () => {
     return authService.getUserInfo()
   }
@@ -144,6 +148,7 @@ export function useAuth() {
   })
 
   return {
+    
     isAuthenticated,
     isAnonymous,
     hasSession,
@@ -158,6 +163,7 @@ export function useAuth() {
     getUserRoles,
     getUserId,
     startTokenRefreshTimer,
-    stopTokenRefreshTimer
+    stopTokenRefreshTimer,
+    getToken,
   }
 }

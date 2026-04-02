@@ -1,4 +1,4 @@
-// src/composables/useTextMessage.js
+// src/composables/chat/useTextMessage.js
 import { ref } from 'vue'
 import { textMessageService } from '@/services/chat/textMessageService'
 

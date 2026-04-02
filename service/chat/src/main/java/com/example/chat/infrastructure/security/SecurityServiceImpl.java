@@ -2,6 +2,7 @@ package com.example.chat.infrastructure.security;
 
 import com.example.chat.infrastructure.security.enums.Claims;
 import com.example.chat.infrastructure.security.enums.Roles;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Log4j2
 @Component
 public class SecurityServiceImpl implements SecurityService {
 
@@ -20,6 +22,7 @@ public class SecurityServiceImpl implements SecurityService {
         if (authentication instanceof JwtAuthenticationToken jwtAuth) {
             return jwtAuth.getToken();
         }
+        log.info("токен {}", authentication.toString());
         throw new IllegalStateException("No JWT token found in security context");
     }
 

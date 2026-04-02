@@ -41,13 +41,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useChat } from '@/composables/useChat'
-import { useTextMessage } from '@/composables/useTextMessage'
+import { useChat } from '@/composables/chat/useChat'
+import { useTextMessage } from '@/composables/chat/useTextMessage'
 import { useProfile } from '@/composables/useProfile'
 import { useContact } from '@/composables/useContact'
 import { useAuth } from '@/composables/useAuth'
+import { useSubscription } from '@/composables/chat/useSubscription'
+import { useTextMessageWebSocket } from '@/composables/chat/useTextMessageWebSocket'
 import ChatHeader from './components/ChatHeader.vue'
 import MessagesContainer from './components/MessagesContainer.vue'
 import ChatInput from './components/ChatInput.vue'
@@ -67,12 +69,25 @@ const {
   loadingNewer,
   hasOlder,
   hasNewer,
-  currentChat 
+  currentChat,
+  addMessage,
+  removeMessage,
+  updateMessage,
+  resetHasNewer
 } = useChat()
 const { sendMessage: sendTextMessage, sending } = useTextMessage()
 const { fetchProfile, profile: otherProfile } = useProfile()
 const { fetchContactByProfileId, currentContact } = useContact()
 const { fetchMyProfile, profile: myProfile } = useProfile()
+const { 
+  connect: wsConnect, 
+  disconnect: wsDisconnect, 
+  subscribeToChat, 
+  subscribeToReplies,
+  isConnected: wsIsConnected,
+  connected: wsConnected
+} = useSubscription()
+const { sendMessage: wsSendMessage } = useTextMessageWebSocket()
 
 const chatId = route.params.id
 const messageText = ref('')
@@ -101,12 +116,21 @@ const findOtherParticipant = (participants) => {
 const loadChatData = async () => {
   try {
     loadingMessages.value = true
+    console.log('📥 Loading chat data for chat:', chatId)
+    
     await fetchMyProfile()
     currentUserId.value = getUserId()
+    console.log('Current user ID:', currentUserId.value)
     
     await fetchChat(chatId)
     await fetchUnreadCount(chatId)
     await loadMessagesAroundLastRead(chatId)
+    
+    console.log('After loadMessagesAroundLastRead:', {
+      hasOlder: hasOlder.value,
+      hasNewer: hasNewer.value,
+      messagesCount: messages.value.length
+    })
     
     if (!currentChat.value) return
     
@@ -123,21 +147,70 @@ const loadChatData = async () => {
         otherParticipantAvatar.value = getImageUrl(otherProfile.value.imageId)
         otherParticipantPublicName.value = otherProfile.value.publicName || 'Пользователь'
         chatName.value = otherProfile.value.publicName || 'Пользователь'
+        console.log('Other participant:', { name: chatName.value, id: otherParticipantProfileId.value })
       }
       
       try {
         await fetchContactByProfileId(other.profileId)
         if (currentContact.value?.contactName) {
           chatName.value = currentContact.value.contactName
+          console.log('Using contact name:', chatName.value)
         }
       } catch (err) {
-        console.log('Контакт не найден, используем имя профиля')
+        console.log('Contact not found, using profile name')
       }
     }
+    
   } catch (err) {
-    console.error('Ошибка загрузки чата:', err)
+    console.error('❌ Error loading chat data:', err)
   } finally {
     loadingMessages.value = false
+  }
+}
+
+const setupWebSocket = async () => {
+  try {
+    console.log('🔌 Setting up WebSocket connection for chat:', chatId)
+    
+    // 1. Подключаемся к WebSocket
+    const connected = await wsConnect()
+    if (!connected) {
+      console.warn('⚠️ WebSocket connection failed, will use REST fallback')
+      return
+    }
+    console.log('✅ WebSocket connected')
+    
+    // 2. Подписываемся на личные ответы
+    await subscribeToReplies((reply) => {
+      console.log('📨 Server reply:', reply)
+      if (reply.error) {
+        console.error('Server error:', reply.error)
+      }
+    })
+    console.log('✅ Subscribed to replies')
+    
+    // 3. Подписываемся на события чата
+    await subscribeToChat(chatId, {
+      onMessage: (message) => {
+        console.log('💬 New message via WebSocket:', message)
+        addMessage(message)
+      },
+      onUpdate: (update) => {
+        console.log('✏️ Message update via WebSocket:', update)
+        updateMessage(update.messageId, { 
+          content: update.newContent,
+          updated: true 
+        })
+      },
+      onDelete: (deleteMsg) => {
+        console.log('🗑️ Message delete via WebSocket:', deleteMsg)
+        removeMessage(deleteMsg.messageId)
+      }
+    })
+    console.log('✅ Subscribed to chat events for:', chatId)
+    
+  } catch (err) {
+    console.error('❌ Failed to setup WebSocket:', err)
   }
 }
 
@@ -152,22 +225,49 @@ const openUserModal = () => {
 const sendMessage = async (text) => {
   if (!text.trim() || sending.value) return
   
+  console.log('📤 Sending message via WebSocket:', { chatId, text })
+  
   try {
-    await sendTextMessage(chatId, text)
-    messageText.value = ''
-    // После отправки обновляем список
-    await loadMessagesAroundLastRead(chatId)
+    // Отправляем через WebSocket
+    const sent = wsSendMessage(chatId, text)
+    
+    if (sent && wsIsConnected()) {
+      console.log('✅ Message sent via WebSocket')
+      messageText.value = ''
+      // WebSocket сам добавит сообщение через onMessage
+    } else {
+      // Fallback на REST
+      console.warn('⚠️ WebSocket send failed, falling back to REST')
+      await sendTextMessage(chatId, text)
+      messageText.value = ''
+      await loadMessagesAroundLastRead(chatId)
+    }
+    
   } catch (err) {
-    console.error('Ошибка отправки сообщения:', err)
+    console.error('❌ Error sending message:', err)
     alert('Не удалось отправить сообщение')
   }
 }
 
 const messagesContainer = ref(null)
 
-onMounted(() => {
+onMounted(async () => {
   if (chatId) {
-    loadChatData()
+    console.log('🚀 ChatRoom mounted, chatId:', chatId)
+    await loadChatData()
+    await setupWebSocket()
+  }
+})
+
+onUnmounted(() => {
+  console.log('🔌 Cleaning up WebSocket subscriptions for chat:', chatId)
+  if (chatId) {
+    try {
+      unsubscribeFromChat(chatId)
+    } catch (err) {
+      console.warn('Error unsubscribing:', err)
+    }
+    wsDisconnect()
   }
 })
 </script>

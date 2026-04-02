@@ -1,4 +1,4 @@
-// src/composables/useChat.js
+// src/composables/chat/useChat.js
 import { ref } from 'vue'
 import { chatService } from '@/services/chat/chatService'
 
@@ -172,6 +172,73 @@ export function useChat() {
   }
 
   /**
+   * Добавить новое сообщение в список (из WebSocket)
+   * @param {Object} message - новое сообщение
+   */
+  const addMessage = (message) => {
+    if (!message) return
+    
+    // Проверяем, нет ли уже такого сообщения
+    const exists = messages.value.some(m => m.id === message.id)
+    if (exists) return
+    
+    // Добавляем сообщение в конец списка
+    messages.value = [...messages.value, message]
+    
+    // Обновляем lastMessageId
+    if (messages.value.length > 0) {
+      lastMessageId.value = messages.value[messages.value.length - 1]?.id
+    }
+    
+    // Обновляем hasNewer — после добавления нового сообщения, если мы не в конце, то есть новые
+    // Это нужно для кнопки "Новые сообщения"
+    // Флаг hasNewer будет сброшен, когда пользователь доскроллит вниз
+  }
+
+  /**
+   * Удалить сообщение из списка (по WebSocket уведомлению)
+   * @param {string} messageId - ID сообщения для удаления
+   */
+  const removeMessage = (messageId) => {
+    if (!messageId) return
+    
+    const index = messages.value.findIndex(m => m.id === messageId)
+    if (index === -1) return
+    
+    messages.value = messages.value.filter(m => m.id !== messageId)
+    
+    // Если удалили последнее сообщение, обновляем lastMessageId
+    if (messages.value.length > 0) {
+      lastMessageId.value = messages.value[messages.value.length - 1]?.id
+    } else {
+      lastMessageId.value = null
+    }
+    
+    // Если удалили первое сообщение, обновляем firstMessageId
+    if (messages.value.length > 0) {
+      firstMessageId.value = messages.value[0]?.id
+    } else {
+      firstMessageId.value = null
+      hasOlder.value = false
+      hasNewer.value = false
+    }
+  }
+
+  /**
+   * Обновить сообщение в списке (по WebSocket уведомлению)
+   * @param {string} messageId - ID сообщения
+   * @param {Object} updates - обновленные поля
+   */
+  const updateMessage = (messageId, updates) => {
+    if (!messageId || !updates) return
+    
+    const index = messages.value.findIndex(m => m.id === messageId)
+    if (index === -1) return
+    
+    messages.value[index] = { ...messages.value[index], ...updates }
+  }
+
+  /**
    * Установить последнее прочитанное сообщение
    * @param {string} chatId - ID чата
    * @param {string} messageId - ID сообщения
@@ -183,6 +250,13 @@ export function useChat() {
     } catch (err) {
       console.error('Ошибка установки последнего прочитанного:', err)
     }
+  }
+
+  /**
+   * Сбросить флаг hasNewer (когда пользователь доскроллил вниз)
+   */
+  const resetHasNewer = () => {
+    hasNewer.value = false
   }
 
   return {
@@ -207,6 +281,12 @@ export function useChat() {
     loadNewerMessages,
     setLastRead,
     checkHasOlder,
-    checkHasNewer
+    checkHasNewer,
+    
+    // WebSocket методы
+    addMessage,
+    removeMessage,
+    updateMessage,
+    resetHasNewer
   }
 }

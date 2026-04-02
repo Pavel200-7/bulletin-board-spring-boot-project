@@ -43,6 +43,15 @@ public class Routes {
                         .uri(properties.getFullPath(properties.getChat()))
                 )
 
+                // ========== CHAT SERVICE (WEBSOCKET) ==========
+                .route("chat_service_ws", r -> r
+                        .path("/api/v1/ws/**")
+                        .filters(f -> f
+                                .rewritePath("/api/v1/ws/(?<segment>.*)", "/ws/${segment}")
+                        )
+                        .uri(properties.getFullPath(properties.getChat()))
+                )
+
                 // ========== KEYCLOAK ==========
                 .route("keycloak_service", r -> r
                         .path(
