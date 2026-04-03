@@ -96,6 +96,8 @@ export function useChat() {
         hasNewer.value = false
       }
 
+      loadNewerMessages(chatId)
+
       return response
     } catch (err) {
       error.value = err.response?.data?.message || err.message
@@ -234,19 +236,66 @@ export function useChat() {
     messages.value[index] = { ...messages.value[index], ...updates }
   }
 
+  // /**
+  //  * Установить последнее прочитанное сообщение
+  //  * @param {string} chatId - ID чата
+  //  * @param {string} messageId - ID сообщения
+  //  */
+  // const setLastRead = async (chatId, messageId) => {
+  //   try {
+  //     await chatService.setLastReadMessage(chatId, messageId)
+  //     await fetchUnreadCount(chatId)
+  //   } catch (err) {
+  //   }
+  // }
+
   /**
-   * Установить последнее прочитанное сообщение
-   * @param {string} chatId - ID чата
-   * @param {string} messageId - ID сообщения
-   */
-  const setLastRead = async (chatId, messageId) => {
-    try {
-      await chatService.setLastReadMessage(chatId, messageId)
+ * Установить последнее прочитанное сообщение
+ * @param {string} chatId - ID чата
+ * @param {string} newMessageId - ID нового прочитанного сообщения
+ * @param {string} oldMessageId - ID старого последнего прочитанного сообщения (опционально)
+ * @returns {Promise<boolean>} - true если обновили, false если сообщение старее
+ */
+const setLastRead = async (chatId, newMessageId, oldMessageId = null) => {
+  if (!chatId || !newMessageId) return false
+  
+  try {
+    // Если нет старого сообщения, просто обновляем
+    if (!oldMessageId) {
+      await chatService.setLastReadMessage(chatId, newMessageId)
       await fetchUnreadCount(chatId)
-    } catch (err) {
-      console.error('Ошибка установки последнего прочитанного:', err)
+      return true
     }
+    
+    // Находим индексы сообщений в текущем списке
+    const newIndex = messages.value.findIndex(m => m.id === newMessageId)
+    const oldIndex = messages.value.findIndex(m => m.id === oldMessageId)
+    
+    // Проверяем, является ли новое сообщение более новым
+    let shouldUpdate = false
+    
+    if (newIndex !== -1 && oldIndex !== -1) {
+      shouldUpdate = newIndex > oldIndex
+    }
+    else {
+      shouldUpdate = true
+    }
+    
+    // Если новое сообщение действительно новее, обновляем
+    if (shouldUpdate) {
+      await chatService.setLastReadMessage(chatId, newMessageId)
+      await fetchUnreadCount(chatId)
+      console.log(`✅ Last read updated from ${oldMessageId} to ${newMessageId}`)
+      return true
+    } else {
+      console.log(`⏭️ Skipping update: message ${newMessageId} is not newer than ${oldMessageId}`)
+      return false
+    }
+    
+  } catch (err) {
+    return false
   }
+}
 
   /**
    * Сбросить флаг hasNewer (когда пользователь доскроллил вниз)

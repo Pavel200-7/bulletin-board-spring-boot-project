@@ -19,10 +19,12 @@
       :current-user-profile-id="currentUserProfileId"
       :has-older="hasOlder"
       :has-newer="hasNewer"
+      :current-last-read-message-id="currentUserParticipantLastSeemMessageId"
       @load-older="() => loadOlderMessages(chatId)"
       @load-newer="() => loadNewerMessages(chatId)"
       @edit-message="handleEditMessage"
       @delete-message="handleDeleteMessage"
+      @update-last-read="handleUpdateLastRead"
     />
 
     <ChatInput
@@ -39,7 +41,9 @@
       :profile-id="otherParticipantProfileId"
       :contact-name="chatName"
       :profile-data="otherParticipantProfile"
+      :contact-id="currentContactId"
       @close="showUserModal = false"
+      @name-updated="handleContactNameUpdated"
     />
   </div>
 </template>
@@ -78,7 +82,8 @@ const {
   addMessage,
   removeMessage,
   updateMessage,
-  resetHasNewer
+  resetHasNewer,
+  setLastRead
 } = useChat()
 const { sendMessage: sendTextMessage, sending } = useTextMessage()
 const { fetchProfile, profile: otherProfile } = useProfile()
@@ -114,7 +119,9 @@ const otherParticipantPublicName = ref('')
 const showUserModal = ref(false)
 const currentUserId = ref(null)
 const currentUserProfileId = ref(null)
-
+const currentUserParticipant = ref(null)
+const currentUserParticipantLastSeemMessageId = ref(null)
+const currentContactId = ref(null)
 
 const getImageUrl = (imageId) => {
   if (!imageId) return null
@@ -126,6 +133,11 @@ const getImageUrl = (imageId) => {
 const findOtherParticipant = (participants) => {
   if (!myProfile.value || !participants?.length) return null
   return participants.find(p => p.profileId !== myProfile.value.id)
+}
+
+const findMeParticipant = (participants) => {
+  if (!myProfile.value || !participants?.length) return null
+  return participants.find(p => p.profileId === myProfile.value.id)
 }
 
 const loadChatData = async () => {
@@ -153,8 +165,12 @@ const loadChatData = async () => {
     })
     
     if (!currentChat.value) return
+
     
     const participants = currentChat.value.participantResponses || []
+    currentUserParticipant.value = findMeParticipant(participants)
+    currentUserParticipantLastSeemMessageId.value = currentUserParticipant.value?.lastReadMessageId
+
     const other = findOtherParticipant(participants)
     
     if (other) {
@@ -172,12 +188,15 @@ const loadChatData = async () => {
       
       try {
         await fetchContactByProfileId(other.profileId)
-        if (currentContact.value?.contactName) {
-          chatName.value = currentContact.value.contactName
-          console.log('Using contact name:', chatName.value)
+        if (currentContact.value) {
+          currentContactId.value = currentContact.value.id
+          if (currentContact.value?.contactName) {
+            chatName.value = currentContact.value.contactName
+          }
         }
       } catch (err) {
         console.log('Contact not found, using profile name')
+        currentContactId.value = null
       }
     }
     
@@ -192,7 +211,6 @@ const setupWebSocket = async () => {
   try {
     console.log('🔌 Setting up WebSocket connection for chat:', chatId)
     
-    // 1. Подключаемся к WebSocket
     const connected = await wsConnect()
     if (!connected) {
       console.warn('⚠️ WebSocket connection failed, will use REST fallback')
@@ -200,26 +218,19 @@ const setupWebSocket = async () => {
     }
     console.log('✅ WebSocket connected')
     
-    // 2. Подписываемся на личные ответы
     await subscribeToReplies((reply) => {
       console.log('📨 Server reply:', reply)
       if (reply.error) {
         console.error('Server error:', reply.error)
       }
-      // Можно обработать успешные ответы от сервера
       if (reply.chatMessageResponse) {
         console.log('Message sent successfully:', reply.chatMessageResponse)
       }
     })
     console.log('✅ Subscribed to replies')
     
-    // 3. Подписываемся на события чата (один топик)
     await subscribeToChat(chatId, {
-      onMessageCreated: (message) => {
-        console.log('💬 New message via WebSocket:', message)
-        resetHasNewer()
-        loadNewerMessages(chatId)
-      },
+      onMessageCreated: onMessageCreated,
       onMessageUpdated: (update) => {
         console.log('✏️ Message update via WebSocket:', update)
         updateMessage(update.id, { 
@@ -239,6 +250,18 @@ const setupWebSocket = async () => {
   }
 }
 
+const onMessageCreated = async (message) => {
+  console.log('💬 New message via WebSocket:', message)
+  resetHasNewer()
+  await loadNewerMessages(chatId)
+  
+  if (message.senderId !== currentUserProfileId.value && document.hasFocus()) {
+    setTimeout(() => {
+      handleUpdateLastRead(message.id)
+    }, 100)
+  }
+}
+
 const goBack = () => {
   router.push('/chat/contacts')
 }
@@ -253,15 +276,12 @@ const sendMessage = async (text) => {
   console.log('📤 Sending message via WebSocket:', { chatId, text })
   
   try {
-    // Отправляем через WebSocket
     const sent = wsSendMessage(chatId, text)
     
     if (sent && wsIsConnected()) {
       console.log('✅ Message sent via WebSocket')
       messageText.value = ''
-      // WebSocket сам добавит сообщение через onMessage
     } else {
-      // Fallback на REST
       console.warn('⚠️ WebSocket send failed, falling back to REST')
       await sendTextMessage(chatId, text)
       messageText.value = ''
@@ -289,7 +309,6 @@ const handleSendImage = async (imageId) => {
       console.log('✅ Image message sent via WebSocket')
     } else {
       console.warn('⚠️ WebSocket send failed, need REST fallback')
-      // Здесь можно добавить REST fallback для image сообщений
     }
   } catch (err) {
     console.error('❌ Error sending image:', err)
@@ -299,7 +318,6 @@ const handleSendImage = async (imageId) => {
 
 const handleEditMessage = async ({ messageId, newText }) => {
   try {
-    // Отправляем запрос на сервер
     const sent = wsUpdateMessage(chatId, messageId, newText)
     console.log('✅ Message update sent via WebSocket')
     
@@ -312,10 +330,8 @@ const handleEditMessage = async ({ messageId, newText }) => {
   }
 }
 
-// Обработчик удаления сообщения
 const handleDeleteMessage = async (messageId) => {
   try {
-    // Отправляем запрос на сервер
     const sent = wsDeleteMessage(chatId, messageId)
     
     if (!sent) {
@@ -325,6 +341,30 @@ const handleDeleteMessage = async (messageId) => {
     console.error('Error deleting message:', err)
     alert('Не удалось удалить сообщение')
   }
+}
+
+const handleUpdateLastRead = async (messageId) => {
+  if (!messageId) return
+  
+  if (currentUserParticipantLastSeemMessageId.value === messageId) return
+  
+  console.log(`📖 Updating last read to: ${messageId}`)
+  
+  const updated = await setLastRead(
+    chatId, 
+    messageId, 
+    currentUserParticipantLastSeemMessageId.value
+  )
+  
+  if (updated) {
+    currentUserParticipantLastSeemMessageId.value = messageId
+    console.log(`✅ Last read updated to: ${messageId}`)
+  }
+}
+
+const handleContactNameUpdated = ({ contactId, newName }) => {
+  chatName.value = newName
+  console.log(`Contact ${contactId} renamed to: ${newName}`)
 }
 
 const messagesContainer = ref(null)

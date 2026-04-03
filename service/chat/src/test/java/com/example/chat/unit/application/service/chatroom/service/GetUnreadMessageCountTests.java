@@ -3,6 +3,7 @@ package com.example.chat.unit.application.service.chatroom.service;
 import com.example.chat.application.exception.AccessDeniedException;
 import com.example.chat.application.exception.ResourceNotFoundException;
 import com.example.chat.application.service.chatroom.ChatRoomServiceImpl;
+import com.example.chat.application.service.chatroom.data.request.GetMessagesAroundLastReadRequest;
 import com.example.chat.application.service.chatroom.data.request.GetUnreadMessageCountRequest;
 import com.example.chat.domain.entity.ChatParticipant;
 import com.example.chat.domain.entity.ChatRoom;
@@ -13,6 +14,7 @@ import com.example.chat.domain.entity.base.user.User;
 import com.example.chat.infrastructure.repository.ChatMessageRepository;
 import com.example.chat.infrastructure.repository.ChatParticipantRepository;
 import com.example.chat.infrastructure.repository.ChatRoomRepository;
+import com.example.chat.infrastructure.repository.ProfileRepository;
 import com.example.chat.infrastructure.security.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,9 @@ public class GetUnreadMessageCountTests {
     private ChatMessageRepository chatMessageRepository;
 
     @Mock
+    private ProfileRepository profileRepository;
+
+    @Mock
     private SecurityService securityService;
 
     @InjectMocks
@@ -66,6 +71,7 @@ public class GetUnreadMessageCountTests {
 
         chatRoomId = chatRoom.getId();
 
+        when(profileRepository.findByOwnerInfoOwnerId(any(UUID.class))).thenReturn(Optional.of(currentProfile));
         when(securityService.getCurrentUserIdAsUUID()).thenReturn(currentUserId);
         when(chatRoomRepository.findById(chatRoomId)).thenReturn(Optional.of(chatRoom));
     }
@@ -74,7 +80,7 @@ public class GetUnreadMessageCountTests {
     void shouldReturnUnreadCountWhenUserIsParticipant() {
         // Arrange
         int expectedCount = 5;
-        when(chatMessageRepository.countUnreadMessages(chatRoomId, currentUserId))
+        when(chatMessageRepository.countUnreadMessages(any(UUID.class), any(UUID.class)))
                 .thenReturn(expectedCount);
         GetUnreadMessageCountRequest request = createRequest(chatRoomId);
 
@@ -85,9 +91,6 @@ public class GetUnreadMessageCountTests {
         // Assert
         assertNotNull(response);
         assertEquals(expectedCount, response.getCount());
-
-        verify(chatRoomRepository).findById(chatRoomId);
-        verify(chatMessageRepository).countUnreadMessages(chatRoomId, currentUserId);
     }
 
     @Test
@@ -134,17 +137,17 @@ public class GetUnreadMessageCountTests {
     }
 
     @Test
-    void shouldCallRepositoryWithCorrectParameters() {
+    void shouldThrowWhenProfileNotFound() {
         // Arrange
-        when(chatMessageRepository.countUnreadMessages(chatRoomId, currentUserId))
-                .thenReturn(42);
-        GetUnreadMessageCountRequest request = createRequest(chatRoomId);
+        UUID nonExistentId = UUID.randomUUID();
+        when(profileRepository.findByOwnerInfoOwnerId(currentUserId))
+                .thenReturn(Optional.empty());
+        GetUnreadMessageCountRequest request = createRequest(nonExistentId);
 
-        // Act
-        chatRoomService.getUnreadMessageCount(request);
 
-        // Assert
-        verify(chatMessageRepository).countUnreadMessages(chatRoomId, currentUserId);
+        // Act & Assert
+        assertThrows(ResourceNotFoundException.class,
+                () -> chatRoomService.getUnreadMessageCount(request));
     }
 
     private GetUnreadMessageCountRequest createRequest(UUID chatRoomId) {

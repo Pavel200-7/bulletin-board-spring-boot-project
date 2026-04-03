@@ -134,6 +134,9 @@ export const chatService = {
    * @param {string} messageId - ID сообщения
    */
   setLastReadMessage(chatId, messageId) {
-    return apiClient.put(`/chat/${chatId}/messages/${messageId}/last-read`)
+    try {
+      return apiClient.put(`/chat/${chatId}/messages/${messageId}/last-read`)
+    } catch (error) {
+    }
   }
 }

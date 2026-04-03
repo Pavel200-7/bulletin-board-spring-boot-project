@@ -67,11 +67,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional(readOnly = true)
     public GetUnreadMessageCountResponse getUnreadMessageCount(GetUnreadMessageCountRequest request) {
         UUID currentUserId = securityService.getCurrentUserIdAsUUID();
+        Profile profile = profileRepository.findByOwnerInfoOwnerId(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for user: " + currentUserId));
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatId())
                 .orElseThrow(() -> new ResourceNotFoundException("Chat room not found with id: " + request.getChatId()));
         checkIfCurrentUserIsChatParticipant(chatRoom, currentUserId);
 
-        int unreadCount = chatMessageRepository.countUnreadMessages(request.getChatId(), currentUserId);
+        int unreadCount = chatMessageRepository.countUnreadMessages(request.getChatId(), profile.getId());
 
         log.info("Найдено {} непрочитанных сообщений в чате с id {} у пользователя с id {}",
                 unreadCount, request.getChatId(), currentUserId);

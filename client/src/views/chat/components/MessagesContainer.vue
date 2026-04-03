@@ -22,6 +22,7 @@
       <div
         v-for="message in messages"
         :key="message.id"
+        :data-message-id="message.id"
         class="message-item"
         :class="{ 
           'message-own': message.senderId === currentUserProfileId
@@ -29,7 +30,6 @@
         @contextmenu="(e) => openContextMenu(e, message)"
       >
         <div class="message-bubble">
-          <!-- Рендерим разные типы сообщений через компоненты -->
           <TextMessage
             v-if="message.type === 'TEXT'"
             :message="message"
@@ -56,7 +56,6 @@
       <span>Загрузка новых...</span>
     </div>
 
-    <!-- Контекстное меню -->
     <MessageActions
       :show="contextMenu.show"
       :position="contextMenu.position"
@@ -65,7 +64,6 @@
       @close="closeContextMenu"
     />
 
-    <!-- Модальное окно редактирования -->
     <EditMessageModal
       :show="showEditModal"
       :current-text="editText"
@@ -73,7 +71,6 @@
       @close="closeEditModal"
     />
 
-    <!-- Модальное окно подтверждения удаления -->
     <DeleteConfirmModal
       :show="showDeleteModal"
       @confirm="confirmDelete"
@@ -83,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
 import TextMessage from './messages/TextMessage.vue'
 import ImageMessage from './messages/ImageMessage.vue'
 import MessageActions from './MessageActions.vue'
@@ -118,10 +115,20 @@ const props = defineProps({
   hasNewer: {
     type: Boolean,
     default: false
+  },
+  currentLastReadMessageId: {
+    type: String,
+    default: null
   }
 })
 
-const emit = defineEmits(['load-older', 'load-newer', 'edit-message', 'delete-message'])
+const emit = defineEmits([
+  'load-older', 
+  'load-newer', 
+  'edit-message', 
+  'delete-message',
+  'update-last-read'  // Новое событие для обновления lastRead
+])
 
 const container = ref(null)
 const isUserAtBottom = ref(true)
@@ -134,6 +141,11 @@ const contextMenu = ref({
   show: false,
   position: { x: 0, y: 0 }
 })
+
+// Intersection Observer для отслеживания видимых сообщений
+let observer = null
+const lastProcessedMessageId = ref(null)
+const updateTimeout = ref(null)
 
 const handleScroll = () => {
   const el = container.value
@@ -165,10 +177,103 @@ const scrollToBottom = () => {
   }
 }
 
+// Инициализация Intersection Observer для отслеживания видимых сообщений
+const initVisibilityObserver = () => {
+  if (observer) {
+    observer.disconnect()
+  }
+  
+  const options = {
+    root: container.value,
+    threshold: 0.5 // Сообщение считается видимым, если видно 50%
+  }
+  
+  observer = new IntersectionObserver((entries) => {
+    // Находим все видимые сообщения
+    const visibleMessages = entries
+      .filter(entry => entry.isIntersecting)
+      .map(entry => ({
+        id: entry.target.dataset.messageId,
+        index: props.messages.findIndex(m => m.id === entry.target.dataset.messageId)
+      }))
+      .filter(item => item.index !== -1)
+      .sort((a, b) => a.index - b.index) // Сортируем по индексу
+    
+    if (visibleMessages.length === 0) return
+    
+    // Берем последнее видимое сообщение (самое новое из видимых)
+    const lastVisible = visibleMessages[visibleMessages.length - 1]
+    
+    // Проверяем, что это сообщение не обработано недавно
+    if (lastProcessedMessageId.value === lastVisible.id) return
+    
+    // Проверяем, что это сообщение новее текущего lastRead
+    if (props.currentLastReadMessageId) {
+      const currentIndex = props.messages.findIndex(m => m.id === props.currentLastReadMessageId)
+      
+      // Если текущий lastRead найден и он новее или равен видимому, не обновляем
+      if (currentIndex !== -1 && currentIndex >= lastVisible.index) {
+        return
+      }
+    }
+    
+    // Дебаунсим обновление, чтобы не спамить запросами
+    if (updateTimeout.value) {
+      clearTimeout(updateTimeout.value)
+    }
+    
+    updateTimeout.value = setTimeout(() => {
+      console.log(`📖 User viewed message: ${lastVisible.id} (index: ${lastVisible.index})`)
+      lastProcessedMessageId.value = lastVisible.id
+      emit('update-last-read', lastVisible.id)
+    }, 500)
+    
+  }, options)
+  
+  // Начинаем наблюдение за всеми сообщениями
+  observeMessages()
+}
+
+// Наблюдение за сообщениями
+const observeMessages = () => {
+  if (!observer || !container.value) return
+  
+  const messageElements = container.value.querySelectorAll('.message-item')
+  messageElements.forEach(el => {
+    observer.observe(el)
+  })
+}
+
+// При изменении списка сообщений, переинициализируем observer
+watch(() => props.messages, () => {
+  nextTick(() => {
+    if (observer) {
+      initVisibilityObserver()
+    }
+  })
+}, { deep: true })
+
+// При изменении currentLastReadMessageId, обновляем lastProcessed
+watch(() => props.currentLastReadMessageId, (newId) => {
+  if (newId) {
+    lastProcessedMessageId.value = newId
+  }
+})
+
+// Очистка observer при размонтировании
+onBeforeUnmount(() => {
+  if (observer) {
+    observer.disconnect()
+    observer = null
+  }
+  if (updateTimeout.value) {
+    clearTimeout(updateTimeout.value)
+  }
+})
+
 const openContextMenu = (event, message) => {
   event.preventDefault()
   
-  // Только свои сообщения можно редактировать/удалять
   if (message.senderId !== props.currentUserProfileId) return
   
   selectedMessage.value = message
@@ -219,7 +324,6 @@ const closeDeleteModal = () => {
   showDeleteModal.value = false
 }
 
-// Методы для редактирования inline (если нужно)
 const startEdit = (messageId, content) => {
   editingMessageId.value = messageId
   editText.value = content
@@ -244,7 +348,6 @@ const updateEditText = (text) => {
   editText.value = text
 }
 
-// Закрываем контекстное меню при клике вне его
 const handleClickOutside = () => {
   if (contextMenu.value.show) {
     closeContextMenu()
@@ -253,6 +356,7 @@ const handleClickOutside = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  initVisibilityObserver()
 })
 
 defineExpose({

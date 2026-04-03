@@ -35,9 +35,35 @@
           </div>
         </div>
         
-        <!-- Основная информация -->
+        <!-- Основная информация с редактированием имени -->
         <div class="user-info-block">
-          <h2 class="user-name">{{ displayName }}</h2>
+          <div v-if="!isEditingName" class="name-display">
+            <h2 class="user-name">{{ displayName }}</h2>
+            <button 
+              v-if="contactId" 
+              class="edit-name-btn" 
+              @click="startEditName"
+              title="Редактировать имя контакта"
+            >
+              ✏️
+            </button>
+          </div>
+          <div v-else class="name-edit">
+            <input
+              ref="nameInputRef"
+              v-model="editNameValue"
+              type="text"
+              class="name-input"
+              maxlength="100"
+              @keyup.enter="saveName"
+              @keyup.esc="cancelEditName"
+            />
+            <div class="name-edit-actions">
+              <button class="save-name-btn" @click="saveName">✓</button>
+              <button class="cancel-name-btn" @click="cancelEditName">✕</button>
+            </div>
+          </div>
+          <p v-if="contactId" class="contact-hint">Имя отображается только у вас</p>
         </div>
         
         <!-- Описание -->
@@ -57,8 +83,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useProfile } from '@/composables/useProfile'
+import { useContact } from '@/composables/useContact'
 
 const props = defineProps({
   show: {
@@ -76,15 +103,24 @@ const props = defineProps({
   profileData: {
     type: Object,
     default: null
+  },
+  contactId: {
+    type: String,
+    default: null
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'name-updated'])
 
 const { fetchProfile, profile: fetchedProfile } = useProfile()
+const { renameContact } = useContact()
 const loading = ref(false)
 const error = ref(null)
 const localProfileData = ref(null)
+const localContactName = ref('')
+const isEditingName = ref(false)
+const editNameValue = ref('')
+const nameInputRef = ref(null)
 
 const getImageUrl = (imageId) => {
   if (!imageId) return null
@@ -98,8 +134,12 @@ const avatarUrl = computed(() => {
 })
 
 const displayName = computed(() => {
-  // Сначала пробуем имя из контакта, затем из профиля
-  return props.contactName || localProfileData.value?.publicName || 'Пользователь'
+  // Сначала показываем кастомное имя контакта, если есть
+  if (localContactName.value) return localContactName.value
+  // Затем имя из пропса (из контакта)
+  if (props.contactName) return props.contactName
+  // Затем публичное имя из профиля
+  return localProfileData.value?.publicName || 'Пользователь'
 })
 
 const loadData = async () => {
@@ -113,12 +153,54 @@ const loadData = async () => {
     if (fetchedProfile.value) {
       localProfileData.value = fetchedProfile.value
     }
+    
+    // Загружаем текущее имя контакта
+    localContactName.value = props.contactName || ''
   } catch (err) {
     console.error('Ошибка загрузки профиля:', err)
     error.value = err.message || 'Не удалось загрузить данные'
   } finally {
     loading.value = false
   }
+}
+
+const startEditName = () => {
+  editNameValue.value = displayName.value
+  isEditingName.value = true
+  nextTick(() => {
+    nameInputRef.value?.focus()
+  })
+}
+
+const saveName = async () => {
+  if (!editNameValue.value.trim()) {
+    cancelEditName()
+    return
+  }
+  
+  if (!props.contactId) {
+    console.error('No contactId provided')
+    cancelEditName()
+    return
+  }
+  
+  try {
+    await renameContact(props.contactId, editNameValue.value.trim())
+    localContactName.value = editNameValue.value.trim()
+    emit('name-updated', {
+      contactId: props.contactId,
+      newName: editNameValue.value.trim()
+    })
+    isEditingName.value = false
+  } catch (err) {
+    console.error('Failed to rename contact:', err)
+    error.value = 'Не удалось изменить имя контакта'
+  }
+}
+
+const cancelEditName = () => {
+  isEditingName.value = false
+  editNameValue.value = ''
 }
 
 // Используем данные из пропса, если они переданы
@@ -128,6 +210,11 @@ watch(() => props.profileData, (newData) => {
   }
 }, { immediate: true })
 
+// Обновляем локальное имя при изменении пропса
+watch(() => props.contactName, (newName) => {
+  localContactName.value = newName || ''
+})
+
 // Загружаем данные при открытии модалки
 watch(() => props.show, (newVal) => {
   if (newVal && props.profileId && !localProfileData.value) {
@@ -136,6 +223,9 @@ watch(() => props.show, (newVal) => {
 })
 
 const close = () => {
+  if (isEditingName.value) {
+    cancelEditName()
+  }
   emit('close')
 }
 </script>
@@ -285,11 +375,94 @@ const close = () => {
   margin-bottom: 1.5rem;
 }
 
+.name-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 .user-name {
   font-size: 1.25rem;
   font-weight: 600;
   color: #2d3748;
   margin: 0;
+}
+
+.edit-name-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.edit-name-btn:hover {
+  opacity: 1;
+  background: #edf2f7;
+}
+
+.name-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.name-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #667eea;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+}
+
+.name-input:focus {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.name-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-name-btn, .cancel-name-btn {
+  padding: 0.25rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.save-name-btn {
+  background: #48bb78;
+  color: white;
+}
+
+.save-name-btn:hover {
+  background: #38a169;
+}
+
+.cancel-name-btn {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.cancel-name-btn:hover {
+  background: #cbd5e0;
+}
+
+.contact-hint {
+  font-size: 0.7rem;
+  color: #a0aec0;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
 }
 
 .info-section {

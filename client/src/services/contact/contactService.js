@@ -48,6 +48,6 @@ export const contactService = {
    * @param {string} newName - новое имя
    */
   changeContactName(contactId, newName) {
-    return apiClient.put(`/contact/${contactId}/name`, { newName })
+    return apiClient.put(`/contact/${contactId}/name`, { contactId, newName })
   }
 }

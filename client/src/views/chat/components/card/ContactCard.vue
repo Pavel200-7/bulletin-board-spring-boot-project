@@ -15,6 +15,9 @@
     <div class="contact-info">
       <div class="contact-header">
         <h3 class="contact-name">{{ contactName || 'Без имени' }}</h3>
+        <div v-if="unreadCount > 0" class="unread-badge">
+          {{ unreadCount > 99 ? '99+' : unreadCount }}
+        </div>
       </div>
       <div class="contact-footer">
         <div class="contact-id">ID: {{ profileId?.slice(0, 8) }}...</div>
@@ -24,8 +27,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useProfile } from '@/composables/useProfile'
+import { useChat } from '@/composables/chat/useChat'
 
 const props = defineProps({
   contactId: {
@@ -49,6 +53,7 @@ const props = defineProps({
 defineEmits(['click'])
 
 const { fetchProfile, profile } = useProfile()
+const { fetchUnreadCount, unreadCount } = useChat()
 const imageId = ref(null)
 const loading = ref(true)
 
@@ -79,8 +84,19 @@ const loadProfile = async () => {
   }
 }
 
+const loadUnreadCount = async () => {
+  if (props.chatId) {
+    const res = await fetchUnreadCount(props.chatId)
+  }
+}
+
 onMounted(() => {
   loadProfile()
+  loadUnreadCount()
+})
+
+watch(() => props.chatId, () => {
+  loadUnreadCount()
 })
 </script>
 
@@ -137,6 +153,7 @@ onMounted(() => {
 .contact-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.5rem;
   margin-bottom: 0.25rem;
 }
@@ -146,6 +163,21 @@ onMounted(() => {
   font-size: 1rem;
   font-weight: 600;
   color: #2d3748;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unread-badge {
+  background: #e53e3e;
+  color: white;
+  border-radius: 12px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .contact-footer {

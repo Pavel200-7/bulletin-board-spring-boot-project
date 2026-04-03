@@ -66,6 +66,7 @@ const searchQuery = ref('')
 
 const filteredContacts = computed(() => {
   if (!searchQuery.value) return contacts.value
+  console.log(contacts)
   return contacts.value.filter(contact =>
     contact.contactName?.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
@@ -87,7 +88,10 @@ const loadContacts = async () => {
   await Promise.all([
     fetchContacts(),
     fetchMyProfile()
+    
   ])
+    console.log(contacts)
+
 }
 
 const handleSearch = (query) => {
