@@ -4,6 +4,8 @@ import { websocketService } from './websocketService'
 class SubscriptionService {
   constructor() {
     this.handlers = new Map()
+    this.subscribeQueue = []
+    this.isProcessing = false
   }
 
   /**
@@ -14,29 +16,68 @@ class SubscriptionService {
   }
 
   /**
-   * Подписаться на канал
-   * @param {string} destination - адрес канала (например, /topic/chat/{chatId})
-   * @param {Function} onMessage - обработчик сообщений
-   * @returns {Promise} - промис с объектом подписки
+   * Подписаться на канал с очередью (чтобы избежать конфликтов)
    */
   async subscribe(destination, onMessage) {
+    // Добавляем в очередь
+    return new Promise((resolve, reject) => {
+      this.subscribeQueue.push({
+        destination,
+        onMessage,
+        resolve,
+        reject
+      })
+      this.processQueue()
+    })
+  }
+
+  async processQueue() {
+    if (this.isProcessing || this.subscribeQueue.length === 0) {
+      return
+    }
+
+    this.isProcessing = true
+
+    while (this.subscribeQueue.length > 0) {
+      const task = this.subscribeQueue.shift()
+      
+      try {
+        // Ждем между подписками 200ms
+        if (this.subscribeQueue.length > 0) {
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+        
+        const subscription = await this.doSubscribe(task.destination, task.onMessage)
+        task.resolve(subscription)
+      } catch (err) {
+        task.reject(err)
+      }
+    }
+
+    this.isProcessing = false
+  }
+
+  async doSubscribe(destination, onMessage) {
     if (!websocketService.isConnected) {
       throw new Error('WebSocket not connected')
     }
 
     const client = websocketService.getClient()
     
-    const subscription = client.subscribe(destination, (message) => {
+    const callback = (message) => {
       try {
         const data = JSON.parse(message.body)
         onMessage(data)
       } catch (err) {
-        console.error('Error parsing message:', err)
+        console.error(`Error parsing message from ${destination}:`, err)
         onMessage(message.body)
       }
-    })
-
-    websocketService._registerSubscription(destination, subscription)
+    }
+    
+    console.log(`📡 Subscribing to ${destination}...`)
+    const subscription = client.subscribe(destination, callback)
+    websocketService._registerSubscription(destination, subscription, callback)
+    console.log(`✅ Subscribed to ${destination}`)
     
     return subscription
   }
@@ -58,40 +99,20 @@ class SubscriptionService {
   }
 
   /**
-   * Подписаться на сообщения чата
+   * Подписаться на все события чата (один топик)
    * @param {string} chatId - ID чата
-   * @param {Function} onMessage - обработчик сообщений
+   * @param {Function} onMessage - обработчик сообщений (уже включает все типы событий)
    */
   async subscribeToChat(chatId, onMessage) {
     return this.subscribe(`/topic/chat/${chatId}`, onMessage)
   }
 
   /**
-   * Подписаться на обновления в чате
-   * @param {string} chatId - ID чата
-   * @param {Function} onUpdate - обработчик обновлений
-   */
-  async subscribeToChatUpdates(chatId, onUpdate) {
-    return this.subscribe(`/topic/chat/${chatId}/updates`, onUpdate)
-  }
-
-  /**
-   * Подписаться на удаления в чате
-   * @param {string} chatId - ID чата
-   * @param {Function} onDelete - обработчик удалений
-   */
-  async subscribeToChatDeletes(chatId, onDelete) {
-    return this.subscribe(`/topic/chat/${chatId}/deletes`, onDelete)
-  }
-
-  /**
-   * Отписаться от всех каналов чата
+   * Отписаться от чата
    * @param {string} chatId - ID чата
    */
   unsubscribeFromChat(chatId) {
     this.unsubscribe(`/topic/chat/${chatId}`)
-    this.unsubscribe(`/topic/chat/${chatId}/updates`)
-    this.unsubscribe(`/topic/chat/${chatId}/deletes`)
   }
 }
 

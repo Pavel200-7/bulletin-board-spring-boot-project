@@ -1,4 +1,4 @@
-// src/composables/websocket/useSubscription.js
+// src/composables/chat/useSubscription.js
 import { ref } from 'vue'
 import { subscriptionService } from '@/services/websocket/subscriptionService'
 import { websocketService } from '@/services/websocket/websocketService'
@@ -79,12 +79,12 @@ export function useSubscription() {
   }
 
   /**
-   * Подписаться на чат
+   * Подписаться на чат (один топик для всех событий)
    * @param {string} chatId - ID чата
    * @param {Object} handlers - обработчики событий
-   * @param {Function} handlers.onMessage - новое сообщение
-   * @param {Function} handlers.onUpdate - обновление сообщения
-   * @param {Function} handlers.onDelete - удаление сообщения
+   * @param {Function} handlers.onMessageCreated - создано новое сообщение
+   * @param {Function} handlers.onMessageUpdated - обновлено сообщение
+   * @param {Function} handlers.onMessageDeleted - удалено сообщение
    */
   const subscribeToChat = async (chatId, handlers = {}) => {
     console.log(`📡 Subscribing to chat ${chatId}...`)
@@ -98,9 +98,9 @@ export function useSubscription() {
     }
     
     const {
-      onMessage,
-      onUpdate,
-      onDelete
+      onMessageCreated,
+      onMessageUpdated,
+      onMessageDeleted
     } = handlers
 
     // Сохраняем ID чата для отслеживания
@@ -110,26 +110,48 @@ export function useSubscription() {
 
     const chatSubs = subscriptions.value.get(chatId)
 
-    // Подписка на новые сообщения
-    if (onMessage && !chatSubs.message) {
-      console.log(`  - Subscribing to messages for chat ${chatId}`)
-      chatSubs.message = await subscriptionService.subscribeToChat(chatId, onMessage)
-    }
-
-    // Подписка на обновления
-    if (onUpdate && !chatSubs.update) {
-      console.log(`  - Subscribing to updates for chat ${chatId}`)
-      chatSubs.update = await subscriptionService.subscribeToChatUpdates(chatId, onUpdate)
-    }
-
-    // Подписка на удаления
-    if (onDelete && !chatSubs.delete) {
-      console.log(`  - Subscribing to deletes for chat ${chatId}`)
-      chatSubs.delete = await subscriptionService.subscribeToChatDeletes(chatId, onDelete)
+    // Только одна подписка на чат
+    if (!chatSubs.main) {
+      console.log(`  - Subscribing to chat topic for chat ${chatId}`)
+      
+      // Единый обработчик для всех типов сообщений
+      const messageHandler = (webSocketMessage) => {
+        console.log(`📨 Received WebSocket message for chat ${chatId}:`, webSocketMessage)
+        
+        const { type, data } = webSocketMessage
+        
+        switch (type) {
+          case 'MESSAGE_CREATED':
+            console.log('💬 Message created:', data)
+            if (onMessageCreated) {
+              onMessageCreated(data)
+            }
+            break
+            
+          case 'MESSAGE_UPDATED':
+            console.log('✏️ Message updated:', data)
+            if (onMessageUpdated) {
+              onMessageUpdated(data)
+            }
+            break
+            
+          case 'MESSAGE_DELETED':
+            console.log('🗑️ Message deleted:', data)
+            if (onMessageDeleted) {
+              onMessageDeleted(data)
+            }
+            break
+            
+          default:
+            console.warn('Unknown message type:', type, data)
+        }
+      }
+      
+      chatSubs.main = await subscriptionService.subscribeToChat(chatId, messageHandler)
     }
 
     isSubscribed.value = true
-    console.log(`✅ Subscribed to all events for chat ${chatId}`)
+    console.log(`✅ Subscribed to chat ${chatId} (single topic)`)
   }
 
   /**

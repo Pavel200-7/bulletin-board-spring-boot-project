@@ -199,24 +199,31 @@ const setupWebSocket = async () => {
       if (reply.error) {
         console.error('Server error:', reply.error)
       }
+      // Можно обработать успешные ответы от сервера
+      if (reply.chatMessageResponse) {
+        console.log('Message sent successfully:', reply.chatMessageResponse)
+      }
     })
     console.log('✅ Subscribed to replies')
     
-    // 3. Подписываемся на события чата
+    // 3. Подписываемся на события чата (один топик)
     await subscribeToChat(chatId, {
-      onMessage: (message) => {
+      onMessageCreated: (message) => {
         console.log('💬 New message via WebSocket:', message)
         addMessage(message)
       },
-      onUpdate: (update) => {
+      onMessageUpdated: (update) => {
         console.log('✏️ Message update via WebSocket:', update)
-        updateMessage(update.messageId, { 
-          content: update.newContent,
-          updated: true 
+        // update - это ChatMessageWebSocketDto с полями:
+        // { id, senderId, type, updated, content }
+        updateMessage(update.id, { 
+          content: update.content,
+          updated: update.updated 
         })
       },
-      onDelete: (deleteMsg) => {
+      onMessageDeleted: (deleteMsg) => {
         console.log('🗑️ Message delete via WebSocket:', deleteMsg)
+        // deleteMsg - это DeleteMessageWebSocketDto с полем messageId
         removeMessage(deleteMsg.messageId)
       }
     })

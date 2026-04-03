@@ -7,6 +7,8 @@ import com.example.chat.application.service.message.text.data.request.UpdateText
 import com.example.chat.application.service.message.text.data.response.CreateTextChatMessageResponse;
 import com.example.chat.host.controller.websocket.data.response.ChatMessageWebSocketDto;
 import com.example.chat.host.controller.websocket.data.response.DeleteMessageWebSocketDto;
+import com.example.chat.host.controller.websocket.data.response.base.WebSocketMessageDto;
+import com.example.chat.host.controller.websocket.data.response.enums.WebSocketMessageType;
 import com.example.chat.infrastructure.security.SecurityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +37,6 @@ public class ChatMessageWebSocketController {
             @DestinationVariable UUID chatId,
             CreateTextChatMessageRequest request,
             Principal principal) {
-//        log.info("WebSocket create message for chat: {}, from: {}", chatId, securityService.getCurrentUsername());
-
         log.info("WebSocket create message for chat: {}, from: {}", chatId, principal.getName());
         request.setChatId(chatId);
         CreateTextChatMessageResponse response = textChatMessageService.createTextMessage(request);
@@ -49,7 +49,9 @@ public class ChatMessageWebSocketController {
 
         messagingTemplate.convertAndSend(
                 "/topic/chat/" + chatId,
-                ChatMessageWebSocketDto.fromResponse(response.getChatMessageResponse())
+                new WebSocketMessageDto(
+                        WebSocketMessageType.MESSAGE_CREATED,
+                        ChatMessageWebSocketDto.fromResponse(response.getChatMessageResponse()))
         );
     }
 
@@ -71,9 +73,10 @@ public class ChatMessageWebSocketController {
         );
 
         messagingTemplate.convertAndSend(
-                "/topic/chat/" + chatId + "/updates",
-                ChatMessageWebSocketDto.fromResponse(response.getChatMessageResponse())
-
+                "/topic/chat/" + chatId,
+                new WebSocketMessageDto(
+                        WebSocketMessageType.MESSAGE_UPDATED,
+                        ChatMessageWebSocketDto.fromResponse(response.getChatMessageResponse()))
         );
     }
 
@@ -88,20 +91,18 @@ public class ChatMessageWebSocketController {
             Principal principal) {
         log.info("WebSocket delete message: {} in chat: {}, from: {}", messageId, chatId, principal.getName());
         var response = textChatMessageService.deleteMessage(new DeleteChatMessageRequest(messageId));
+
         messagingTemplate.convertAndSendToUser(
                 principal.getName(),
                 "/queue/reply",
                 response
         );
 
-        DeleteMessageWebSocketDto payload = DeleteMessageWebSocketDto.builder()
-                .messageId(messageId)
-                .build();
-
         messagingTemplate.convertAndSend(
-                "/topic/chat/" + chatId + "/deletes",
-                new DeleteMessageWebSocketDto(messageId)
-        );
+                "/topic/chat/" + chatId,
+                new WebSocketMessageDto(
+                        WebSocketMessageType.MESSAGE_DELETED,
+                        new DeleteMessageWebSocketDto(messageId)));
     }
 
 }
