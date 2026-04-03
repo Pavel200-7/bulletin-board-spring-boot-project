@@ -72,6 +72,7 @@ public class ContactServiceImpl implements ContactService {
 
         chatRoomRepository.save(newChatRoom);
         profileRepository.save(ownerProfile);
+        profileRepository.save(contactProfile);
 
         log.info("Создан новый контакт с id: {}, чат так же создан.", contact.getId());
         
@@ -86,8 +87,7 @@ public class ContactServiceImpl implements ContactService {
                 .orElseThrow(() -> new ResourceNotFoundException("Contact not found with id: " + request.getContactId()));
 
         UUID currentUserId = securityService.getCurrentUserIdAsUUID();
-        if (!contact.getOwnerProfile().getOwnerInfo().getOwnerId().equals(currentUserId)
-                && !contact.getContactProfile().getOwnerInfo().getOwnerId().equals(currentUserId)) {
+        if (!contact.getOwnerProfile().getOwnerInfo().getOwnerId().equals(currentUserId)) {
             throw new AccessDeniedException("You don't have permission to modify this contact");
         }
 

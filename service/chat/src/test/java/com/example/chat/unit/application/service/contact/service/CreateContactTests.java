@@ -125,6 +125,8 @@ public class CreateContactTests {
 
         verify(ownerProfile).addContact(contactProfile);
         verify(profileRepository).save(ownerProfile);
+        verify(profileRepository).save(contactProfile);
+
         // Проверяем, что chatRoom сохранен с правильным объектом
         verify(chatRoomRepository).save(chatRoomCaptor.capture());
         assertEquals(mockChatRoom, chatRoomCaptor.getValue());

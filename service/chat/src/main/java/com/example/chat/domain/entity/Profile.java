@@ -86,9 +86,13 @@ public class Profile extends BaseEntity {
 
     public Contact addContact(Profile contactProfile) {
         validateContactAddition(contactProfile);
-        Contact contact = Contact.createContact(this, contactProfile);
-        this.contacts.add(contact);
-        return contact;
+
+        Contact contactForOwnerSide = Contact.createContact(this, contactProfile);
+        Contact contactForOtherSide = Contact.createContact(contactProfile, this);
+
+        this.contacts.add(contactForOwnerSide);
+        contactProfile.contacts.add(contactForOtherSide);
+        return contactForOwnerSide;
     }
 
     private void validateContactAddition(Profile contactProfile) {

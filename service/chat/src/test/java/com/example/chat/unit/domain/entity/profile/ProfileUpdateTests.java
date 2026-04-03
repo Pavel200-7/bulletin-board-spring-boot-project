@@ -77,6 +77,59 @@ public class ProfileUpdateTests {
     }
 
     @Test
+    public void shouldCreateContactInBothSides() {
+        // Arrange
+        Profile ownerProfile = createProfile("Public Name");
+
+        String contactName = "Friend";
+        Profile contactProfile = createProfile(contactName);
+
+        // Act
+        Contact contact = ownerProfile.addContact(contactProfile);
+
+        // Assert
+        assertFalse(ownerProfile.getContacts().isEmpty());
+        assertFalse(contactProfile.getContacts().isEmpty());
+    }
+
+    @Test
+    public void shouldCreateContactForOwner() {
+        // Arrange
+        Profile ownerProfile = createProfile("Public Name");
+
+        String contactName = "Friend";
+        Profile contactProfile = createProfile(contactName);
+
+        // Act
+        Contact contact = ownerProfile.addContact(contactProfile);
+
+        // Assert
+        assertEquals(ownerProfile, contact.getOwnerProfile());
+        assertEquals(contactProfile, contact.getContactProfile());
+        assertEquals(contactName, contact.getContactName());
+    }
+
+    @Test
+    public void shouldCreateContactForOther() {
+        // Arrange
+        Profile ownerProfile = createProfile("Public Name");
+
+        String contactName = "Friend";
+        Profile contactProfile = createProfile(contactName);
+
+        // Act
+        Contact contact = ownerProfile.addContact(contactProfile);
+
+        // Assert
+        Contact otherSideContact = contactProfile.getContacts().getFirst();
+        assertNotNull(otherSideContact);
+
+        assertEquals(contactProfile, otherSideContact.getOwnerProfile());
+        assertEquals(ownerProfile, otherSideContact.getContactProfile());
+        assertEquals(ownerProfile.getPublicName(), otherSideContact.getContactName());
+    }
+
+    @Test
     public void shouldTwoPartyAddChat() {
         // Arrange
         Profile ownerProfile = createProfile("Public Name");
