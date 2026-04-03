@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -19,6 +20,8 @@ public class ChatMessageWebSocketDto {
     private ChatMessageType type;
     private boolean updated;
     private String content;
+    private LocalDateTime createdAt;
+
 
     public static ChatMessageWebSocketDto fromResponse(ChatMessageResponse response) {
         return ChatMessageWebSocketDto.builder()
@@ -27,6 +30,7 @@ public class ChatMessageWebSocketDto {
                 .type(response.getType())
                 .updated(response.isUpdated())
                 .content(response.getContent())
+                .createdAt(response.getCreatedAt())
                 .build();
     }
 

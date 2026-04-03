@@ -24,37 +24,29 @@
         :key="message.id"
         class="message-item"
         :class="{ 
-          'message-own': message.senderId === currentUserProfileId,
-          'message-own-edit': message.senderId === currentUserProfileId && editingMessageId === message.id
+          'message-own': message.senderId === currentUserProfileId
         }"
         @contextmenu="(e) => openContextMenu(e, message)"
       >
         <div class="message-bubble">
-          <div v-if="message.type === 'TEXT'" class="message-text">
-            <template v-if="editingMessageId === message.id">
-              <textarea
-                ref="editTextareaRef"
-                v-model="editText"
-                class="edit-input"
-                @keyup.enter.prevent="saveEdit(message.id)"
-                @keyup.esc="cancelEdit"
-              ></textarea>
-              <div class="edit-actions">
-                <button @click="saveEdit(message.id)" class="save-btn">✓</button>
-                <button @click="cancelEdit" class="cancel-btn">✕</button>
-              </div>
-            </template>
-            <template v-else>
-              {{ message.content }}
-              <span v-if="message.updated" class="edited-badge">(изменено)</span>
-            </template>
-          </div>
-          <div v-else-if="message.type === 'IMAGE'" class="message-image">
-            <img :src="getImageUrl(message.content)" alt="Изображение" @click="openImage(message.content)" />
-          </div>
-          <div class="message-time">
-            {{ formatTime(message.createdAt) }}
-          </div>
+          <!-- Рендерим разные типы сообщений через компоненты -->
+          <TextMessage
+            v-if="message.type === 'TEXT'"
+            :message="message"
+            :is-own="message.senderId === currentUserProfileId"
+            :editing-id="editingMessageId"
+            :edit-text="editText"
+            @start-edit="startEdit"
+            @save-edit="saveEdit"
+            @cancel-edit="cancelEdit"
+            @update-edit-text="updateEditText"
+          />
+          
+          <ImageMessage
+            v-else-if="message.type === 'IMAGE'"
+            :message="message"
+            :is-own="message.senderId === currentUserProfileId"
+          />
         </div>
       </div>
     </div>
@@ -91,7 +83,9 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
+import TextMessage from './messages/TextMessage.vue'
+import ImageMessage from './messages/ImageMessage.vue'
 import MessageActions from './MessageActions.vue'
 import EditMessageModal from './EditMessageModal.vue'
 import DeleteConfirmModal from './DeleteConfirmModal.vue'
@@ -141,21 +135,6 @@ const contextMenu = ref({
   position: { x: 0, y: 0 }
 })
 
-const getImageUrl = (imageId) => {
-  if (!imageId) return null
-  const MINIO_URL = import.meta.env.VITE_MINIO_URL || 'http://localhost:9001'
-  const BUCKET = import.meta.env.VITE_MINIO_BUCKET || 'bulletins'
-  return `${MINIO_URL}/${BUCKET}/${imageId}`
-}
-
-const formatTime = (date) => {
-  if (!date) return ''
-  return new Date(date).toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
 const handleScroll = () => {
   const el = container.value
   if (!el) return
@@ -193,8 +172,6 @@ const openContextMenu = (event, message) => {
   if (message.senderId !== props.currentUserProfileId) return
   
   selectedMessage.value = message
-  console.log(selectedMessage.value)
-
   contextMenu.value = {
     show: true,
     position: { x: event.clientX, y: event.clientY }
@@ -203,7 +180,6 @@ const openContextMenu = (event, message) => {
 
 const closeContextMenu = () => {
   contextMenu.value.show = false
-  // selectedMessage.value = null
 }
 
 const handleEditMessage = () => {
@@ -218,15 +194,7 @@ const handleDeleteMessage = () => {
 }
 
 const confirmEdit = (newText) => {
-  console.log('Sending 22222222222222222222222211111111111')
-  console.log('Sending newText', newText)
-  console.log(selectedMessage.value)
-  console.log(newText.trim())
-
-
   if (selectedMessage.value && newText.trim()) {
-    console.log('Sending 222222222222222222222222')
-
     emit('edit-message', {
       messageId: selectedMessage.value.id,
       newText: newText.trim()
@@ -249,6 +217,31 @@ const confirmDelete = () => {
 
 const closeDeleteModal = () => {
   showDeleteModal.value = false
+}
+
+// Методы для редактирования inline (если нужно)
+const startEdit = (messageId, content) => {
+  editingMessageId.value = messageId
+  editText.value = content
+}
+
+const saveEdit = (messageId) => {
+  if (editText.value.trim()) {
+    emit('edit-message', {
+      messageId: messageId,
+      newText: editText.value.trim()
+    })
+  }
+  cancelEdit()
+}
+
+const cancelEdit = () => {
+  editingMessageId.value = null
+  editText.value = ''
+}
+
+const updateEditText = (text) => {
+  editText.value = text
 }
 
 // Закрываем контекстное меню при клике вне его
@@ -312,10 +305,6 @@ defineExpose({
   justify-content: flex-end;
 }
 
-.message-own-edit {
-  opacity: 0.5;
-}
-
 .message-bubble {
   max-width: 70%;
   padding: 0.5rem 0.75rem;
@@ -328,78 +317,6 @@ defineExpose({
 .message-own .message-bubble {
   background: #667eea;
   color: white;
-}
-
-.message-text {
-  font-size: 0.875rem;
-  line-height: 1.4;
-  white-space: pre-wrap;
-}
-
-.message-image img {
-  max-width: 200px;
-  max-height: 200px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.message-time {
-  font-size: 0.65rem;
-  color: #a0aec0;
-  margin-top: 0.25rem;
-  text-align: right;
-}
-
-.message-own .message-time {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.edited-badge {
-  font-size: 0.65rem;
-  margin-left: 0.25rem;
-  opacity: 0.7;
-}
-
-.edit-input {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-family: inherit;
-  resize: vertical;
-}
-
-.edit-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.save-btn, .cancel-btn {
-  padding: 0.25rem 0.5rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.75rem;
-}
-
-.save-btn {
-  background: #48bb78;
-  color: white;
-}
-
-.save-btn:hover {
-  background: #38a169;
-}
-
-.cancel-btn {
-  background: #e2e8f0;
-  color: #4a5568;
-}
-
-.cancel-btn:hover {
-  background: #cbd5e0;
 }
 
 .loading-indicator {

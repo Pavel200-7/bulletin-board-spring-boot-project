@@ -1,6 +1,7 @@
 // src/composables/chat/useImageMessageWebSocket.js
 import { ref } from 'vue'
 import { imageMessageWebSocketService } from '@/services/websocket/imageMessageService'
+import { websocketService } from '@/services/websocket/websocketService'
 
 export function useImageMessageWebSocket() {
   const sending = ref(false)
@@ -19,13 +20,24 @@ export function useImageMessageWebSocket() {
       return false
     }
     
+    // Проверяем подключение ДО установки sending
+    if (!websocketService.isConnected) {
+      console.warn('WebSocket not connected, cannot send image message')
+      error.value = 'WebSocket not connected'
+      return false
+    }
+    
     sending.value = true
     error.value = null
     
+    console.log("Отправляю image message", { chatId, imageId })
+
     try {
       const result = imageMessageWebSocketService.sendImageMessage(chatId, imageId)
+      console.log("Результат отправки:", result)
       return result
     } catch (err) {
+      console.error("Ошибка при отправке:", err)
       error.value = err.message
       return false
     } finally {
@@ -45,6 +57,12 @@ export function useImageMessageWebSocket() {
       return false
     }
     
+    if (!websocketService.isConnected) {
+      console.warn('WebSocket not connected, cannot delete image message')
+      error.value = 'WebSocket not connected'
+      return false
+    }
+    
     deleting.value = true
     error.value = null
     
@@ -60,12 +78,9 @@ export function useImageMessageWebSocket() {
   }
 
   return {
-    // state
     sending,
     deleting,
     error,
-    
-    // actions
     sendImageMessage,
     deleteImageMessage
   }

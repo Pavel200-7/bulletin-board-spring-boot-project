@@ -1,32 +1,17 @@
-<!-- src/views/chat/components/ChatInput.vue -->
+<!-- src/views/chat/components/ChatImageUpload.vue -->
 <template>
-  <div class="chat-input-container">
-    <div class="input-wrapper">
-      <!-- Кнопка загрузки изображения -->
-      <button 
-        type="button"
-        class="image-upload-btn"
-        :class="{ uploading }"
-        :disabled="uploading"
-        @click="triggerFileSelect"
-        title="Отправить изображение"
-      >
-        <span v-if="!uploading">📷</span>
-        <div v-else class="spinner-small"></div>
-      </button>
-      
-      <textarea
-        v-model="localMessage"
-        placeholder="Сообщение..."
-        class="message-input"
-        rows="1"
-        @keyup.enter.prevent="handleSend"
-      ></textarea>
-      
-      <button class="send-btn" @click="handleSend" :disabled="!localMessage.trim()">
-        📤
-      </button>
-    </div>
+  <div class="chat-image-upload">
+    <button 
+      type="button"
+      class="upload-btn"
+      :class="{ uploading }"
+      :disabled="uploading"
+      @click="triggerFileSelect"
+      title="Отправить изображение"
+    >
+      <span v-if="!uploading">📷</span>
+      <div v-else class="spinner-small"></div>
+    </button>
     
     <input
       ref="fileInput"
@@ -39,13 +24,9 @@
     <!-- Модальное окно предпросмотра -->
     <div v-if="previewImage" class="preview-modal" @click="closePreview">
       <div class="preview-content" @click.stop>
-        <div class="preview-header">
-          <h3>Предпросмотр</h3>
-          <button class="close-btn" @click="closePreview">✕</button>
-        </div>
         <img :src="previewImage" alt="Preview" />
         <div class="preview-actions">
-          <button @click="confirmSend" class="send-btn-preview">📤 Отправить</button>
+          <button @click="confirmSend" class="send-btn">📤 Отправить</button>
           <button @click="closePreview" class="cancel-btn">❌ Отмена</button>
         </div>
       </div>
@@ -54,41 +35,22 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useMinio } from '@/composables/useMinio'
 
 const props = defineProps({
-  modelValue: {
-    type: String,
-    default: ''
-  },
   chatId: {
     type: String,
     required: true
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'send', 'send-image'])
+const emit = defineEmits(['send-image'])
 
 const { uploadFile, uploading, uploadProgress, uploadError } = useMinio()
 const fileInput = ref(null)
 const previewImage = ref(null)
 const selectedFile = ref(null)
-const localMessage = ref(props.modelValue)
-
-watch(() => props.modelValue, (newVal) => {
-  localMessage.value = newVal
-})
-
-watch(localMessage, (newVal) => {
-  emit('update:modelValue', newVal)
-})
-
-const handleSend = () => {
-  if (!localMessage.value.trim()) return
-  emit('send', localMessage.value)
-  localMessage.value = ''
-}
 
 const triggerFileSelect = () => {
   if (!uploading.value) {
@@ -103,7 +65,6 @@ const handleFileSelect = async (event) => {
   const validation = validateFile(file)
   if (!validation.valid) {
     alert(validation.error)
-    fileInput.value.value = ''
     return
   }
   
@@ -159,23 +120,15 @@ const validateFile = (file) => {
 </script>
 
 <style scoped>
-.chat-input-container {
-  background: white;
-  border-top: 1px solid #e2e8f0;
-  padding: 1rem;
+.chat-image-upload {
+  display: inline-block;
 }
 
-.input-wrapper {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-end;
-}
-
-.image-upload-btn {
+.upload-btn {
   width: 40px;
   height: 40px;
-  background: transparent;
   border: none;
+  background: transparent;
   border-radius: 50%;
   cursor: pointer;
   font-size: 1.25rem;
@@ -184,69 +137,26 @@ const validateFile = (file) => {
   justify-content: center;
   transition: all 0.2s;
   color: #667eea;
-  flex-shrink: 0;
 }
 
-.image-upload-btn:hover:not(:disabled) {
+.upload-btn:hover:not(:disabled) {
   background: #edf2f7;
   transform: scale(1.05);
 }
 
-.image-upload-btn:disabled {
+.upload-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.image-upload-btn.uploading {
+.upload-btn.uploading {
   cursor: wait;
-}
-
-.message-input {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 24px;
-  font-size: 0.875rem;
-  resize: none;
-  font-family: inherit;
-  max-height: 120px;
-}
-
-.message-input:focus {
-  outline: none;
-  border-color: #667eea;
-}
-
-.send-btn {
-  width: 40px;
-  height: 40px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.send-btn:hover:not(:disabled) {
-  background: #5a67d8;
-  transform: scale(1.05);
-}
-
-.send-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .file-input {
   display: none;
 }
 
-/* Preview Modal */
 .preview-modal {
   position: fixed;
   top: 0;
@@ -268,41 +178,11 @@ const validateFile = (file) => {
   border-radius: 12px;
   padding: 1rem;
   cursor: default;
-  display: flex;
-  flex-direction: column;
-}
-
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.preview-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #2d3748;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  color: #a0aec0;
-  transition: color 0.2s;
-}
-
-.close-btn:hover {
-  color: #e53e3e;
 }
 
 .preview-content img {
   max-width: calc(90vw - 2rem);
-  max-height: calc(90vh - 120px);
+  max-height: calc(90vh - 100px);
   object-fit: contain;
   border-radius: 8px;
 }
@@ -312,11 +192,9 @@ const validateFile = (file) => {
   gap: 1rem;
   justify-content: center;
   margin-top: 1rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e2e8f0;
 }
 
-.send-btn-preview, .cancel-btn {
+.send-btn, .cancel-btn {
   padding: 0.5rem 1.5rem;
   border: none;
   border-radius: 8px;
@@ -325,12 +203,12 @@ const validateFile = (file) => {
   transition: all 0.2s;
 }
 
-.send-btn-preview {
+.send-btn {
   background: #667eea;
   color: white;
 }
 
-.send-btn-preview:hover {
+.send-btn:hover {
   background: #5a67d8;
   transform: scale(1.02);
 }

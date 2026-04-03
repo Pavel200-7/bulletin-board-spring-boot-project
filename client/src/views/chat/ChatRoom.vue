@@ -27,8 +27,10 @@
 
     <ChatInput
       v-model="messageText"
-      @send="sendMessage"
+      :chat-id="chatId"
       :disabled="sending"
+      @send="sendMessage"
+      @send-image="handleSendImage"
     />
 
     <UserProfileModal
@@ -52,6 +54,7 @@ import { useContact } from '@/composables/useContact'
 import { useAuth } from '@/composables/useAuth'
 import { useSubscription } from '@/composables/chat/useSubscription'
 import { useTextMessageWebSocket } from '@/composables/chat/useTextMessageWebSocket'
+import { useImageMessageWebSocket } from '@/composables/chat/useImageMessageWebSocket'
 import ChatHeader from './components/ChatHeader.vue'
 import MessagesContainer from './components/MessagesContainer.vue'
 import ChatInput from './components/ChatInput.vue'
@@ -86,6 +89,7 @@ const {
   disconnect: wsDisconnect, 
   subscribeToChat, 
   subscribeToReplies,
+  unsubscribeFromChat,
   isConnected: wsIsConnected,
   connected: wsConnected
 } = useSubscription()
@@ -94,6 +98,9 @@ const {
   updateMessage: wsUpdateMessage, 
   deleteMessage: wsDeleteMessage 
 } = useTextMessageWebSocket()
+const { 
+  sendImageMessage: wsSendImageMessage
+} = useImageMessageWebSocket()
 
 const chatId = route.params.id
 const messageText = ref('')
@@ -210,12 +217,11 @@ const setupWebSocket = async () => {
     await subscribeToChat(chatId, {
       onMessageCreated: (message) => {
         console.log('💬 New message via WebSocket:', message)
-        addMessage(message)
+        resetHasNewer()
+        loadNewerMessages(chatId)
       },
       onMessageUpdated: (update) => {
         console.log('✏️ Message update via WebSocket:', update)
-        // update - это ChatMessageWebSocketDto с полями:
-        // { id, senderId, type, updated, content }
         updateMessage(update.id, { 
           content: update.content,
           updated: update.updated 
@@ -223,7 +229,6 @@ const setupWebSocket = async () => {
       },
       onMessageDeleted: (deleteMsg) => {
         console.log('🗑️ Message delete via WebSocket:', deleteMsg)
-        // deleteMsg - это DeleteMessageWebSocketDto с полем messageId
         removeMessage(deleteMsg.messageId)
       }
     })
@@ -269,18 +274,36 @@ const sendMessage = async (text) => {
   }
 }
 
+const handleSendImage = async (imageId) => {
+  console.log('📤 Sending image via WebSocket:', { chatId, imageId })
+  
+  console.log('WebSocket state:', {
+    isConnected: wsIsConnected(),
+    connected: wsConnected.value,
+  })
+
+  try {
+    const sent = wsSendImageMessage(chatId, imageId)
+    
+    if (sent && wsIsConnected()) {
+      console.log('✅ Image message sent via WebSocket')
+    } else {
+      console.warn('⚠️ WebSocket send failed, need REST fallback')
+      // Здесь можно добавить REST fallback для image сообщений
+    }
+  } catch (err) {
+    console.error('❌ Error sending image:', err)
+    alert('Не удалось отправить изображение')
+  }
+}
+
 const handleEditMessage = async ({ messageId, newText }) => {
   try {
-    // Обновляем локально сразу (оптимистично)
-    // updateMessageInList(messageId, { content: newText, updated: true })
-    
     // Отправляем запрос на сервер
     const sent = wsUpdateMessage(chatId, messageId, newText)
     console.log('✅ Message update sent via WebSocket')
-
     
     if (!sent) {
-      // Если WebSocket не работает, используем REST (TODO: добавить REST метод)
       console.warn('WebSocket update failed, need REST fallback')
     }
   } catch (err) {
@@ -292,9 +315,6 @@ const handleEditMessage = async ({ messageId, newText }) => {
 // Обработчик удаления сообщения
 const handleDeleteMessage = async (messageId) => {
   try {
-    // Удаляем локально сразу (оптимистично)
-    // removeMessageFromList(messageId)
-    
     // Отправляем запрос на сервер
     const sent = wsDeleteMessage(chatId, messageId)
     

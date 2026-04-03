@@ -9,7 +9,7 @@ class ImageMessageWebSocketService {
    * @returns {boolean} - успешность отправки
    */
   sendImageMessage(chatId, imageId) {
-    if (!websocketService.isConnected()) {
+    if (!websocketService.isConnected) {
       console.warn('WebSocket not connected')
       return false
     }
@@ -30,7 +30,7 @@ class ImageMessageWebSocketService {
    * @returns {boolean} - успешность отправки
    */
   deleteImageMessage(chatId, messageId) {
-    if (!websocketService.isConnected()) {
+    if (!websocketService.isConnected) {
       console.warn('WebSocket not connected')
       return false
     }

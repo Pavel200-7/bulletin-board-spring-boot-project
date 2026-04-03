@@ -4,6 +4,7 @@ import com.example.chat.domain.enums.ChatMessageType;
 import lombok.Builder;
 import lombok.Value;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Value
@@ -14,4 +15,5 @@ public class ChatMessageResponse {
     private ChatMessageType type;
     private boolean updated;
     private String content;
+    private LocalDateTime createdAt;
 }

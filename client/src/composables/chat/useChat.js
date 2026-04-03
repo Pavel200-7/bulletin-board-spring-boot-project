@@ -189,10 +189,6 @@ export function useChat() {
     if (messages.value.length > 0) {
       lastMessageId.value = messages.value[messages.value.length - 1]?.id
     }
-    
-    // Обновляем hasNewer — после добавления нового сообщения, если мы не в конце, то есть новые
-    // Это нужно для кнопки "Новые сообщения"
-    // Флаг hasNewer будет сброшен, когда пользователь доскроллит вниз
   }
 
   /**
@@ -256,7 +252,7 @@ export function useChat() {
    * Сбросить флаг hasNewer (когда пользователь доскроллил вниз)
    */
   const resetHasNewer = () => {
-    hasNewer.value = false
+    hasNewer.value = true
   }
 
   return {
