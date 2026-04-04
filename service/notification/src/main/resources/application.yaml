@@ -59,6 +59,11 @@ spring:
 mail:
   debug: true
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_PATH:http://eureka:8761/eureka/ }
+
 app:
   keycloak:
     client-id: ${KEYCLOAK_CLIENT_ID:myclient}

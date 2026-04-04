@@ -110,41 +110,6 @@ public class AuthController {
                 });
     }
 
-
-//    @PostMapping("/refresh")
-//    public Mono<ResponseEntity<LoginResponse>> refresh(@RequestBody RefreshTokenRequest request) {
-//        String refreshToken = request.getRefreshToken();
-//        log.info("Refreshing token");
-//
-//        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-//        body.add("client_id", clientId);
-//        body.add("client_secret", clientSecret);
-//        body.add("refresh_token", refreshToken);
-//        body.add("grant_type", "refresh_token");
-//
-//        return webClient.post()
-//                .uri(tokenUri)
-//                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-//                .body(BodyInserters.fromFormData(body))
-//                .retrieve()
-//                .bodyToMono(Map.class)
-//                .map(response -> {
-//                    LoginResponse loginResponse = LoginResponse.builder()
-//                            .accessToken((String) response.get("access_token"))
-//                            .refreshToken((String) response.get("refresh_token"))
-//                            .expiresIn((Integer) response.get("expires_in"))
-//                            .tokenType((String) response.get("token_type"))
-//                            .build();
-//
-//                    log.info("Token refreshed successfully");
-//                    return ResponseEntity.ok(loginResponse);
-//                })
-//                .onErrorResume(e -> {
-//                    log.error("Failed to refresh token: {}", e.getMessage());
-//                    return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
-//                });
-//    }
-
     @PostMapping("/refresh")
     public Mono<ResponseEntity<LoginResponse>> refresh(@RequestBody RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
@@ -157,7 +122,6 @@ public class AuthController {
         log.info("Refreshing token with refresh token: {}",
                 refreshToken.substring(0, Math.min(20, refreshToken.length())) + "...");
 
-        // Декодируем refresh token для проверки issuer
         try {
             String[] parts = refreshToken.split("\\.");
             if (parts.length > 1) {
@@ -233,4 +197,5 @@ public class AuthController {
                     return Mono.just(ResponseEntity.ok().<Void>build());
                 });
     }
+
 }

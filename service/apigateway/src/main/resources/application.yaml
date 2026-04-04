@@ -2,6 +2,11 @@ spring:
   application:
     name: apigateway
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_PATH:http://eureka:8761/eureka/ }
+
 server:
   port: 8080
 
@@ -18,11 +23,3 @@ logging:
     # Для видимости raw запроса/ответа
     org.apache.tomcat.util.net: DEBUG
     org.apache.tomcat.util.http: DEBUG
-
-app:
-  service-path:
-    bulletin: ${BULLETIN_SERVICE_PATH:bulletin:8080}
-    notification: ${NOTIFICATION_SERVICE_PATH:notification:8080}
-    chat: ${CHAT_SERVICE_PATH:chat:8080}
-    keycloak: ${KEYCLOAK_PATH:keycloak:8080}
-    auth: ${AUTH_PATH:auth:8080}

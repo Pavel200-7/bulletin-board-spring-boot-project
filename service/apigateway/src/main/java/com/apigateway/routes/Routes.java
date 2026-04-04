@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class Routes {
 
-    private final ServicePathProperties properties;
-
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -24,13 +22,13 @@ public class Routes {
                                 "/api/v1/characteristic-value/**",
                                 "/api/v1/trade-account/**"
                         )
-                        .uri(properties.getFullPath(properties.getBulletin()))
+                        .uri(ServiceUri.bulletin)
                 )
 
                 // ========== NOTIFICATION SERVICE ==========
                 .route("notification_service", r -> r
                         .path("/api/v1/subscription/**")
-                        .uri(properties.getFullPath(properties.getNotification()))
+                        .uri(ServiceUri.notification)
                 )
 
                 // ========== CHAT SERVICE ==========
@@ -40,7 +38,7 @@ public class Routes {
                                 "/api/v1/contact/**",
                                 "/api/v1/profile/**"
                         )
-                        .uri(properties.getFullPath(properties.getChat()))
+                        .uri(ServiceUri.chat)
                 )
 
                 // ========== CHAT SERVICE (WEBSOCKET) ==========
@@ -49,25 +47,14 @@ public class Routes {
                         .filters(f -> f
                                 .rewritePath("/api/v1/ws/(?<segment>.*)", "/ws/${segment}")
                         )
-                        .uri(properties.getFullPath(properties.getChat()))
-                )
-
-                // ========== KEYCLOAK ==========
-                .route("keycloak_service", r -> r
-                        .path(
-                                "/realms/**",
-                                "/resources/**",
-                                "/protocol/**",
-                                "/admin/**"
-                        )
-                        .uri(properties.getFullPath(properties.getKeycloak()))
+                        .uri(ServiceUri.chat)
                 )
                 .route("auth_service", r -> r
                         .path("/api/v1/auth/**")
                         .filters(f -> f
                                 .rewritePath("/api/v1/auth/(?<segment>.*)", "/api/v1/auth/${segment}")
                         )
-                        .uri(properties.getFullPath(properties.getAuth()))
+                        .uri(ServiceUri.auth)
                 )
                 .build();
     }

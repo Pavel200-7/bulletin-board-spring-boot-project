@@ -9,7 +9,6 @@ import com.example.notification.domain.entity.Subscription;
 import com.example.notification.domain.entity.base.OwnerInfo;
 import com.example.notification.domain.entity.base.user.User;
 import com.example.notification.domain.enums.NotificationType;
-import com.example.notification.domain.enums.PublisherType;
 import com.example.notification.infrastructure.repository.SubscriptionRepository;
 import com.example.notification.infrastructure.repository.UserRepository;
 import com.example.notification.infrastructure.security.SecurityService;

@@ -21,14 +21,34 @@ services:
       - CHAT_SERVICE_PATH=chat:8080
       - KEYCLOAK_PATH=keycloak:8080
       - AUTH_PATH=auth:8080
+      
       # Server
       - SERVER_PORT=8080 
+      
+      # Eureka
+      - EUREKA_PATH=http://eureka:8761/eureka/
     networks:
       app-net:
     depends_on:
       - bulletin
       - notification
       - chat
+
+  eureka:
+    build: ./service/eureka
+    container_name: eureka
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761 
+    networks:
+      app-net:
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
 
   bulletin:
     build: ./service/bulletin
@@ -52,6 +72,9 @@ services:
       
       # Server
       - SERVER_PORT=8080 
+
+      # Eureka
+      - EUREKA_PATH=http://eureka:8761/eureka/
     networks:
       app-net:
     depends_on:
@@ -60,6 +83,8 @@ services:
       postgres:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      eureka:
         condition: service_healthy
 
   notification:
@@ -91,6 +116,9 @@ services:
       
       # Server
       - SERVER_PORT=8080 
+
+      # Eureka
+      - EUREKA_PATH=http://eureka:8761/eureka/
     networks:
       app-net:
     depends_on:
@@ -123,6 +151,9 @@ services:
       
       # Server
       - SERVER_PORT=8080 
+
+      # Eureka
+      - EUREKA_PATH=http://eureka:8761/eureka/
     networks:
       app-net:
     depends_on:
@@ -145,6 +176,9 @@ services:
       - KEYCLOAK_CLIENT_SECRET=sYXnZMAiSY4ouudztjv73iHyPr5H0dQC
       - BACKEND_CALLBACK_URI=http://localhost:8080/api/v1/auth/callback
       - FRONTEND_REDIRECT_URI=http://localhost:5173/callback
+
+      # Eureka
+      - EUREKA_PATH=http://eureka:8761/eureka/
     networks:
       - app-net
     depends_on:
