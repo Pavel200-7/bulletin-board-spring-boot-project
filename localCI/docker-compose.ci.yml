@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  ci-builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.ci
+    image: my-ci-runner:latest
+    container_name: ci-builder
+    volumes:
+      # Проброс Docker сокета
+      - /var/run/docker.sock:/var/run/docker.sock
+      
+      # Проброс корня проекта
+      - ..:/project
+      
+      # КЕШИРОВАНИЕ 
+      - gradle-cache:/root/.gradle
+      - maven-cache:/root/.m2
+      - gradle-wrapper-cache:/root/.gradle/wrapper
+    environment:
+      - DOCKER_USERNAME=${DOCKER_USERNAME}
+      - DOCKER_PASSWORD=${DOCKER_PASSWORD}
+      - VERSION=${VERSION:-latest}
+      - DOCKER_REGISTRY=${DOCKER_REGISTRY:-docker.io}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      
+      # Опции Gradle для ускорения
+      - GRADLE_USER_HOME=/root/.gradle
+      
+    working_dir: /project
+    command: /usr/local/bin/build-all.sh
+
+volumes:
+  gradle-cache:
+    name: bulletin-gradle-cache  # Фиксированное имя для переиспользования
+  maven-cache:
+    name: bulletin-maven-cache
+  gradle-wrapper-cache:
+    name: bulletin-gradle-wrapper-cache

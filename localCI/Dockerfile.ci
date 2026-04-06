@@ -1,0 +1,26 @@
+FROM ubuntu:22.04
+
+# Установка пакетов
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    vim \
+    docker.io \
+    openjdk-21-jdk \
+    maven \
+    gradle \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /project
+
+# Копируем все скрипты
+COPY scripts/*.sh /usr/local/bin/
+RUN ls -la /usr/local/bin/*.sh
+
+
+# Делаем их исполняемыми
+RUN chmod +x /usr/local/bin/*.sh
+
+# Точка входа
+CMD ["/usr/local/bin/build-all.sh"]
