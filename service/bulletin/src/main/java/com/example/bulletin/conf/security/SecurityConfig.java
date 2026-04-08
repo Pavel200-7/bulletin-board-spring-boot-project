@@ -67,7 +67,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.disable())
                 .authorizeHttpRequests((authorize) -> authorize
                         // ========== ПУБЛИЧНЫЕ ЭНДПОИНТЫ (READ ONLY) ==========
+                        // Работоспособность
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/info").permitAll()
+
                         // BulletinController
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/bulletin/page").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/bulletin/**").permitAll()
 

@@ -7,7 +7,7 @@
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 300,
+  "accessTokenLifespan": 1800,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
@@ -32,7 +32,7 @@
   "registrationAllowed": true,
   "registrationEmailAsUsername": false,
   "rememberMe": false,
-  "verifyEmail": true,
+  "verifyEmail": false,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
@@ -53,6 +53,15 @@
         "id": "f3602edc-b734-4d06-95a5-1d7836b7437e",
         "name": "offline_access",
         "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "b8e1c791-0541-4592-a5d0-0953b5dc3209",
+        "attributes": {}
+      },
+      {
+        "id": "055d767f-fdff-4bf8-89cd-d8b8ed8d71fe",
+        "name": "admin",
+        "description": "",
         "composite": false,
         "clientRole": false,
         "containerId": "b8e1c791-0541-4592-a5d0-0953b5dc3209",
@@ -686,19 +695,22 @@
       "clientId": "myclient",
       "name": "",
       "description": "",
-      "rootUrl": "http://localhost:8083",
-      "adminUrl": "http://localhost:8083",
+      "rootUrl": "http://localhost/auth",
+      "adminUrl": "http://localhost/auth",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "**********",
+      "secret": "sYXnZMAiSY4ouudztjv73iHyPr5H0dQC",
       "redirectUris": [
-        "http://localhost:8083/*"
+        "http://localhost:8080/*",
+        "http://localhost:5173/*",
+        "http://localhost/*",
+        "http://localhost:5173/callback"
       ],
       "webOrigins": [
-        "http://localhost:8083"
+        "http://localhost:8080"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -712,7 +724,7 @@
       "protocol": "openid-connect",
       "attributes": {
         "logout.confirmation.enabled": "false",
-        "client.secret.creation.time": "1770561150",
+        "client.secret.creation.time": "1772614580",
         "standard.token.exchange.enabled": "false",
         "frontchannel.logout.session.required": "true",
         "post.logout.redirect.uris": "+",
@@ -810,7 +822,9 @@
       "id": "8d469a32-b9ac-4877-959e-030378af21a4",
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
+      "description": "",
       "rootUrl": "${authAdminUrl}",
+      "adminUrl": "",
       "baseUrl": "/admin/oAuth/console/",
       "surrogateAuthRequired": false,
       "enabled": true,
@@ -833,10 +847,18 @@
       "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
+        "logout.confirmation.enabled": "false",
         "realm_client": "false",
+        "oidc.ciba.grant.enabled": "false",
         "client.use.lightweight.access.token.enabled": "true",
+        "backchannel.logout.session.required": "false",
+        "standard.token.exchange.enabled": "false",
         "post.logout.redirect.uris": "+",
-        "pkce.code.challenge.method": "S256"
+        "display.on.consent.screen": "false",
+        "oauth2.device.authorization.grant.enabled": "false",
+        "pkce.code.challenge.method": "S256",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "dpop.bound.access.tokens": "false"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
@@ -1599,7 +1621,7 @@
     "envelopeFrom": "",
     "ssl": "true",
     "timeout": "10000",
-    "password": "prvepeophfnvnjlm",
+    "password": "**********",
     "port": "465",
     "host": "smtp.yandex.ru",
     "replyTo": "",
@@ -1611,7 +1633,8 @@
   },
   "eventsEnabled": false,
   "eventsListeners": [
-    "jboss-logging"
+    "jboss-logging",
+    "my-event-listener"
   ],
   "enabledEventTypes": [
     "UPDATE_CONSENT_ERROR",
@@ -1729,7 +1752,7 @@
         "showInAccountConsole": "ALWAYS",
         "filteredByClaim": "false",
         "syncMode": "IMPORT",
-        "clientSecret": "d947c14b93757353d54f996f70a4affcbbfe5564",
+        "clientSecret": "**********",
         "caseSensitiveOriginalUsername": "false"
       },
       "types": []
@@ -1761,14 +1784,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-full-name-mapper",
-            "saml-user-attribute-mapper",
             "oidc-usermodel-property-mapper",
+            "saml-user-attribute-mapper",
             "oidc-address-mapper",
             "saml-role-list-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-property-mapper"
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper",
+            "saml-user-property-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1788,14 +1811,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-attribute-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "saml-user-property-mapper",
             "oidc-usermodel-attribute-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-user-attribute-mapper",
+            "saml-role-list-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-property-mapper",
             "oidc-full-name-mapper",
-            "saml-role-list-mapper"
+            "oidc-usermodel-property-mapper"
           ]
         }
       },
@@ -2741,7 +2764,10 @@
     "clientOfflineSessionMaxLifespan": "0",
     "oauth2DevicePollingInterval": "5",
     "clientSessionIdleTimeout": "0",
+    "actionTokenGeneratedByUserLifespan.verify-email": "",
+    "actionTokenGeneratedByUserLifespan.idp-verify-account-via-email": "",
     "clientOfflineSessionIdleTimeout": "0",
+    "actionTokenGeneratedByUserLifespan.execute-actions": "",
     "cibaInterval": "5",
     "realmReusableOtpCode": "false",
     "cibaExpiresIn": "120",
@@ -2749,8 +2775,10 @@
     "saml.signature.algorithm": "",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",
-    "frontendUrl": "",
-    "acr.loa.map": "{}"
+    "frontendUrl": "http://localhost/auth",
+    "acr.loa.map": "{}",
+    "shortVerificationUri": "",
+    "actionTokenGeneratedByUserLifespan.reset-credentials": ""
   },
   "keycloakVersion": "26.5.2",
   "userManagedAccessAllowed": false,
