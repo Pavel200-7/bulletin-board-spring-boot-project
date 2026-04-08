@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-deployment
+  labels:
+    app: notification
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+      - name: notification
+        image: pavel2007/notification:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: notification-config
+        - secretRef:
+            name: common-secret
+        - secretRef:
+            name: notification-secret

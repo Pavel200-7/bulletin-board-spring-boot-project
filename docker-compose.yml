@@ -84,8 +84,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-      eureka:
-        condition: service_healthy
 
   notification:
     build: ./service/notification
