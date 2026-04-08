@@ -21,6 +21,11 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-./localCI/.env
-./kubernetes/overlays/development/secret.env
+localCI/.env
+localCI/.env.*
+**/.env
+**/.env.*
+**/secret.env
+**/*-secret.env
+**/secrets.env
 
