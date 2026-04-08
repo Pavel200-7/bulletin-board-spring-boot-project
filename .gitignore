@@ -21,8 +21,8 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-localCI/.env
-localCI/.env.*
+./localCI/.env
+./localCI/.env.*
 **/.env
 **/.env.*
 **/secret.env
