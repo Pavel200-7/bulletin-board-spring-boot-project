@@ -1,0 +1,135 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:  
+    inputs:
+      version:
+        description: 'Version (e.g., v1.0.0)'
+        required: false
+        default: 'latest'
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Checkout кода
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # 2. Настройка JDK
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      
+      # 3. Настройка Gradle кеша
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      
+      # 4. Настройка Node.js (для фронтенда)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'client/package-lock.json'
+      
+      # 5. Логин в Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      
+      # 6. Сборка общей библиотеки
+      - name: Build shared library
+        run: |
+          cd service/lib/rabbitMQ-events-contracts
+          chmod +x gradlew
+          ./gradlew clean build publishToMavenLocal -x test
+      
+      # 7. Сборка SPI
+      - name: Build Keycloak SPI
+        run: |
+          cd service/lib/keycloak-registration-listener-spi
+          chmod +x gradlew
+          ./gradlew clean build -x test
+          # Копируем JAR в директорию Keycloak
+          mkdir -p config/keycloak/spi-providers
+          find build/libs -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" -exec cp {} ../../config/keycloak/spi-providers/ \;
+      
+      # 8. Сборка микросервисов
+      - name: Build and push microservices
+        run: |
+          SERVICES=("eureka" "apigateway" "auth" "bulletin" "chat" "notification")
+          VERSION=${GITHUB_REF_NAME#v}
+          if [ -z "$VERSION" ]; then
+            VERSION="latest"
+          fi
+          
+          for service in "${SERVICES[@]}"; do
+            if [ -d "service/$service" ]; then
+              echo "Building $service"
+              cd service/$service
+              
+              # Сборка JAR
+              chmod +x gradlew
+              ./gradlew clean bootJar -x test
+              
+              # Сборка Docker образа
+              IMAGE_NAME="pavel2007/$service:${VERSION}"
+              docker build -t $IMAGE_NAME -t "pavel2007/$service:latest" .
+              
+              # Пуш
+              docker push $IMAGE_NAME
+              docker push "pavel2007/$service:latest"
+              
+              cd ../..
+            fi
+          done
+      
+      # 9. Сборка фронтенда
+      - name: Build and push frontend
+        run: |
+          cd client
+          VERSION=${GITHUB_REF_NAME#v}
+          if [ -z "$VERSION" ]; then
+            VERSION="latest"
+          fi
+          
+          # Сборка Docker образа
+          docker build -t pavel2007/frontend:${VERSION} -t pavel2007/frontend:latest .
+          
+          # Пуш
+          docker push pavel2007/frontend:${VERSION}
+          docker push pavel2007/frontend:latest
+      
+      # 10. Сборка Keycloak
+      - name: Build and push Keycloak
+        run: |
+          cd config/keycloak
+          VERSION=${GITHUB_REF_NAME#v}
+          if [ -z "$VERSION" ]; then
+            VERSION="latest"
+          fi
+          
+          docker build -t pavel2007/keycloak-custom:${VERSION} -t pavel2007/keycloak-custom:latest .
+          docker push pavel2007/keycloak-custom:${VERSION}
+          docker push pavel2007/keycloak-custom:latest
