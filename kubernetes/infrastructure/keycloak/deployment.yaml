@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: bulletinboard
+  labels:
+    app: keycloak
+    component: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+        component: auth
+    spec:
+      containers:
+      - name: keycloak
+        image: pavel2007/keycloak-custom:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        - containerPort: 9000
+        envFrom:
+        - configMapRef:
+            name: keycloak-config
+        - secretRef:
+            name: keycloak-secret
+        command:
+        - start-dev
+        - --import-realm
+        - --spi-import-provider-single-file-file=/opt/keycloak/data/import/realm-export.json
+        - --spi-import-provider-single-file-override=false
+        - --spi-events-listener-my-event-listener-enabled=true
+        - --spi-events-listener-my-event-listener-rabbitmqhost=rabbitmq-service
+        - --spi-events-listener-my-event-listener-rabbitmqport=5672
+        - --spi-events-listener-my-event-listener-rabbitmqusername=rmuser
+        - --spi-events-listener-my-event-listener-rabbitmqpassword=rmpassword
+        - --spi-events-listener-my-event-listener-rabbitmqvirtualhost=/
+        volumeMounts:
+        - name: keycloak-import
+          mountPath: /opt/keycloak/data/import
+        - name: keycloak-providers
+          mountPath: /opt/keycloak/providers
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+      volumes:
+      - name: keycloak-import
+        configMap:
+          name: keycloak-import
+      - name: keycloak-providers
+        configMap:
+          name: keycloak-providers

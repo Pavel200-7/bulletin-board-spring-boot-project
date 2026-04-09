@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka
+  namespace: bulletinboard
+  labels:
+    app: eureka
+    component: discovery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka
+  template:
+    metadata:
+      labels:
+        app: eureka
+        component: discovery
+    spec:
+      containers:
+      - name: eureka
+        image: pavel2007/eureka:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8761
+        envFrom:
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: eureka-config
+        - secretRef:
+            name: common-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

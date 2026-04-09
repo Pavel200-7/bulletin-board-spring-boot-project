@@ -56,11 +56,11 @@ services:
     environment:
       - SERVER_PORT=8080
       - EUREKA_PATH=http://eureka:8761/eureka/
-      - BULLETIN_SERVICE_PATH=bulletin:8080
-      - NOTIFICATION_SERVICE_PATH=notification:8080
-      - CHAT_SERVICE_PATH=chat:8080
-      - KEYCLOAK_PATH=keycloak:8080
-      - AUTH_PATH=auth:8080
+      # - BULLETIN_SERVICE_PATH=bulletin:8080
+      # - NOTIFICATION_SERVICE_PATH=notification:8080
+      # - CHAT_SERVICE_PATH=chat:8080
+      # - KEYCLOAK_PATH=keycloak:8080
+      # - AUTH_PATH=auth:8080
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
       - MANAGEMENT_SECURITY_ENABLED=false

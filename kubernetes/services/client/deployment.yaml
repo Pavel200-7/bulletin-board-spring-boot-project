@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client
+  namespace: bulletinboard
+  labels:
+    app: client
+    component: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+        component: frontend
+    spec:
+      containers:
+      - name: client
+        image: pavel2007/frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5173
+        envFrom:
+        - configMapRef:
+            name: client-config
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

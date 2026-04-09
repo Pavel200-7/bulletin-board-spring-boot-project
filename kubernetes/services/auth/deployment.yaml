@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  namespace: bulletinboard
+  labels:
+    app: auth
+    component: security
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+        component: security
+    spec:
+      containers:
+      - name: auth
+        image: pavel2007/auth:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: common-config
+        - configMapRef:
+            name: auth-config
+        - secretRef:
+            name: common-secret
+        - secretRef:
+            name: auth-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
