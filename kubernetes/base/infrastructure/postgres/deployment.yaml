@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: bulletinboard
+  labels:
+    app: postgres
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        component: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:17
+        ports:
+        - containerPort: 5432
+        env:
+        # Из common-config (base)
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: POSTGRES_USER
+        # Из common-secret (base)
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: POSTGRES_PASSWORD
+        # Из postgres-config (локальный)
+        - name: PGDATA
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: PGDATA
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: init-script
+        configMap:
+          name: postgres-init-script

@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apigateway
+  labels:
+    app: apigateway
+    component: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apigateway
+  template:
+    metadata:
+      labels:
+        app: apigateway
+        component: gateway
+    spec:
+      containers:
+      - name: apigateway
+        image: pavel2007/apigateway:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        # Из common-config
+        - name: EUREKA_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: EUREKA_PATH
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+        - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+        - name: MANAGEMENT_SECURITY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MANAGEMENT_SECURITY_ENABLED
+        # Из apigateway-config
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: apigateway-config
+              key: SERVER_PORT
+        - name: EUREKA_INSTANCE_HOSTNAME
+          valueFrom:
+              configMapKeyRef:
+                name: apigateway-config
+                key: EUREKA_INSTANCE_HOSTNAME
+        - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+          valueFrom:
+              configMapKeyRef:
+                name: apigateway-config
+                key: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+        - name: EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED
+          valueFrom:
+              configMapKeyRef:
+                name: apigateway-config
+                key: EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED
+        - name: EUREKA_INSTANCE_NON_SECURE_PORT
+          valueFrom:
+              configMapKeyRef:
+                name: apigateway-config
+                key: EUREKA_INSTANCE_NON_SECURE_PORT
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

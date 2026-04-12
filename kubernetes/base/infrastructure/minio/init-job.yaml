@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-bucket-init
+  namespace: bulletinboard
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: mc
+        image: minio/mc:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Ждать, пока MinIO запустится
+          until mc alias set myminio http://minio-service:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD; do
+            echo "Waiting for MinIO service..."
+            sleep 5
+          done
+          
+          mc mb myminio/bulletins --ignore-existing
+          mc anonymous set download myminio/bulletins
+          
+          echo "Bucket 'bulletins' initialized successfully"
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            configMapKeyRef:
+              name: minio-config
+              key: MINIO_ROOT_USER
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: MINIO_ROOT_PASSWORD

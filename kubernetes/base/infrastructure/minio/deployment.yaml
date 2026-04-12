@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  labels:
+    app: minio
+    component: storage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+        component: storage
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:latest
+        args:
+        - server
+        - --console-address
+        - ":9002"
+        - /data
+        ports:
+        - containerPort: 9000
+        - containerPort: 9002
+        env:
+        # Из common-config
+        - name: MINIO_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MINIO_ENDPOINT
+        - name: MINIO_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MINIO_BUCKET
+        # Из common-secret
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: MINIO_ROOT_PASSWORD
+        # Из minio-config
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            configMapKeyRef:
+              name: minio-config
+              key: MINIO_ROOT_USER
+        - name: MINIO_BROWSER
+          valueFrom:
+            configMapKeyRef:
+              name: minio-config
+              key: MINIO_BROWSER
+        - name: MINIO_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              name: minio-config
+              key: MINIO_SERVER_URL
+        - name: MINIO_BROWSER_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: minio-config
+              key: MINIO_BROWSER_REDIRECT_URL
+        volumeMounts:
+        - name: minio-storage
+          mountPath: /data
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: minio-storage
+        persistentVolumeClaim:
+          claimName: minio-pvc

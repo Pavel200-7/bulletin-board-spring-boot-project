@@ -1,0 +1,157 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification
+  labels:
+    app: notification
+    component: business
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+        component: business
+    spec:
+      containers:
+      - name: notification
+        image: pavel2007/notification:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        # Из common-config
+        - name: RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: RABBITMQ_HOST
+        - name: RABBITMQ_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: RABBITMQ_PORT
+        - name: RABBITMQ_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: RABBITMQ_USERNAME
+        - name: KEYCLOAK_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: KEYCLOAK_CLIENT_ID
+        - name: KEYCLOAK_ISSUER_URI
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: KEYCLOAK_ISSUER_URI
+        - name: DB_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: POSTGRES_USER
+        - name: EUREKA_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: EUREKA_PATH
+        - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+        - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+        - name: MANAGEMENT_SECURITY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MANAGEMENT_SECURITY_ENABLED
+        # SMTP из common-config
+        - name: MAIL_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MAIL_HOST
+        - name: MAIL_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MAIL_PORT
+        - name: MAIL_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MAIL_PROTOCOL
+        - name: MAIL_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: MAIL_USERNAME
+        # Из common-secret
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: POSTGRES_PASSWORD
+        - name: RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: RABBITMQ_PASSWORD
+        - name: KEYCLOAK_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: KEYCLOAK_CLIENT_SECRET
+        # SMTP из common-secret
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: MAIL_PASSWORD
+        # Из notification-config
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: SERVER_PORT
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: notification-config
+              key: DB_URL
+        - name: EUREKA_INSTANCE_HOSTNAME
+          valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: EUREKA_INSTANCE_HOSTNAME
+        - name: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+          valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: EUREKA_INSTANCE_PREFER_IP_ADDRESS
+        - name: EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED
+          valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: EUREKA_INSTANCE_NON_SECURE_PORT_ENABLED
+        - name: EUREKA_INSTANCE_NON_SECURE_PORT
+          valueFrom:
+              configMapKeyRef:
+                name: notification-config
+                key: EUREKA_INSTANCE_NON_SECURE_PORT
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

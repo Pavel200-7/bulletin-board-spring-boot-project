@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+    component: message-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+        component: message-broker
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.10.7-management
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+        env:
+        # Из common-config (общие для всех)
+        - name: RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: RABBITMQ_HOST
+        - name: RABBITMQ_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: RABBITMQ_PORT
+        # Из common-secret (общие секреты)
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: common-secret
+              key: RABBITMQ_PASSWORD
+        # Из rabbitmq-config (специфичные)
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: RABBITMQ_USERNAME
+        - name: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS
+        volumeMounts:
+        - name: rabbitmq-storage
+          mountPath: /var/lib/rabbitmq
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: rabbitmq-storage
+        persistentVolumeClaim:
+          claimName: rabbitmq-pvc

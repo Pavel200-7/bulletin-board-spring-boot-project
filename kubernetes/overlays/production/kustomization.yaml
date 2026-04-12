@@ -1,43 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-bases:
-  - ../../infrastructure/postgres
-  - ../../infrastructure/rabbitmq
-  - ../../infrastructure/minio
-  - ../../infrastructure/keycloak
-  - ../../services/eureka
-  - ../../services/auth
-  - ../../services/bulletin
-  - ../../services/notification
-  - ../../services/chat
-  - ../../services/apigateway
-  - ../../services/client
-  - ../../ingress
 
-# Переопределение секретов для production
-secretGenerator:
-- name: common-secret
-  envs:
-  - common-secret.env
-  behavior: replace
-
-- name: auth-secret
-  envs:
-  - services/auth-secret.env
-  behavior: replace
-
-- name: notification-secret
-  envs:
-  - services/notification-secret.env
-  behavior: replace
-
-- name: keycloak-secret
-  envs:
-  - services/keycloak-secret.env
-  behavior: replace
-
-- name: minio-secret
-  envs:
-  - services/minio-secret.env
-  behavior: replace
+resources:
+  - ../../base

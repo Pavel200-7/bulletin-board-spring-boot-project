@@ -1,0 +1,11 @@
+CREATE DATABASE keycloak_db;
+GRANT ALL PRIVILEGES ON DATABASE keycloak_db TO dbuser;
+
+CREATE DATABASE bulletin_db;
+GRANT ALL PRIVILEGES ON DATABASE bulletin_db TO dbuser;
+
+CREATE DATABASE notification_db;
+GRANT ALL PRIVILEGES ON DATABASE notification_db TO dbuser;
+
+CREATE DATABASE chat_db;
+GRANT ALL PRIVILEGES ON DATABASE chat_db TO dbuser;

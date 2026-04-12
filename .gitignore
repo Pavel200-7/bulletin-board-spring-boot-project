@@ -24,5 +24,7 @@ gradle-app.setting
 # Secrets
 **/secret.env
 **/*-secret.env
-overlays/production/**/*.env
-!overlays/production/**/*.sample.env
+**/secrets.env
+**/common-secret.env
+**/overlays/*/secret.env
+**/overlays/*/*-secret.env
