@@ -114,8 +114,16 @@ jobs:
             VERSION="latest"
           fi
           
-          # Сборка Docker образа
-          docker build -t pavel2007/frontend:${VERSION} -t pavel2007/frontend:latest .
+          # Сборка Docker образа с аргументами
+          docker build \
+            --build-arg VITE_API_URL="http://localhost" \
+            --build-arg VITE_KEYCLOAK_URL="http://localhost/auth" \
+            --build-arg VITE_KEYCLOAK_CLIENT_ID="myclient" \
+            --build-arg VITE_APP_URL="http://localhost" \
+            --build-arg VITE_MINIO_URL="http://localhost/minio" \
+            --build-arg VITE_MINIO_BUCKET="bulletins" \
+            -t pavel2007/frontend:${VERSION} \
+            -t pavel2007/frontend:latest .
           
           # Пуш
           docker push pavel2007/frontend:${VERSION}
