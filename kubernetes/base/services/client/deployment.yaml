@@ -22,39 +22,6 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5173
-        env:
-        # Из common-config
-        - name: VITE_KEYCLOAK_CLIENT_ID
-          valueFrom:
-            configMapKeyRef:
-              name: common-config
-              key: VITE_KEYCLOAK_CLIENT_ID
-        - name: VITE_MINIO_BUCKET
-          valueFrom:
-            configMapKeyRef:
-              name: common-config
-              key: VITE_MINIO_BUCKET
-        # Из client-config
-        - name: VITE_API_URL
-          valueFrom:
-            configMapKeyRef:
-              name: client-config
-              key: VITE_API_URL
-        - name: VITE_KEYCLOAK_URL
-          valueFrom:
-            configMapKeyRef:
-              name: client-config
-              key: VITE_KEYCLOAK_URL
-        - name: VITE_APP_URL
-          valueFrom:
-            configMapKeyRef:
-              name: client-config
-              key: VITE_APP_URL
-        - name: VITE_MINIO_URL
-          valueFrom:
-            configMapKeyRef:
-              name: client-config
-              key: VITE_MINIO_URL
         resources:
           requests:
             memory: "128Mi"

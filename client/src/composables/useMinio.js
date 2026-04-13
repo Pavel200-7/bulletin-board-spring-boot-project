@@ -39,7 +39,7 @@ export function useMinio() {
       
       // Загружаем в MinIO
       const uploadedFile = await minioService.uploadFile(file, fileId)
-      
+
       clearInterval(interval)
       uploadProgress.value = 100
       
@@ -53,7 +53,7 @@ export function useMinio() {
       }
       
       files.value.push(newFile)
-      
+  
       return newFile
     } catch (err) {
       uploadError.value = err.response?.data?.message || err.message

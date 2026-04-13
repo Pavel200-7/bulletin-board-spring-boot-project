@@ -6,8 +6,3 @@ namespace: bulletinboard
 resources:
   - deployment.yaml
   - service.yaml
-
-configMapGenerator:
-- name: client-config
-  envs:
-  - config.env

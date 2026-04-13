@@ -12,10 +12,13 @@ const minioClient = axios.create({
 
 // Добавляем токен к каждому запросу (если нужна авторизация)
 minioClient.interceptors.request.use(config => {
+  // console.log(111)
   const token = tokenManager.getAccessToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+    console.log('MinIO Request:', config.method, config.url, config.headers) // ← добавить
+
   return config
 })
 

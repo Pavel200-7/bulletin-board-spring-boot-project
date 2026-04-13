@@ -14,8 +14,12 @@ resources:
   - services/bulletin
   - services/notification
   - services/chat
+  - services/client
   - infrastructure/apigateway
-
+  - ingress/main-ingress.yaml
+  - ingress/keycloak-ingress.yaml
+  - ingress/minio-ingress.yaml
+  - ingress/minio-console-ingress.yaml
 
 
 configMapGenerator:

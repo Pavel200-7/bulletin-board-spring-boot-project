@@ -39,6 +39,11 @@ spec:
             configMapKeyRef:
               name: common-config
               key: RABBITMQ_USERNAME
+        - name: DOCKER_KEYCLOAK_ISSUER_URI
+          valueFrom:
+            configMapKeyRef:
+              name: common-config
+              key: INNER_KEYCLOAK_ISSUER_URI
         - name: KEYCLOAK_CLIENT_ID
           valueFrom:
             configMapKeyRef:

@@ -1,0 +1,13 @@
+controller:
+  image:
+    registry: docker.io
+    image: k8smirror/ingress-nginx-controller
+  admissionWebhooks:
+    patch:
+      image:
+        registry: docker.io
+        image: k8smirror/ingress-nginx-kube-webhook-certgen
+  defaultBackend:
+    image:
+      registry: docker.io
+      image: k8smirror/defaultbackend-amd64

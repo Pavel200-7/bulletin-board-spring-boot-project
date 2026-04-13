@@ -43,7 +43,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: common-config
-              key: KEYCLOAK_ISSUER_URI
+              key: INNER_KEYCLOAK_ISSUER_URI
         - name: KEYCLOAK_CLIENT_ID
           valueFrom:
             configMapKeyRef:
