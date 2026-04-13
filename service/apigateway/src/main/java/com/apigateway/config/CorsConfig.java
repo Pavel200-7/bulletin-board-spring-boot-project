@@ -34,8 +34,7 @@ public class CorsConfig {
         corsConfig.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.regis
-    terCorsConfiguration("/**", corsConfig);
+        source.registerCorsConfiguration("/**", corsConfig);
 
         return new CorsWebFilter(source);
     }

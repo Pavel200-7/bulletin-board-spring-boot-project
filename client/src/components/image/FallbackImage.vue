@@ -46,6 +46,8 @@ const emit = defineEmits(['error', 'load'])
 const hasError = ref(false)
 const currentSrc = ref(props.src)
 
+console.log(props.src)
+
 // Следим за изменением src
 watch(() => props.src, (newSrc) => {
   if (newSrc !== currentSrc.value) {

@@ -125,7 +125,11 @@ export const bulletinService = {
    * Добавить изображение к объявлению
    */
   addImage(bulletinId, providerImageId) {
+    console.log('bulletinService.addImage called with:', bulletinId, providerImageId)
     const response = apiClient.put('/bulletin/add-image', { bulletinId, providerImageId })
+    console.log(response)
+    console.log("addImage finished")
+
     return response
   },
 

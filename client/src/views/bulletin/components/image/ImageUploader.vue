@@ -50,6 +50,7 @@ const { uploadFile, deleteFile, getFileUrl, uploading, uploadProgress, uploadErr
 const localFiles = ref([])
 const isInitializing = ref(true)
 
+
 const getImageUrl = (image) => {
   if (image.isNew && image.previewUrl) {
     return image.previewUrl
@@ -75,19 +76,24 @@ watch(() => props.existingFiles, (newFiles) => {
 }, { immediate: true })
 
 // Отправляем изменения наружу
-watch(localFiles, (newFiles) => {
-  if (!isInitializing.value) {
-    emit('files-updated', newFiles.map(f => ({
-      id: f.bulletinImageId,
-      minioId: f.minioId,
-      main: f.main
-    })))
-  }
-}, { deep: true })
+// watch(localFiles, (newFiles) => {
+//   console.log("localFiles изменен")
+//   console.log(localFiles)
 
-nextTick(() => {
-  isInitializing.value = false
-})
+//   console.log(isInitializing.value)
+
+//   if (!isInitializing.value) {
+//     emit('files-updated', newFiles.map(f => ({
+//       id: f.bulletinImageId,
+//       minioId: f.minioId,
+//       main: f.main
+//     })))
+//   }
+// }, { deep: true })
+
+// nextTick(() => {
+//   isInitializing.value = false
+// })
 
 const handleImageError = (image) => {
   console.warn('Image load error:', image.minioId)
@@ -102,6 +108,12 @@ const setAsMain = (image) => {
   if (image.bulletinImageId) {
     emit('set-main', { imageId: image.bulletinImageId, bulletinId: props.bulletinId })
   }
+
+  emit('files-updated', localFiles.value.map(f => ({
+    id: f.bulletinImageId,
+    minioId: f.minioId,
+    main: f.main
+  })))
 }
 
 const deleteImage = async (image) => {
@@ -121,9 +133,16 @@ const deleteImage = async (image) => {
   } catch (err) {
     console.error('Error deleting image:', err)
   }
+  emit('files-updated', localFiles.value.map(f => ({
+    id: f.bulletinImageId,
+    minioId: f.minioId,
+    main: f.main
+  })))
 }
 
 const addImageToLocal = (imageData, previewUrl = null) => {
+
+  console.log("addImageToLocal")
   const newImage = {
     bulletinImageId: null,
     minioId: imageData.id,
@@ -132,6 +151,12 @@ const addImageToLocal = (imageData, previewUrl = null) => {
     previewUrl: previewUrl
   }
   localFiles.value = [...localFiles.value, newImage]
+
+  emit('files-updated', localFiles.value.map(f => ({
+    id: f.bulletinImageId,
+    minioId: f.minioId,
+    main: f.main
+  })))
   
   setTimeout(() => {
     const idx = localFiles.value.findIndex(i => i.minioId === newImage.minioId)
@@ -141,6 +166,8 @@ const addImageToLocal = (imageData, previewUrl = null) => {
     }
   }, 1000)
   
+  console.log("addImageToLocal finished")
+
   return newImage
 }
 
