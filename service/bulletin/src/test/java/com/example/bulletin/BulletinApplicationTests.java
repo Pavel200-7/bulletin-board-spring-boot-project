@@ -1,14 +1,14 @@
 package com.example.bulletin;
 
-import com.example.bulletin.config.TestOAuth2Config;
+import com.example.bulletin.config.TestConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
+@SpringBootTest()
 @ActiveProfiles("test")
-@Import(TestOAuth2Config.class)
+@Import(TestConfig.class)
 class BulletinApplicationTests {
 
 	@Test

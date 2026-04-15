@@ -1,3 +1,45 @@
 management:
   endpoints:
     enabled-by-default: false
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+      - org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration
+      - org.springframework.amqp.rabbit.annotation.RabbitAutoConfiguration
+
+
+jpa:
+  hibernate:
+    ddl-auto: create-drop
+  show-sql: true
+  properties:
+    hibernate:
+      format_sql: true
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    enabled: false
+
+ribbon:
+  eureka:
+    enabled: false
+
+security:
+  basic:
+    enabled: false
+
+cloud:
+  discovery:
+    enabled: false
+
+logging:
+  level:
+    org.springframework.boot.autoconfigure: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.cloud.netflix.eureka: DEBUG
+    org.springframework.amqp: DEBUG

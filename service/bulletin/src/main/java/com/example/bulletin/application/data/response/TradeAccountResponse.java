@@ -1,14 +1,14 @@
 package com.example.bulletin.application.data.response;
 
-import lombok.Builder;
-import lombok.Setter;
-import lombok.Value;
+import lombok.*;
 
 import java.util.Objects;
 import java.util.UUID;
 
 @Value
 @Builder
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class TradeAccountResponse {
 
     private UUID id;

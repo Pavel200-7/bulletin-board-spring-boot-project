@@ -31,4 +31,10 @@ public class TestController {
         databaseFillerService.fillDatabase();
         return "БД заполнена тестовыми данными.";
     }
+
+    @GetMapping("/is-alive")
+    public String isAlive() {
+        return "Yes";
+    }
+
 }

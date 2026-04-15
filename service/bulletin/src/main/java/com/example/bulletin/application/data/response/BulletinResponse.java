@@ -1,7 +1,9 @@
 package com.example.bulletin.application.data.response;
 
 import com.example.bulletin.domain.enums.bulletin.BulletinState;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.stream.IntStream;
 
 @Value
 @Builder
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class BulletinResponse {
     private UUID id;
     private UUID ownerId;

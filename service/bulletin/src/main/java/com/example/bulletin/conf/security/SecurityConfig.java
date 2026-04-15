@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
+@Profile("!test")
 public class SecurityConfig {
 
     private final SecurityConfigProperties properties;
@@ -37,7 +38,6 @@ public class SecurityConfig {
     // При развертывании в сети docker возникает проблема с подписями:
     // keycloak считает себя localhost:8080, а программа может обратится к ниему (за клемами проверки токенов и тд)
     // только по внутренему адресу сети docker keycloak:8080.
-    @Profile("!test")
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(
@@ -58,8 +58,8 @@ public class SecurityConfig {
         );
     }
 
-    @Profile("!test")
     @Bean
+    @Profile("!test")
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
         http
@@ -152,7 +152,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Profile("!test")
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
@@ -182,7 +181,6 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-    @Profile("!test")
     @Bean
     public JwtDecoder jwtDecoder() {
         log.info("Creating JwtDecoder...");
