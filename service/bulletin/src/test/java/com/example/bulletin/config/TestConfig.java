@@ -9,5 +9,4 @@ import org.springframework.context.annotation.Import;
         TestSecurityConfig.class
 })
 public class TestConfig {
-    // Пустой класс, просто агрегатор конфигураций
 }

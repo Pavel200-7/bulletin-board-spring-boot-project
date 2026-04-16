@@ -1,6 +1,8 @@
 package com.example.bulletin.application.service.category.data.response.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.UUID;
 
 @Value
 @Builder
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 public class CategoryFamilyResponse {
     private UUID id;
     private String name;
