@@ -6,10 +6,9 @@ import com.example.bulletin.application.service.category.data.response.*;
 import com.example.bulletin.application.service.category.data.response.data.CategoryFamilyResponse;
 import com.example.bulletin.config.TestConfig;
 import com.example.bulletin.domain.entity.Category;
-import com.example.bulletin.infrastructure.repository.CategoryRepository;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.apache.http.HttpStatus;
+import com.example.bulletin.integration.hosts.helper.cleaner.DatabaseCleaner;
+import com.example.bulletin.integration.hosts.helper.client.CategoryAPIClient;
+import com.example.bulletin.integration.hosts.helper.initializer.CategoryInitializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,10 +24,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static io.restassured.RestAssured.given;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -40,16 +37,22 @@ public class CategoryAPITests {
     protected int port;
 
     @Autowired
-    private CategoryRepository repository;
+    private DatabaseCleaner databaseCleaner;
+
+    @Autowired
+    private CategoryInitializer categoryInitializer;
+
+    private CategoryAPIClient categoryAPIClient;
+
 
     @Container
-    protected static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17")
+    private static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17")
             .withDatabaseName("testdb")
             .withUsername("testuser")
             .withPassword("testpass");
 
     @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
+    private static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
@@ -57,31 +60,17 @@ public class CategoryAPITests {
 
     @BeforeEach
     protected void setUp() {
-        RestAssured.port = port;
-        RestAssured.baseURI = "http://localhost";
-        repository.deleteAll();
-
+        categoryAPIClient = new CategoryAPIClient(port);
+        databaseCleaner.cleanAll();
     }
 
-
-
     @Test
-    void ShouldGetCategoryById() {
+    public void ShouldGetCategoryById() {
         // Arrange
-        Category category = Category.createRoot("root");
-        repository.save(category);
-        UUID categoryId = category.getId();
+        Category category = categoryInitializer.createRoot("root");
 
         // Act
-        GetCategoryResponse response = given()
-                .contentType(ContentType.JSON)
-                .pathParam("id", categoryId)
-                .when()
-                    .get("/api/v1/category/{id}")
-                .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .extract()
-                    .as(GetCategoryResponse.class);
+        GetCategoryResponse response = categoryAPIClient.getCategory(category.getId());
 
         // Assert
         assertNotNull(response);
@@ -93,22 +82,14 @@ public class CategoryAPITests {
     }
 
     @Test
-    void ShouldCreateRootCategory() {
+    public void ShouldCreateRootCategory() {
         // Arrange
         CreateRootCategoryRequest request = CreateRootCategoryRequest.builder()
                 .name("My first root")
                 .build();
 
         // Act
-        CreateRootCategoryResponse response = given()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when()
-                    .post("/api/v1/category/root")
-                .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .extract()
-                    .as(CreateRootCategoryResponse.class);
+        CreateRootCategoryResponse response = categoryAPIClient.createRoot(request);
 
         // Assert
         assertNotNull(response);
@@ -120,24 +101,14 @@ public class CategoryAPITests {
     }
 
     @Test
-    void ShouldGetRootCategories() {
+    public void ShouldGetRootCategories() {
         // Arrange
-        Category category1 = Category.createRoot("root 1");
-        Category category2 = Category.createRoot("root 2");
-        Category category3 = Category.createRoot("root 3");
-        repository.save(category1);
-        repository.save(category2);
-        repository.save(category3);
+        Category category1 = categoryInitializer.createRoot("root 1");
+        Category category2 = categoryInitializer.createRoot("root 2");
+        Category category3 = categoryInitializer.createRoot("root 3");
 
         // Act
-        GetRootCategoriesResponse response = given()
-                .contentType(ContentType.JSON)
-                .when()
-                    .get("/api/v1/category/root")
-                .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .extract()
-                    .as(GetRootCategoriesResponse.class);
+        GetRootCategoriesResponse response = categoryAPIClient.getRoot();
 
         // Assert
         assertNotNull(response);
@@ -151,42 +122,21 @@ public class CategoryAPITests {
     }
 
     @Test
-    void ShouldGetCategoryFamily() {
+    public void ShouldGetCategoryFamily() {
         // Arrange
-        Category root = Category.createRoot("root 1");
-        repository.save(root);
-
-        Category firLvlChild = root.createChild("first level child");
-        repository.save(firLvlChild);
-
-        Category secLvlChild1 = firLvlChild.createLeafyChild("second level child 1");
-        Category secLvlChild2 = firLvlChild.createLeafyChild("second level child ");
-        Category secLvlChild3 = firLvlChild.createLeafyChild("second level child");
-        repository.save(secLvlChild1);
-        repository.save(secLvlChild2);
-        repository.save(secLvlChild3);
-
-        UUID categoryId = firLvlChild.getId();
+        Category category = categoryInitializer.createNotRootCategoryWithLeafyChildren();
 
         // Act
-        GetCategoryWithFamilyResponse response = given()
-                .contentType(ContentType.JSON)
-                .pathParam("id", categoryId)
-                .when()
-                    .get("/api/v1/category/family/{id}")
-                .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .extract()
-                    .as(GetCategoryWithFamilyResponse.class);
+        GetCategoryWithFamilyResponse response = categoryAPIClient.getCategoryWithFamily(category.getId());
 
         // Assert
         assertNotNull(response);
 
         CategoryFamilyResponse categoryResponseRoot = response.getCategoryFamilyResponse();
-        assertEquals(root.getName(), categoryResponseRoot.getName());
+        assertEquals(category.getParent().getName(), categoryResponseRoot.getName());
 
         CategoryFamilyResponse categoryResponseFirLvlChild = categoryResponseRoot.getChildren().getFirst();
-        assertEquals(firLvlChild.getName(), categoryResponseFirLvlChild.getName());
+        assertEquals(category.getName(), categoryResponseFirLvlChild.getName());
         assertEquals(3, categoryResponseFirLvlChild.getChildren().size());
     }
 
