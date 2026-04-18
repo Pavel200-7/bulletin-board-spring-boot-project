@@ -42,7 +42,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional(readOnly = true)
     public GetSubscriptionsResponse getSubscriptions(GetSubscriptionsRequest request) {
         UUID currentUserId = securityService.getCurrentUserIdAsUUID();
-        List<Subscription> subscriptions = subscriptionRepository.findByOwnerInfo_Owner_Id(currentUserId);
+        List<Subscription> subscriptions = subscriptionRepository.findByOwnerInfoOwnerId(currentUserId);
 
         log.info("Found {} subscriptions for user", subscriptions.size());
         List<SubscriptionResponse> responses = subscriptions.stream()

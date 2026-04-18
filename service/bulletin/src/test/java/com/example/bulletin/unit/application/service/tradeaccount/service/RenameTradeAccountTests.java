@@ -62,7 +62,7 @@ public class RenameTradeAccountTests {
         when(securityService.getCurrentUserIdAsUUID())
                 .thenReturn(UUID.randomUUID());
 
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(any(UUID.class)))
                 .thenReturn(Optional.of(tradeAccount));
 
         when(tradeAccountRepository.save(any(TradeAccount.class)))
@@ -79,7 +79,7 @@ public class RenameTradeAccountTests {
     public void shouldThrowWhenTradeAccountNotFound() {
         // Arrange
         RenameTradeAccountRequest request = createRequest();
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert

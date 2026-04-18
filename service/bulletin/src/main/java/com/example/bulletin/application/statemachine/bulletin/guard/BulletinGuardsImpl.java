@@ -80,7 +80,7 @@ public class BulletinGuardsImpl implements BulletinGuards {
                 return validationContext.reject();
             }
 
-            Optional<TradeAccount> tradeAccount = tradeAccountRepository.findByOwnerInfo_Owner_Id(userId);
+            Optional<TradeAccount> tradeAccount = tradeAccountRepository.findByOwnerInfoOwnerId(userId);
             if (!tradeAccount.isPresent()) {
                 validationContext.addObjectError("User with this id does not have trade account.");
                 return validationContext.reject();

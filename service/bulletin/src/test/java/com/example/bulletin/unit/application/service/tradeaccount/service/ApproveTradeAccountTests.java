@@ -5,9 +5,7 @@ import com.example.bulletin.application.exception.ResourceNotFoundException;
 import com.example.bulletin.application.mapper.TradeAccountMapper;
 import com.example.bulletin.application.service.tradeaccount.TradeAccountServiceImpl;
 import com.example.bulletin.application.service.tradeaccount.data.request.ApproveTradeAccountRequest;
-import com.example.bulletin.application.service.tradeaccount.data.request.ChangeContactsTradeAccountRequest;
 import com.example.bulletin.application.service.tradeaccount.data.response.ApproveTradeAccountResponse;
-import com.example.bulletin.application.service.tradeaccount.data.response.ChangeContactsTradeAccountResponse;
 import com.example.bulletin.domain.entity.TradeAccount;
 import com.example.bulletin.domain.entity.base.Location;
 import com.example.bulletin.domain.entity.base.OwnerInfo;
@@ -68,7 +66,7 @@ public class ApproveTradeAccountTests {
         when(securityService.getCurrentUserIdAsUUID())
                 .thenReturn(UUID.randomUUID());
 
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(any(UUID.class)))
                 .thenReturn(Optional.of(tradeAccount));
 
         when(tradeAccountRepository.save(any(TradeAccount.class)))
@@ -85,7 +83,7 @@ public class ApproveTradeAccountTests {
     public void shouldThrowWhenTradeAccountNotFound() {
         // Arrange
         ApproveTradeAccountRequest request = createRequest();
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(any(UUID.class)))
                 .thenReturn(Optional.empty());
 
         // Act & Assert

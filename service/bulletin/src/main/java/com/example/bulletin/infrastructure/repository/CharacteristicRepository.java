@@ -32,4 +32,7 @@ public interface CharacteristicRepository extends JpaRepository<Characteristic, 
             JOIN ancestors ac ON ch.category_id = ac.id
         """, nativeQuery = true)
     List<Characteristic> findByCategoryHierarchy(@Param("categoryId") UUID categoryId);
+
+
+    List<Characteristic> findByCategoryId(UUID categoryId);
 }

@@ -60,7 +60,8 @@ public class GetCategoryCharacteristicsTests {
 
         List<Characteristic> characteristics = new ArrayList<>();
         characteristics.add(createCharacteristic());
-        when(characteristicRepository.findByCategoryHierarchy(any(UUID.class)))
+
+        when(characteristicRepository.findByCategoryId(any(UUID.class)))
                 .thenReturn(characteristics);
 
         when(mapper.toResponse(any(Characteristic.class)))
@@ -90,7 +91,7 @@ public class GetCategoryCharacteristicsTests {
         service.getCategoryCharacteristics(request);
 
         // Assert
-        verify(characteristicRepository, Mockito.times(1)).findByCategoryHierarchy(request.getCategoryId());
+        verify(characteristicRepository, Mockito.times(1)).findByCategoryId(request.getCategoryId());
 
     }
 

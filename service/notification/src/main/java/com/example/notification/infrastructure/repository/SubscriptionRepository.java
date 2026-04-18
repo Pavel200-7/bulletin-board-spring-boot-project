@@ -15,7 +15,8 @@ import java.util.UUID;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
-    List<Subscription> findByOwnerInfo_Owner_Id(UUID ownerId);
+    @Query("SELECT s FROM Subscription s WHERE s.ownerInfo.owner.id = :ownerId")
+    List<Subscription> findByOwnerInfoOwnerId(@Param("ownerId") UUID ownerId);
 
     @Query(value = """
             SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END

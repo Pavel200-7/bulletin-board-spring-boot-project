@@ -44,7 +44,8 @@ public class CharacteristicServiceImpl implements CharacteristicService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("A category with this id is not found."));
 
-        List<Characteristic> characteristics = characteristicRepository.findByCategoryHierarchy(request.getCategoryId());
+//        List<Characteristic> characteristics = characteristicRepository.findByCategoryHierarchy(request.getCategoryId());
+        List<Characteristic> characteristics = characteristicRepository.findByCategoryId(request.getCategoryId());
 
         List<CharacteristicResponse> characteristicResponse = characteristics.stream()
                 .map(c -> mapper.toResponse(c))

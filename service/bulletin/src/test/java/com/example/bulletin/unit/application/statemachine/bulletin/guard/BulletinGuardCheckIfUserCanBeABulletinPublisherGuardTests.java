@@ -72,7 +72,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
                 .thenReturn(Optional.of(user));
 
         tradeAccount = createApprovedTradeAccount(user);
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(user.getId()))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(user.getId()))
                 .thenReturn(Optional.of(tradeAccount));
     }
 
@@ -123,7 +123,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
     @Test
     public void shouldForbidWhenUserDoesNotHaveTradeAccount() {
         // Arrange
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(user.getId()))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(user.getId()))
                 .thenReturn(Optional.empty());
         // Act
         boolean result = bulletinGuards.checkIfUserCanBeABulletinPublisherGuard().evaluate(context);
@@ -142,7 +142,7 @@ public class BulletinGuardCheckIfUserCanBeABulletinPublisherGuardTests {
     public void shouldForbidWhenTradeAccountIsNotApproved() {
         // Arrange
         tradeAccount = createBlankTradeAccount(user);
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(user.getId()))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(user.getId()))
                 .thenReturn(Optional.of(tradeAccount));
 
         // Act

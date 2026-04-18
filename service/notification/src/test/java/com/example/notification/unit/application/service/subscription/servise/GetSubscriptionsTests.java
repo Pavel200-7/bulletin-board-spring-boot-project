@@ -73,7 +73,7 @@ public class GetSubscriptionsTests {
         Subscription sub1 = createSubscription();
         Subscription sub2 = createSubscription();
 
-        when(subscriptionRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
+        when(subscriptionRepository.findByOwnerInfoOwnerId(any(UUID.class)))
                 .thenReturn(List.of(sub1, sub2));
 
         // Act
@@ -88,7 +88,7 @@ public class GetSubscriptionsTests {
     @Test
     public void shouldReturnEmptyListWhenNoSubscriptions() {
         // Arrange
-        when(subscriptionRepository.findByOwnerInfo_Owner_Id(any(UUID.class)))
+        when(subscriptionRepository.findByOwnerInfoOwnerId(any(UUID.class)))
                 .thenReturn(List.of());
 
         // Act

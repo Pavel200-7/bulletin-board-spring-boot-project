@@ -62,7 +62,7 @@ public class GetMyTradeAccountTests {
         tradeAccount = createTradeAccount(currentUserId);
 
         when(securityService.getCurrentUserIdAsUUID()).thenReturn(currentUserId);
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(currentUserId))
                 .thenReturn(Optional.of(tradeAccount));
 
         when(mapper.toResponse(any(TradeAccount.class)))
@@ -75,14 +75,14 @@ public class GetMyTradeAccountTests {
     @Test
     public void shouldThrowWhenTradeAccountNotFound() {
         // Arrange
-        when(tradeAccountRepository.findByOwnerInfo_Owner_Id(currentUserId))
+        when(tradeAccountRepository.findByOwnerInfoOwnerId(currentUserId))
                 .thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(ResourceNotFoundException.class, () -> service.getMyTradeAccount(request));
 
         verify(securityService).getCurrentUserIdAsUUID();
-        verify(tradeAccountRepository).findByOwnerInfo_Owner_Id(currentUserId);
+        verify(tradeAccountRepository).findByOwnerInfoOwnerId(currentUserId);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class GetMyTradeAccountTests {
                 .isEqualTo(expected);
 
         verify(securityService).getCurrentUserIdAsUUID();
-        verify(tradeAccountRepository).findByOwnerInfo_Owner_Id(currentUserId);
+        verify(tradeAccountRepository).findByOwnerInfoOwnerId(currentUserId);
         verify(mapper).toResponse(tradeAccount);
     }
 
@@ -112,7 +112,7 @@ public class GetMyTradeAccountTests {
 
         // Assert
         verify(securityService).getCurrentUserIdAsUUID();
-        verify(tradeAccountRepository).findByOwnerInfo_Owner_Id(currentUserId);
+        verify(tradeAccountRepository).findByOwnerInfoOwnerId(currentUserId);
     }
 
     @Test
