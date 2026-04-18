@@ -1,6 +1,6 @@
 <!-- src/views/chat/components/card/ProfileCard.vue -->
 <template>
-  <div class="profile-card" @click="$emit('click', profileData)">
+  <div class="profile-card" :class="{ 'current-user-card': isCurrentUser }" @click="$emit('click', profileData)">
     <div class="profile-avatar">
       <img 
         v-if="avatarUrl" 
@@ -15,7 +15,10 @@
     <div class="profile-info">
       <div class="profile-header">
         <h3 class="profile-name">{{ publicName || 'Без имени' }}</h3>
-        <div v-if="contact" class="contact-badge" title="В ваших контактах">
+        <div v-if="isCurrentUser" class="current-user-badge" title="Это вы">
+          Вы
+        </div>
+        <div v-else-if="contact" class="contact-badge" title="В ваших контактах">
           ✓
         </div>
       </div>
@@ -111,6 +114,16 @@ const handleAddContact = () => {
   border-color: #cbd5e0;
 }
 
+/* Стиль для карточки текущего пользователя */
+.current-user-card {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+  border-left: 3px solid #667eea;
+}
+
+.current-user-card:hover {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+}
+
 .profile-avatar {
   width: 60px;
   height: 60px;
@@ -147,6 +160,7 @@ const handleAddContact = () => {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.25rem;
+  flex-wrap: wrap;
 }
 
 .profile-name {
@@ -154,6 +168,21 @@ const handleAddContact = () => {
   font-size: 1rem;
   font-weight: 600;
   color: #2d3748;
+}
+
+/* Стиль для метки текущего пользователя */
+.current-user-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.7rem;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .contact-badge {

@@ -66,8 +66,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useProfile } from '@/composables/useProfile'
 import { useAuth } from '@/composables/useAuth'
 import { useContact } from '@/composables/useContact'
@@ -78,6 +78,7 @@ import SearchInput from './components/wiget/SearchInput.vue'
 import SortSelector from './components/wiget/SortSelector.vue'
 
 const router = useRouter()
+const route = useRoute()
 const { searchProfiles, profiles, loading, error, pagination } = useProfile()
 const { getUserId } = useAuth()
 const { addContact: addContactToContacts } = useContact()
@@ -102,6 +103,13 @@ const loadProfiles = async (page = 0) => {
 }
 
 const handleSearch = () => {
+  // Обновляем query параметр в URL
+  if (searchQuery.value) {
+    router.replace({ query: { ...route.query, q: searchQuery.value } })
+  } else {
+    const { q, ...rest } = route.query
+    router.replace({ query: rest })
+  }
   loadProfiles(0)
 }
 
@@ -122,7 +130,6 @@ const handleAddContact = async (profile) => {
   try {
     console.log('Добавляем пользователя в контакты:', profile)
     await addContactToContacts(profile.id)
-    // Обновляем список, чтобы обновить статус контакта
     await loadProfiles(currentPage.value)
     alert(`Пользователь ${profile.publicName} добавлен в контакты`)
   } catch (err) {
@@ -131,9 +138,25 @@ const handleAddContact = async (profile) => {
   }
 }
 
+// Читаем параметр поиска из URL при монтировании
 onMounted(async () => {
   currentUserId.value = getUserId()
+  
+  // Проверяем query параметр q
+  const querySearch = route.query.q
+  if (querySearch) {
+    searchQuery.value = querySearch
+  }
+  
   await loadProfiles()
+})
+
+// Следим за изменением query параметров (если пользователь нажимает назад/вперед)
+watch(() => route.query.q, (newQuery) => {
+  if (newQuery !== undefined && newQuery !== searchQuery.value) {
+    searchQuery.value = newQuery || ''
+    loadProfiles(0)
+  }
 })
 </script>
 
