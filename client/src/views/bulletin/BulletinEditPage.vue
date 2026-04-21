@@ -19,10 +19,6 @@
           :loading="publishing"
           @click="handlePublish"
         />
-        <PreviewButton 
-          v-if="!isNew && bulletin" 
-          @click="preview"
-        />
       </div>
     </div>
 

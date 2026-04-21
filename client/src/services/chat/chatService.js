@@ -124,7 +124,6 @@ export const chatService = {
       size: 1
     }).then(response => {
       const content = response.data?.chatMessagePage?.content || []
-      console.log('hasNewerMessages response:', content)
       return content.length > 0
     }).catch(() => false)
   },

@@ -18,9 +18,9 @@
       <div class="seller-arrow">▶</div>
     </div>
     
-    <!-- Кнопка подписки (только для авторизованных) -->
+    <!-- Кнопка подписки (только для авторизованных)  -->
     <SubscribeButton 
-      v-if="isAuthenticated" 
+      v-if="isAuthenticated && getUserId() !== ownerId" 
       :owner-id="ownerId"
     />
     
@@ -46,7 +46,7 @@ const props = defineProps({
   }
 })
 
-const { isAuthenticated } = useAuth()
+const { isAuthenticated, getUserId } = useAuth()
 const { fetchTradeAccountByUserId, account } = useTradeAccount()
 const showModal = ref(false)
 const sellerName = ref('')

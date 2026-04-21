@@ -79,7 +79,6 @@ const {
   hasOlder,
   hasNewer,
   currentChat,
-  lastMessageId,
   addMessage,
   removeMessage,
   updateMessage,
@@ -159,8 +158,6 @@ const loadChatData = async () => {
     await fetchChat(chatId)
     await fetchUnreadCount(chatId)
     await loadMessagesAroundLastRead(chatId)
-    console.log(lastMessageId)
-    // await loadNewerMessages(chatId)
 
     
     // console.log('After loadMessagesAroundLastRead:', {

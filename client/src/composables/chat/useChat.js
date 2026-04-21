@@ -66,7 +66,6 @@ export function useChat() {
    */
   const checkHasNewer = async (chatId, messageId) => {
     if (!messageId) return false
-    console.log("запрос")
     return await chatService.hasNewerMessages(chatId, messageId)
   }
 
@@ -148,17 +147,9 @@ export function useChat() {
    * Загрузить более новые сообщения (скролл вниз / кнопка)
    */
   const loadNewerMessages = async (chatId, size = 20) => {
-    console.log("Вход")
-    console.log(loadingNewer.value)    
-    console.log(!hasNewer.value)
-    console.log(!lastMessageId.value)
-
-
     if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) {
       return
     }
-    console.log("Прошло")
-
     
     loadingNewer.value = true
     
