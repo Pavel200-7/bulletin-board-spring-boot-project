@@ -9,7 +9,7 @@ class WebSocketService {
     this.connectPromise = null
     this.subscriptions = new Map()
     this.wsUrl = '/api/v1/ws'
-    console.log('WebSocketService initialized with URL:', this.wsUrl)
+    // console.log('WebSocketService initialized with URL:', this.wsUrl)
   }
 
   connect(token) {
@@ -22,7 +22,7 @@ class WebSocketService {
       }
 
       const wsUrlWithToken = `${this.wsUrl}?access_token=${encodeURIComponent(token)}`
-      console.log('Connecting to WebSocket at:', wsUrlWithToken)
+      // console.log('Connecting to WebSocket at:', wsUrlWithToken)
 
       this.connectPromise = new Promise((resolve, reject) => {
           const socket = new SockJS(wsUrlWithToken)
@@ -37,28 +37,28 @@ class WebSocketService {
               heartbeatOutgoing: 4000,
               
               onConnect: () => {
-                  console.log('✅ WebSocket connected')
+                  // console.log('✅ WebSocket connected')
                   this.isConnected = true
                   this.connectPromise = null
                   resolve()
               },
               
               onStompError: (frame) => {
-                  console.error('❌ STOMP error:', frame)
+                  // console.error('❌ STOMP error:', frame)
                   this.isConnected = false
                   this.connectPromise = null
                   reject(frame)
               },
               
               onWebSocketError: (error) => {
-                  console.error('❌ WebSocket error:', error)
+                  // console.error('❌ WebSocket error:', error)
                   this.isConnected = false
                   this.connectPromise = null
                   reject(error)
               },
               
               onDisconnect: () => {
-                  console.log('🔌 WebSocket disconnected')
+                  // console.log('🔌 WebSocket disconnected')
                   this.isConnected = false
               }
           })

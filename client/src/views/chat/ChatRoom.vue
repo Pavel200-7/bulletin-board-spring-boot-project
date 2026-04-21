@@ -79,11 +79,13 @@ const {
   hasOlder,
   hasNewer,
   currentChat,
+  lastMessageId,
   addMessage,
   removeMessage,
   updateMessage,
   resetHasNewer,
-  setLastRead
+  setLastRead,
+  loadFirstPage
 } = useChat()
 const { sendMessage: sendTextMessage, sending } = useTextMessage()
 const { fetchProfile, profile: otherProfile } = useProfile()
@@ -143,26 +145,29 @@ const findMeParticipant = (participants) => {
 const loadChatData = async () => {
   try {
     loadingMessages.value = true
-    console.log('📥 Loading chat data for chat:', chatId)
+    // console.log('📥 Loading chat data for chat:', chatId)
     
     await fetchMyProfile()
 
     currentUserId.value = getUserId()
-    console.log('Current user ID:', currentUserId.value)
+    // console.log('Current user ID:', currentUserId.value)
 
     currentUserProfileId.value = myProfile.value?.id
-    console.log('Current user Profile ID:', currentUserProfileId.value)
+    // console.log('Current user Profile ID:', currentUserProfileId.value)
 
     
     await fetchChat(chatId)
     await fetchUnreadCount(chatId)
     await loadMessagesAroundLastRead(chatId)
+    console.log(lastMessageId)
+    // await loadNewerMessages(chatId)
+
     
-    console.log('After loadMessagesAroundLastRead:', {
-      hasOlder: hasOlder.value,
-      hasNewer: hasNewer.value,
-      messagesCount: messages.value.length
-    })
+    // console.log('After loadMessagesAroundLastRead:', {
+    //   hasOlder: hasOlder.value,
+    //   hasNewer: hasNewer.value,
+    //   messagesCount: messages.value.length
+    // })
     
     if (!currentChat.value) return
 
@@ -183,7 +188,7 @@ const loadChatData = async () => {
         otherParticipantAvatar.value = getImageUrl(otherProfile.value.imageId)
         otherParticipantPublicName.value = otherProfile.value.publicName || 'Пользователь'
         chatName.value = otherProfile.value.publicName || 'Пользователь'
-        console.log('Other participant:', { name: chatName.value, id: otherParticipantProfileId.value })
+        // console.log('Other participant:', { name: chatName.value, id: otherParticipantProfileId.value })
       }
       
       try {
@@ -195,7 +200,7 @@ const loadChatData = async () => {
           }
         }
       } catch (err) {
-        console.log('Contact not found, using profile name')
+        // console.log('Contact not found, using profile name')
         currentContactId.value = null
       }
     }
@@ -209,17 +214,17 @@ const loadChatData = async () => {
 
 const setupWebSocket = async () => {
   try {
-    console.log('🔌 Setting up WebSocket connection for chat:', chatId)
+    // console.log('🔌 Setting up WebSocket connection for chat:', chatId)
     
     const connected = await wsConnect()
     if (!connected) {
       console.warn('⚠️ WebSocket connection failed, will use REST fallback')
       return
     }
-    console.log('✅ WebSocket connected')
+    // console.log('✅ WebSocket connected')
     
     await subscribeToReplies((reply) => {
-      console.log('📨 Server reply:', reply)
+      // console.log('📨 Server reply:', reply)
       if (reply.error) {
         console.error('Server error:', reply.error)
       }
@@ -227,32 +232,36 @@ const setupWebSocket = async () => {
         console.log('Message sent successfully:', reply.chatMessageResponse)
       }
     })
-    console.log('✅ Subscribed to replies')
+    // console.log('✅ Subscribed to replies')
     
     await subscribeToChat(chatId, {
       onMessageCreated: onMessageCreated,
       onMessageUpdated: (update) => {
-        console.log('✏️ Message update via WebSocket:', update)
+        // console.log('✏️ Message update via WebSocket:', update)
         updateMessage(update.id, { 
           content: update.content,
           updated: update.updated 
         })
       },
       onMessageDeleted: (deleteMsg) => {
-        console.log('🗑️ Message delete via WebSocket:', deleteMsg)
+        // console.log('🗑️ Message delete via WebSocket:', deleteMsg)
         removeMessage(deleteMsg.messageId)
       }
     })
-    console.log('✅ Subscribed to chat events for:', chatId)
+    // console.log('✅ Subscribed to chat events for:', chatId)
     
   } catch (err) {
-    console.error('❌ Failed to setup WebSocket:', err)
+    // console.error('❌ Failed to setup WebSocket:', err)
   }
 }
 
 const onMessageCreated = async (message) => {
-  console.log('💬 New message via WebSocket:', message)
+  // console.log('💬 New message via WebSocket:', message)
   resetHasNewer()
+
+  if (messages.value.length === 0) {
+    loadFirstPage(chatId)
+  }
   await loadNewerMessages(chatId)
   
   if (message.senderId !== currentUserProfileId.value && document.hasFocus()) {
@@ -273,16 +282,16 @@ const openUserModal = () => {
 const sendMessage = async (text) => {
   if (!text.trim() || sending.value) return
   
-  console.log('📤 Sending message via WebSocket:', { chatId, text })
+  // console.log('📤 Sending message via WebSocket:', { chatId, text })
   
   try {
     const sent = wsSendMessage(chatId, text)
     
     if (sent && wsIsConnected()) {
-      console.log('✅ Message sent via WebSocket')
+      // console.log('✅ Message sent via WebSocket')
       messageText.value = ''
     } else {
-      console.warn('⚠️ WebSocket send failed, falling back to REST')
+      // console.warn('⚠️ WebSocket send failed, falling back to REST')
       await sendTextMessage(chatId, text)
       messageText.value = ''
       await loadMessagesAroundLastRead(chatId)
@@ -295,23 +304,23 @@ const sendMessage = async (text) => {
 }
 
 const handleSendImage = async (imageId) => {
-  console.log('📤 Sending image via WebSocket:', { chatId, imageId })
+  // console.log('📤 Sending image via WebSocket:', { chatId, imageId })
   
-  console.log('WebSocket state:', {
-    isConnected: wsIsConnected(),
-    connected: wsConnected.value,
-  })
+  // console.log('WebSocket state:', {
+  //   isConnected: wsIsConnected(),
+  //   connected: wsConnected.value,
+  // })
 
   try {
     const sent = wsSendImageMessage(chatId, imageId)
     
     if (sent && wsIsConnected()) {
-      console.log('✅ Image message sent via WebSocket')
+      // console.log('✅ Image message sent via WebSocket')
     } else {
-      console.warn('⚠️ WebSocket send failed, need REST fallback')
+      // console.warn('⚠️ WebSocket send failed, need REST fallback')
     }
   } catch (err) {
-    console.error('❌ Error sending image:', err)
+    // console.error('❌ Error sending image:', err)
     alert('Не удалось отправить изображение')
   }
 }
@@ -319,10 +328,10 @@ const handleSendImage = async (imageId) => {
 const handleEditMessage = async ({ messageId, newText }) => {
   try {
     const sent = wsUpdateMessage(chatId, messageId, newText)
-    console.log('✅ Message update sent via WebSocket')
+    // console.log('✅ Message update sent via WebSocket')
     
     if (!sent) {
-      console.warn('WebSocket update failed, need REST fallback')
+      // console.warn('WebSocket update failed, need REST fallback')
     }
   } catch (err) {
     console.error('Error editing message:', err)
@@ -335,10 +344,10 @@ const handleDeleteMessage = async (messageId) => {
     const sent = wsDeleteMessage(chatId, messageId)
     
     if (!sent) {
-      console.warn('WebSocket delete failed, need REST fallback')
+      // console.warn('WebSocket delete failed, need REST fallback')
     }
   } catch (err) {
-    console.error('Error deleting message:', err)
+    // console.error('Error deleting message:', err)
     alert('Не удалось удалить сообщение')
   }
 }
@@ -348,7 +357,7 @@ const handleUpdateLastRead = async (messageId) => {
   
   if (currentUserParticipantLastSeemMessageId.value === messageId) return
   
-  console.log(`📖 Updating last read to: ${messageId}`)
+  // console.log(`📖 Updating last read to: ${messageId}`)
   
   const updated = await setLastRead(
     chatId, 
@@ -358,32 +367,32 @@ const handleUpdateLastRead = async (messageId) => {
   
   if (updated) {
     currentUserParticipantLastSeemMessageId.value = messageId
-    console.log(`✅ Last read updated to: ${messageId}`)
+    // console.log(`✅ Last read updated to: ${messageId}`)
   }
 }
 
 const handleContactNameUpdated = ({ contactId, newName }) => {
   chatName.value = newName
-  console.log(`Contact ${contactId} renamed to: ${newName}`)
+  // console.log(`Contact ${contactId} renamed to: ${newName}`)
 }
 
 const messagesContainer = ref(null)
 
 onMounted(async () => {
   if (chatId) {
-    console.log('🚀 ChatRoom mounted, chatId:', chatId)
+    // console.log('🚀 ChatRoom mounted, chatId:', chatId)
     await loadChatData()
     await setupWebSocket()
   }
 })
 
 onUnmounted(() => {
-  console.log('🔌 Cleaning up WebSocket subscriptions for chat:', chatId)
+  // console.log('🔌 Cleaning up WebSocket subscriptions for chat:', chatId)
   if (chatId) {
     try {
       unsubscribeFromChat(chatId)
     } catch (err) {
-      console.warn('Error unsubscribing:', err)
+      // console.warn('Error unsubscribing:', err)
     }
     wsDisconnect()
   }

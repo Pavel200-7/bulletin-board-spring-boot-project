@@ -100,7 +100,7 @@ export const chatService = {
     return apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
-      direction: 'ASC',
+      direction: 'DESC ',
       size: 1
     }).then(response => {
       const content = response.data?.chatMessagePage?.content || []
@@ -120,10 +120,11 @@ export const chatService = {
     return apiClient.post(`/chat/${chatId}/messages/search`, {
       chatId,
       cursorMessageId,
-      direction: 'DESC',
+      direction: 'ASC',
       size: 1
     }).then(response => {
       const content = response.data?.chatMessagePage?.content || []
+      console.log('hasNewerMessages response:', content)
       return content.length > 0
     }).catch(() => false)
   },
@@ -138,5 +139,10 @@ export const chatService = {
       return apiClient.put(`/chat/${chatId}/messages/${messageId}/last-read`)
     } catch (error) {
     }
+  },
+
+  getFirstMessages(chatId, size = 20) {
+    return apiClient.post(`/chat/${chatId}/messages/first`, { chatId, size })
   }
+
 }

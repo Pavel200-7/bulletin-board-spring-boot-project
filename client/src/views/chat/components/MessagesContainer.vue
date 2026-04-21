@@ -1,6 +1,6 @@
 <!-- src/views/chat/components/MessagesContainer.vue -->
 <template>
-  <div class="messages-container" ref="container" @scroll="handleScroll" @contextmenu.prevent>
+  <div class="messages-container" ref="container" @scroll="handleScroll" @contextmenu.prevent">
     <!-- Индикатор загрузки старых сообщений -->
     <div v-if="loadingOlder" class="loading-indicator top">
       <div class="spinner-small"></div>
@@ -127,7 +127,7 @@ const emit = defineEmits([
   'load-newer', 
   'edit-message', 
   'delete-message',
-  'update-last-read'  // Новое событие для обновления lastRead
+  'update-last-read'
 ])
 
 const container = ref(null)
@@ -146,6 +146,62 @@ const contextMenu = ref({
 let observer = null
 const lastProcessedMessageId = ref(null)
 const updateTimeout = ref(null)
+
+// НОВАЯ ФУНКЦИЯ: Ручная проверка видимых сообщений
+const checkVisibleMessages = () => {
+  if (!container.value || !props.messages.length) return
+  
+  const messageElements = container.value.querySelectorAll('.message-item')
+  if (!messageElements.length) return
+  
+  const visibleMessages = []
+  
+  messageElements.forEach(el => {
+    const rect = el.getBoundingClientRect()
+    const containerRect = container.value.getBoundingClientRect()
+    
+    // Сообщение считается видимым, если хотя бы частично находится в контейнере
+    const isVisible = rect.top < containerRect.bottom && rect.bottom > containerRect.top
+    
+    if (isVisible) {
+      const messageId = el.dataset.messageId
+      const index = props.messages.findIndex(m => m.id === messageId)
+      if (index !== -1) {
+        visibleMessages.push({ id: messageId, index })
+      }
+    }
+  })
+  
+  if (visibleMessages.length === 0) return
+  
+  // Сортируем по индексу и берем последнее (самое новое) видимое сообщение
+  visibleMessages.sort((a, b) => a.index - b.index)
+  const lastVisible = visibleMessages[visibleMessages.length - 1]
+  
+  // Проверяем, что это сообщение не обработано недавно
+  if (lastProcessedMessageId.value === lastVisible.id) return
+  
+  // Проверяем, что это сообщение новее текущего lastRead
+  if (props.currentLastReadMessageId) {
+    const currentIndex = props.messages.findIndex(m => m.id === props.currentLastReadMessageId)
+    
+    // Если текущий lastRead найден и он новее или равен видимому, не обновляем
+    if (currentIndex !== -1 && currentIndex >= lastVisible.index) {
+      return
+    }
+  }
+  
+  // Дебаунсим обновление, чтобы не спамить запросами
+  if (updateTimeout.value) {
+    clearTimeout(updateTimeout.value)
+  }
+  
+  updateTimeout.value = setTimeout(() => {
+    console.log(`📖 User viewed message: ${lastVisible.id} (index: ${lastVisible.index})`)
+    lastProcessedMessageId.value = lastVisible.id
+    emit('update-last-read', lastVisible.id)
+  }, 500)
+}
 
 const handleScroll = () => {
   const el = container.value
@@ -167,6 +223,9 @@ const handleScroll = () => {
   if (isNearBottom && props.hasNewer && !props.loadingNewer) {
     emit('load-newer')
   }
+  
+  // Проверяем видимые сообщения при скролле
+  checkVisibleMessages()
 }
 
 const scrollToBottom = () => {
@@ -244,13 +303,16 @@ const observeMessages = () => {
   })
 }
 
-// При изменении списка сообщений, переинициализируем observer
-watch(() => props.messages, () => {
-  nextTick(() => {
-    if (observer) {
-      initVisibilityObserver()
-    }
-  })
+// При изменении списка сообщений, переинициализируем observer и проверяем видимые
+watch(() => props.messages, async () => {
+  await nextTick()
+  if (observer) {
+    initVisibilityObserver()
+  }
+  // Важно! Проверяем видимые сообщения после загрузки
+  setTimeout(() => {
+    checkVisibleMessages()
+  }, 100)
 }, { deep: true })
 
 // При изменении currentLastReadMessageId, обновляем lastProcessed
@@ -357,6 +419,10 @@ const handleClickOutside = () => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   initVisibilityObserver()
+  // Проверяем видимые сообщения сразу после монтирования
+  setTimeout(() => {
+    checkVisibleMessages()
+  }, 100)
 })
 
 defineExpose({

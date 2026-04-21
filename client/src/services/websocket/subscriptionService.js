@@ -74,10 +74,10 @@ class SubscriptionService {
       }
     }
     
-    console.log(`📡 Subscribing to ${destination}...`)
+    // console.log(`📡 Subscribing to ${destination}...`)
     const subscription = client.subscribe(destination, callback)
     websocketService._registerSubscription(destination, subscription, callback)
-    console.log(`✅ Subscribed to ${destination}`)
+    // console.log(`✅ Subscribed to ${destination}`)
     
     return subscription
   }

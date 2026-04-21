@@ -66,6 +66,7 @@ export function useChat() {
    */
   const checkHasNewer = async (chatId, messageId) => {
     if (!messageId) return false
+    console.log("запрос")
     return await chatService.hasNewerMessages(chatId, messageId)
   }
 
@@ -90,7 +91,10 @@ export function useChat() {
         
         // Проверяем наличие старых и новых сообщений
         hasOlder.value = await checkHasOlder(chatId, firstMessageId.value)
+
         hasNewer.value = await checkHasNewer(chatId, lastMessageId.value)
+        console.log(hasNewer.value)
+        console.log(hasNewer.value)
       } else {
         hasOlder.value = false
         hasNewer.value = false
@@ -144,9 +148,17 @@ export function useChat() {
    * Загрузить более новые сообщения (скролл вниз / кнопка)
    */
   const loadNewerMessages = async (chatId, size = 20) => {
+    console.log("Вход")
+    console.log(loadingNewer.value)    
+    console.log(!hasNewer.value)
+    console.log(!lastMessageId.value)
+
+
     if (loadingNewer.value || !hasNewer.value || !lastMessageId.value) {
       return
     }
+    console.log("Прошло")
+
     
     loadingNewer.value = true
     
@@ -236,72 +248,85 @@ export function useChat() {
     messages.value[index] = { ...messages.value[index], ...updates }
   }
 
-  // /**
-  //  * Установить последнее прочитанное сообщение
-  //  * @param {string} chatId - ID чата
-  //  * @param {string} messageId - ID сообщения
-  //  */
-  // const setLastRead = async (chatId, messageId) => {
-  //   try {
-  //     await chatService.setLastReadMessage(chatId, messageId)
-  //     await fetchUnreadCount(chatId)
-  //   } catch (err) {
-  //   }
-  // }
-
-  /**
- * Установить последнее прочитанное сообщение
- * @param {string} chatId - ID чата
- * @param {string} newMessageId - ID нового прочитанного сообщения
- * @param {string} oldMessageId - ID старого последнего прочитанного сообщения (опционально)
- * @returns {Promise<boolean>} - true если обновили, false если сообщение старее
- */
-const setLastRead = async (chatId, newMessageId, oldMessageId = null) => {
-  if (!chatId || !newMessageId) return false
-  
-  try {
-    // Если нет старого сообщения, просто обновляем
-    if (!oldMessageId) {
-      await chatService.setLastReadMessage(chatId, newMessageId)
-      await fetchUnreadCount(chatId)
-      return true
-    }
+    /**
+   * Установить последнее прочитанное сообщение
+   * @param {string} chatId - ID чата
+   * @param {string} newMessageId - ID нового прочитанного сообщения
+   * @param {string} oldMessageId - ID старого последнего прочитанного сообщения (опционально)
+   * @returns {Promise<boolean>} - true если обновили, false если сообщение старее
+   */
+  const setLastRead = async (chatId, newMessageId, oldMessageId = null) => {
+    if (!chatId || !newMessageId) return false
     
-    // Находим индексы сообщений в текущем списке
-    const newIndex = messages.value.findIndex(m => m.id === newMessageId)
-    const oldIndex = messages.value.findIndex(m => m.id === oldMessageId)
-    
-    // Проверяем, является ли новое сообщение более новым
-    let shouldUpdate = false
-    
-    if (newIndex !== -1 && oldIndex !== -1) {
-      shouldUpdate = newIndex > oldIndex
-    }
-    else {
-      shouldUpdate = true
-    }
-    
-    // Если новое сообщение действительно новее, обновляем
-    if (shouldUpdate) {
-      await chatService.setLastReadMessage(chatId, newMessageId)
-      await fetchUnreadCount(chatId)
-      console.log(`✅ Last read updated from ${oldMessageId} to ${newMessageId}`)
-      return true
-    } else {
-      console.log(`⏭️ Skipping update: message ${newMessageId} is not newer than ${oldMessageId}`)
+    try {
+      // Если нет старого сообщения, просто обновляем
+      if (!oldMessageId) {
+        await chatService.setLastReadMessage(chatId, newMessageId)
+        await fetchUnreadCount(chatId)
+        return true
+      }
+      
+      // Находим индексы сообщений в текущем списке
+      const newIndex = messages.value.findIndex(m => m.id === newMessageId)
+      const oldIndex = messages.value.findIndex(m => m.id === oldMessageId)
+      
+      // Проверяем, является ли новое сообщение более новым
+      let shouldUpdate = false
+      
+      if (newIndex !== -1 && oldIndex !== -1) {
+        shouldUpdate = newIndex > oldIndex
+      }
+      else {
+        shouldUpdate = true
+      }
+      
+      // Если новое сообщение действительно новее, обновляем
+      if (shouldUpdate) {
+        await chatService.setLastReadMessage(chatId, newMessageId)
+        await fetchUnreadCount(chatId)
+        console.log(`✅ Last read updated from ${oldMessageId} to ${newMessageId}`)
+        return true
+      } else {
+        console.log(`⏭️ Skipping update: message ${newMessageId} is not newer than ${oldMessageId}`)
+        return false
+      }
+      
+    } catch (err) {
       return false
     }
-    
-  } catch (err) {
-    return false
   }
-}
 
   /**
    * Сбросить флаг hasNewer (когда пользователь доскроллил вниз)
    */
   const resetHasNewer = () => {
     hasNewer.value = true
+  }
+
+  const loadFirstPage = async (chatId, size = 20) => {
+    loadingNewer.value = true
+
+    try {
+      const response = await chatService.getFirstMessages(chatId, size)
+      const pageData = response.data?.chatMessagePage || response.data
+      const firstMessages = pageData?.content || []
+      
+      if (firstMessages.length > 0) {
+        messages.value = [...messages.value, ...firstMessages]
+        lastMessageId.value = messages.value[messages.value.length - 1]?.id
+        // Проверяем, есть ли еще более новые
+        hasNewer.value = await checkHasNewer(chatId, lastMessageId.value)
+      } else {
+        hasNewer.value = false
+      }
+      
+      return response
+    } catch (err) {
+      console.error('Ошибка загрузки новых сообщений:', err)
+      throw err
+    } finally {
+      loadingNewer.value = false
+    }
   }
 
   return {
@@ -332,6 +357,7 @@ const setLastRead = async (chatId, newMessageId, oldMessageId = null) => {
     addMessage,
     removeMessage,
     updateMessage,
-    resetHasNewer
+    resetHasNewer,
+    loadFirstPage
   }
 }
